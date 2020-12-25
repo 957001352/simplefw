@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.logistics.dao.LogisticsCheckHouseDao">
+    <insert id="insert" parameterType="com.fw.entity.logistics.LogisticsCheckHouse" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_logistics_check_house
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="houseNo != null  and houseNo != ''">house_no,</if>
+            <if test="createUser != null">create_user,</if>
+            <if test="checkUser != null">check_user,</if>
+            <if test="checkTime != null and checkTime != ''">check_time,</if>
+            <if test="checkHouseIds != null">check_house_ids,</if>
+            <if test="note != null and note != ''">note</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="houseNo != null  and houseNo != ''">#{houseNo},</if>
+            <if test="createUser != null">#{createUser},</if>
+            <if test="checkUser != null">#{checkUser},</if>
+            <if test="checkTime != null and checkTime != ''">#{checkTime},</if>
+            <if test="checkHouseIds != null">#{checkHouseIds},</if>
+            <if test="note != null and note != ''">#{note}</if>
+        </trim>
+    </insert>
+    <update id="update" parameterType="com.fw.entity.logistics.LogisticsCheckHouse">
+        update fw_logistics_check_house
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="status != null">status = #{status},</if>
+            <if test="executeTime != null  and executeTime != ''">execute_time = #{executeTime},</if>
+            <if test="executeUser != null  and executeUser != ''">execute_user = #{executeUser},</if>
+            <if test="note != null  and note != ''">note = #{note}</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <update id="updateStatus" parameterType="java.lang.Integer">
+        update fw_logistics_check_house set status = #{status} where id = #{id}
+    </update>
+    <delete id="delete" parameterType="java.util.List">
+        delete from fw_logistics_check_house where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+    <select id="selectById" parameterType="integer" resultType="com.fw.entity.logistics.LogisticsCheckHouse">
+        select * from fw_logistics_check_house where id = #{id}
+    </select>
+
+    <select id="findList" resultType="com.fw.entity.logistics.LogisticsCheckHouse">
+        select h.*,group_concat(l.name) check_house_names
+          from  (select t.*,(select if(count(*)>0,1,0)
+                               from fw_logistics_check_house_detail d
+                              where d.check_house_id=t.id
+                                and check_result=1) check_result
+                 from fw_logistics_check_house t) h
+          left join fw_logistics_storage_location l on find_in_set(l.id,h.check_house_ids)
+        where 1=1
+        <if test="houseNo != null  and houseNo != ''">
+            and h.house_no like concat('%/', #{houseNo}, '%') ESCAPE '/'
+        </if>
+        <if test="checkTime != null  and checkTime != ''">
+            and date_format(h.check_time,'%Y-%m-%d') =#{checkTime}
+        </if>
+        <if test="status != null">
+            and h.status=#{status}
+        </if>
+        <if test="checkResult != null">
+            and h.check_result=#{checkResult}
+        </if>
+        <if test="checkUser != null">
+            and h.check_user=#{checkUser}
+        </if>
+        group by h.id
+        order by h.create_time desc
+    </select>
+    <select id="findCode" resultType="java.lang.String">
+       select ifnull(concat(left(max(house_no),4),lpad(right(max(house_no),6)+1,6,0)),#{code})code from fw_logistics_check_house
+    </select>
+
+    <insert id="insertDetail" parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            insert into fw_logistics_check_house_detail
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="checkHouseId != null">check_house_id,</if>
+                <if test="item.productId != null">product_id,</if>
+                <if test="item.storageCount != null and item.storageCount != ''">storage_count,</if>
+                <if test="item.checkCount != null and item.checkCount != ''">check_count,</if>
+                <if test="item.checkResult != null">check_result,</if>
+                <if test="item.storageId != null">storage_id,</if>
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="checkHouseId != null">#{checkHouseId},</if>
+                <if test="item.productId != null">#{item.productId},</if>
+                <if test="item.storageCount != null and item.storageCount != ''">#{item.storageCount},</if>
+                <if test="item.checkCount != null and item.checkCount != ''">#{item.checkCount},</if>
+                <if test="item.checkResult != null">#{item.checkResult},</if>
+                <if test="item.storageId != null">#{item.storageId}</if>
+            </trim>
+        </foreach>
+    </insert>
+    <delete id="deleteDetail">
+        delete from fw_logistics_check_house_detail where check_house_id=#{checkHouseId}
+    </delete>
+    <select id="findDetailList" resultType="com.fw.entity.logistics.LogisticsCheckHouseDetail">
+        select d.*,p.code product_code,p.name product_name,l.code storage_code,l.name storage_name
+          from fw_logistics_check_house_detail d
+          left join fw_logistics_product p on d.product_id=p.id
+          left join fw_logistics_storage_location l on d.storage_id=l.id
+	     where check_house_id=#{checkHouseId}
+    </select>
+
+    <select id="findStoragePorductList" resultType="com.fw.entity.logistics.LogisticsCheckHouseDetail">
+        select d.product_id,p.code product_code,p.name product_name,l.id storage_id,
+               l.name storage_name,l.code storage_code,sum(storage_count) storage_count,c.name house_name
+          from fw_logistics_storage_detail d
+          left join fw_logistics_product p on d.product_id=p.id
+          left join fw_logistics_storage_location l on d.storage_id=l.id
+          left join fw_logistics_storage_house c on l.storage_house_id=c.id
+         where d.storage_id=#{locationId}
+           and d.storage_count>0
+        group by d.product_id,p.code,p.name,l.name
+    </select>
+
+</mapper>
+

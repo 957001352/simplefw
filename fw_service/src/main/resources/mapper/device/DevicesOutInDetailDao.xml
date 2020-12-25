@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.device.dao.DevicesOutInDetailDao">
+
+    <resultMap id="DevicesOutinDetailResultMap" type="com.fw.entity.device.DevicesOutinDetail">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="devicesSpareId" column="devices_spare_id" jdbcType="INTEGER"/>
+        <result property="useCount" column="use_count" jdbcType="INTEGER"/>
+        <result property="location" column="location" jdbcType="VARCHAR"/>
+        <result property="operate" column="operate" jdbcType="INTEGER"/>
+        <result property="outIn" column="out_in" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.fw.entity.device.DevicesOutinDetail" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_devices_outin_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null and id !=''">id,</if>
+            <if test="devicesSpareId != null and devicesSpareId !=''">devices_spare_id,</if>
+            <if test="useCount != null and useCount !=''">use_count,</if>
+            <if test="location != null and location !=''">location,</if>
+            <if test="operate != null">operate,</if>
+            <if test="outIn != null and outIn !=''">out_in</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null and id !=''">#{id},</if>
+            <if test="devicesSpareId != null and devicesSpareId !=''">#{devicesSpareId},</if>
+            <if test="useCount != null and useCount !=''">#{useCount},</if>
+            <if test="location != null and location !=''">#{location},</if>
+            <if test="operate != null">#{operate},</if>
+            <if test="outIn != null and outIn !=''">#{outIn}</if>
+        </trim>
+    </insert>
+
+    <select id="selectById" resultType="com.fw.entity.device.DevicesOutinDetail">
+        select id , devices_spare_id ,use_count ,location, operate ,out_in from fw_devices_outin_detail where id=#{id}
+    </select>
+
+    <select id="selectByOutin" resultMap="DevicesOutinDetailResultMap">
+        select * from fw_devices_outin_detail where out_in = #{outIn} and operate = #{operate}
+    </select>
+
+    <select id="findAll"  resultType="java.util.LinkedHashMap">
+
+        select
+            A.out_in_id as outInId,
+            A.out_in_no as outInNo,
+            A.order_no as orderNo,
+            DATE_FORMAT(A.create_time,'%Y-%m-%d %H:%i:%s') as createTime,
+            A.create_user as createUser,
+            A.note,
+            operate
+        FROM
+        (SELECT
+            sout.id as out_in_id,
+            sout.out_no AS out_in_no,
+            sout.order_no,
+            sout.create_time,
+            sout.create_user,
+            sout.note,
+            1 as operate
+        FROM
+
+            fw_devices_spare_out sout
+        UNION ALL
+        SELECT
+            sin.id as out_in_id,
+            sin.in_no AS out_in_no,
+            sin.order_no,
+            sin.create_time,
+            sin.create_user,
+            sin.note,
+            0 as operate
+        FROM
+            fw_devices_spare_in sin ) A
+        where 1=1
+        <if test="outOrInNo != null and outOrInNo != ''">
+            and A.out_in_no like "%"#{outOrInNo}"%"
+        </if>
+        <if test="operate != null and operate != ''">
+            and `operate`= #{operate}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            <![CDATA[ and create_time >= #{startTime}]]>
+        </if>
+        <if test="stopTime != null and stopTime != ''">
+            <![CDATA[ and create_time <= #{stopTime}]]>
+        </if>
+        order by outInId desc
+    </select>
+</mapper>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.logistics.dao.LogisticsUpHouseDetailDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.logistics.LogisticsUpHouseDetail">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="storage_detail_id" property="storageDetailId" jdbcType="INTEGER"/>
+        <result column="storage_count" property="storageCount" jdbcType="INTEGER"/>
+        <result column="product_date" property="productDate" jdbcType="TIMESTAMP"/>
+        <result column="batch" property="batch" jdbcType="VARCHAR"/>
+        <result column="storage_location_id" property="storageLocationId" jdbcType="INTEGER"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+        <result column="up_house_id" property="upHouseId" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,storage_detail_id, storage_count, product_date, batch, storage_location_id, note, up_house_id
+    </sql>
+
+    <insert id="batchInsert" parameterType="com.fw.entity.logistics.LogisticsUpHouseDetail">
+        insert into fw_logistics_up_house_detail
+        (storage_detail_id, storage_count, product_date, batch,storage_location_id,note,up_house_id)
+        values
+        <foreach collection="logisticsUpHouseDetail" item="logisticsUpHouseDetail" index="i" separator=",">
+            (
+            #{logisticsUpHouseDetail.storageDetailId},
+            #{logisticsUpHouseDetail.storageCount},
+            #{logisticsUpHouseDetail.productDate},
+            #{logisticsUpHouseDetail.batch},
+            #{logisticsUpHouseDetail.storageLocationId},
+            #{logisticsUpHouseDetail.note},
+            #{logisticsUpHouseDetail.upHouseId}
+            )
+        </foreach>
+    </insert>
+
+    <select id="findAllList" parameterType="com.fw.entity.logistics.LogisticsUpHouseDetail" resultMap="BaseResultMap">
+        SELECT * FROM(
+        SELECT
+        t1.id,
+        t1.storage_detail_id,
+        t1.storage_count,
+        t1.product_date,
+        t1.batch,
+        t1.storage_location_id,
+        t1.note,
+        t1.up_house_id,
+        t2.create_user,
+        t2.create_time,
+        t3.`code`,
+        t3.`name`as productName,
+        t4.`name` as storageName,
+        IFNULL('上架','') as type
+        FROM
+        fw_logistics_up_house_detail t1
+        LEFT JOIN fw_logistics_up_house t2 ON t1.up_house_id = t2.id
+        LEFT JOIN fw_logistics_storage_detail t5 on t1.storage_detail_id = t5.id
+        LEFT JOIN fw_logistics_product t3 ON t5.product_id = t3.id
+        LEFT JOIN fw_logistics_storage_location t4 ON t1.storage_location_id = t4.id
+        WHERE 1=1
+        <if test="code != null  and code != ''">
+            and t3.code like concat('%/', #{code}, '%') ESCAPE '/'
+        </if>
+        <if test="storageName != null  and storageName != ''">
+            and t4.code like concat('%/', #{storageName}, '%') ESCAPE '/'
+        </if>
+        <if test="startCreateTime != null  and startCreateTime != ''">
+            <![CDATA[ and t2.create_time >= #{startCreateTime} ]]>
+        </if>
+        <if test="endCreateTime != null  and endCreateTime != ''">
+            <![CDATA[ and t2.create_time <= #{endCreateTime} ]]>
+        </if>
+        ORDER BY
+        t1.id DESC LIMIT 999999999
+        )up
+        UNION ALL
+        SELECT * FROM (
+        SELECT
+        t1.id,
+        t1.storage_detail_id,
+        t1.storage_count,
+        t1.product_date,
+        t1.batch,
+        t1.storage_location_id,
+        t1.note,
+        t1.down_house_id,
+        t2.create_user,
+        t2.create_time,
+        t3.`code`,
+        t3.`name` as productName,
+        t4.`name` as storageName,
+        IFNULL('下架','') as type
+        FROM
+        fw_logistics_down_house_detail t1
+        LEFT JOIN fw_logistics_down_house t2 ON t1.down_house_id = t2.id
+        LEFT JOIN fw_logistics_storage_detail t5 on t1.storage_detail_id = t5.id
+        LEFT JOIN fw_logistics_product t3 ON t5.product_id = t3.id
+        LEFT JOIN fw_logistics_storage_location t4 ON t1.storage_location_id = t4.id
+        WHERE 1=1
+        <if test="code != null  and code != ''">
+            and t3.code like concat('%/', #{code}, '%') ESCAPE '/'
+        </if>
+        <if test="storageName != null  and storageName != ''">
+            and t4.code like concat('%/', #{storageName}, '%') ESCAPE '/'
+        </if>
+        <if test="startCreateTime != null  and startCreateTime != ''">
+            <![CDATA[ and t2.create_time >= #{startCreateTime} ]]>
+        </if>
+        <if test="endCreateTime != null  and endCreateTime != ''">
+            <![CDATA[ and t2.create_time <= #{endCreateTime} ]]>
+        </if>
+        ORDER BY
+        t1.id DESC LIMIT 999999999
+        )down
+    </select>
+
+</mapper>

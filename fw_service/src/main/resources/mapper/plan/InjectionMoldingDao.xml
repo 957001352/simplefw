@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.plan.dao.InjectionMoldingDao">
+    <insert id="insert" parameterType="com.fw.entity.plan.InjectionMolding" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_plan_injection_molding
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="productId != null">product_id,</if>
+            <if test="customerId != null">customer_id,</if>
+            <if test="planCount != null">plan_count,</if>
+            <if test="productDevicesId != null">product_devices_id,</if>
+            <if test="mouldId != null">mould_id,</if>
+            <if test="startTime != null and startTime != ''">start_time,</if>
+            <if test="priority != null">priority, </if>
+            <if test="productCode != null and productCode != ''">product_code,</if>
+            <if test="material != null and material != ''">material,</if>
+            <if test="productTime != null">product_time,</if>
+            <if test="deliverTime != null and deliverTime != ''">deliver_time,</if>
+            <if test="note != null and note != ''">note,</if>
+            <if test="status != null">status,</if>
+            <if test="updateUser != null">update_user,</if>
+
+            <if test="actualStart != null and actualStart != ''">actual_start,</if>
+            <if test="actualEnd != null and actualEnd != ''">actual_end,</if>
+            <if test="productDeviceCode != null and productDeviceCode != ''">product_device_code,</if>
+            <if test="createUser != null">create_user,</if>
+            <if test="createTime != null and createTime != ''">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="productId != null">#{productId},</if>
+            <if test="customerId != null">#{customerId},</if>
+            <if test="planCount != null">#{planCount},</if>
+            <if test="productDevicesId != null">#{productDevicesId},</if>
+            <if test="mouldId != null">#{mouldId},</if>
+            <if test="startTime != null and startTime != ''">#{startTime},</if>
+            <if test="priority != null">#{priority}, </if>
+            <if test="productCode != null and productCode != ''">#{productCode},</if>
+            <if test="material != null and material != ''">#{material},</if>
+            <if test="productTime != null">#{productTime},</if>
+            <if test="deliverTime != null and deliverTime != ''">#{deliverTime},</if>
+            <if test="note != null and note != ''">#{note},</if>
+            <if test="status != null">#{status},</if>
+            <if test="updateUser != null">#{updateUser},</if>
+
+            <if test="actualStart != null and actualStart != ''">#{actualStart},</if>
+            <if test="actualEnd != null and actualEnd != ''">#{actualEnd},</if>
+            <if test="productDeviceCode != null and productDeviceCode != ''">#{productDeviceCode},</if>
+            <if test="createUser != null">#{createUser},</if>
+            <if test="createTime != null and createTime != ''">#{createTime},</if>
+        </trim>
+    </insert>
+    <update id="update">
+        update fw_plan_injection_molding
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productId != null">product_id= #{productId},</if>
+            <if test="customerId != null">customer_id= #{customerId},</if>
+            <if test="planCount != null">plan_count= #{planCount},</if>
+            <if test="productDevicesId != null">product_devices_id= #{productDevicesId},</if>
+            <if test="productCount != null and productCount != ''">product_count= #{productCount},</if>
+            <if test="mouldId != null">mould_id= #{mouldId},</if>
+            <if test="startTime != null and startTime != ''">start_time= #{startTime},</if>
+            <if test="priority != null">priority= #{priority}, </if>
+            <if test="productCode != null and productCode != ''">product_code= #{productCode},</if>
+            <if test="material != null and material != ''">material= #{material},</if>
+            <if test="productTime != null">product_time = #{productTime},</if>
+            <if test="deliverTime != null and deliverTime != ''">deliver_time= #{deliverTime},</if>
+            <if test="note != null and note != ''">note= #{note},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateUser != null">update_user= #{updateUser},</if>
+            <if test="updateTime != null and updateTime != ''">update_time= #{updateTime},</if>
+
+            <if test="actualStart != null and actualStart != ''">actual_start = #{actualStart},</if>
+            <if test="actualEnd != null and actualEnd != ''">actual_end = #{actualEnd},</if>
+            <if test="productDeviceCode != null and productDeviceCode != ''">product_device_code = #{productDeviceCode},</if>
+            <if test="createUser != null">create_user = #{createUser},</if>
+            <if test="createTime != null and createTime != ''">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="stop">
+        update fw_plan_injection_molding set status = #{status} where id = #{id}
+    </update>
+
+    <update id="cancel">
+        update fw_plan_injection_molding set status = #{status} where id = #{id}
+    </update>
+    <update id="updateList">
+        <foreach collection="injm" item="im" separator=";">
+            update fw_plan_injection_molding
+            set start_time = #{im.startTime} where id = #{im.id}
+        </foreach>
+    </update>
+    <update id="updateStatus" parameterType="com.fw.entity.plan.InjectionMolding">
+        update fw_plan_injection_molding
+        <trim prefix="SET" suffixOverrides=",">
+           <if test="status != null">status= #{status},</if>
+            <if test="actualStart != null  and actualStart != ''">actual_start= #{actualStart},</if>
+            <if test="actualEnd != null  and actualEnd != '' ">actual_end= #{actualEnd}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="selectById" parameterType="integer" resultType="com.fw.entity.plan.InjectionMolding">
+        select * from fw_plan_injection_molding where id = #{id}
+    </select>
+
+
+    <select id="findList" resultType="com.fw.entity.plan.InjectionMolding">
+        select p.*,l.code parts_code,l.name parts_name,l.unit,c.name customer_name,
+              (select sum(stop_time) from fw_plan_injection_stop_list where injection_id=p.id) stop_time,
+              date_add(start_time,INTERVAL product_time MINUTE) end_time
+          from   fw_plan_injection_molding p
+          left join fw_logistics_product l on p.product_id=l.id
+          left join fw_plan_customer c on p.customer_id=c.id
+        where 1=1
+        <if test="productDevicesId != null  and productDevicesId != ''">
+            and p.product_devices_id like concat('%/', #{productDevicesId}, '%') ESCAPE '/'
+        </if>
+        <if test="productCode != null  and productCode != ''">
+            and p.product_code like concat('%/', #{productCode}, '%') ESCAPE '/'
+        </if>
+        <if test="partsCode != null  and partsCode != ''">
+            and l.code like concat('%/', #{partsCode}, '%') ESCAPE '/'
+        </if>
+        <if test="startTime != null  and startTime != ''">
+            and date_format(p.start_time,'%Y-%m-%d') &gt;=#{startTime}
+        </if>
+        <if test="endTime != null  and endTime != ''">
+            and date_format(p.start_time,'%Y-%m-%d') &lt;=#{endTime}
+        </if>
+        <if test="status == null">
+            and p.status in (0,1,2,3)
+        </if>
+        <if test="status != null">
+            and p.status in (${status})
+        </if>
+        order by p.start_time asc
+    </select>
+    <insert id="insertStopList" parameterType="com.fw.entity.plan.InjectionStopList">
+        insert into fw_plan_injection_stop_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="injectionId != null">injection_id,</if>
+            <if test="stopTime != null">stop_time,</if>
+            <if test="stopReason != null">stop_reason,</if>
+            <if test="createUser != null">create_user</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="injectionId != null">#{injectionId},</if>
+            <if test="stopTime != null">#{stopTime},</if>
+            <if test="stopReason != null">#{stopReason},</if>
+            <if test="createUser != null">#{createUser}</if>
+        </trim>
+    </insert>
+    <select id="findAllStopTime" resultType="java.lang.Double">
+          select sum(stop_time) from fw_plan_injection_stop_list where injection_id=#{injectionId}
+    </select>
+    <select id="findByMouldId" resultType="com.fw.entity.plan.InjectionMolding">
+        select *
+        from fw_plan_injection_molding
+        where mould_id = #{mouldId} and status in (0,1,2)
+        order by start_time desc limit 0,1
+    </select>
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.plan.InjectionMolding">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="product_id" property="productId" jdbcType="INTEGER"/>
+        <result column="customer_id" property="customerId" jdbcType="INTEGER"/>
+        <result column="plan_count" property="planCount"/>
+        <result column="product_count" property="productCount" jdbcType="VARCHAR"/>
+        <result column="product_devices_id" property="productDevicesId" jdbcType="INTEGER"/>
+        <result column="mould_id" property="mouldId" jdbcType="INTEGER"/>
+        <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+        <result column="priority" property="priority" jdbcType="INTEGER"/>
+        <result column="product_code" property="productCode" jdbcType="VARCHAR"/>
+        <result column="material" property="material" jdbcType="VARCHAR"/>
+        <result column="product_time" property="productTime"/>
+        <result column="deliver_time" property="deliverTime" jdbcType="TIMESTAMP"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+
+        <result column="update_user" property="updateUser" jdbcType="INTEGER"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+
+        <result column="actual_start" property="actualStart" jdbcType="TIMESTAMP"/>
+        <result column="actual_end" property="actualEnd" jdbcType="TIMESTAMP"/>
+        <result column="product_device_code" property="productDeviceCode" jdbcType="VARCHAR"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+
+        <result column="cavity" property="cavity" jdbcType="VARCHAR"/>
+        <association property="craftMode" column="product_id" select="com.fw.service.craft.dao.CraftModelDao.findByProductId"/>
+    </resultMap>
+    <select id="findByDeviceId" resultMap="BaseResultMap">
+        select fpim.*,fmd.cavity
+        from fw_plan_injection_molding fpim
+        left join fw_mould_devices fmd on fpim.mould_id = fmd.id
+        where fpim.product_devices_id = #{deviceId} and fpim.status in (0,1,2)
+        order by fpim.start_time desc limit 0,1
+    </select>
+    <select id="findByTime" resultType="com.fw.entity.plan.InjectionMolding">
+        select p.*,(select sum(stop_time)*60 from fw_plan_injection_stop_list where injection_id=p.id) stop_time
+        from fw_plan_injection_molding p
+        where p.start_time &gt;= #{startTime}
+        <if test="endTime != null and endTime != ''">
+            and p.start_time &lt;= #{endTime}
+        </if>
+        and product_devices_id = #{productDeviceId}
+        and p.status in (0,2)
+        order by p.start_time
+    </select>
+
+    <select id="findById" resultMap="BaseResultMap">
+        select fpim.*,fmd.cavity
+        from fw_plan_injection_molding fpim
+        left join fw_mould_devices fmd on fpim.mould_id = fmd.id
+        where fpim.id = #{id}
+    </select>
+
+    <select id="findIngByDeviceId" resultMap="BaseResultMap">
+        select fpim.*,fmd.cavity,flp.code parts_code,flp.name parts_name,flp.unit
+        from fw_plan_injection_molding fpim
+        left join fw_mould_devices fmd on fpim.mould_id = fmd.id
+        left join fw_logistics_product flp on fpim.product_id = flp.id
+       where fpim.product_devices_id = #{deviceId} and fpim.status=1
+       order by fpim.start_time desc limit 0,1
+    </select>
+    <select id="findLatestByDeviceId" resultMap="BaseResultMap">
+        select fpim.*,fmd.cavity,flp.code parts_code,flp.name parts_name,flp.unit
+        from fw_plan_injection_molding fpim
+        left join fw_mould_devices fmd on fpim.mould_id = fmd.id
+        left join fw_logistics_product flp on fpim.product_id = flp.id
+       where fpim.product_devices_id = #{deviceId} and fpim.status in(0,1,2)
+       order by fpim.start_time desc limit 0,1
+    </select>
+    <select id="findMouldDevices" resultType="com.fw.entity.plan.InjectionMolding">
+          SELECT
+              t2.id AS mouldId,
+              t2.NAME AS mouldName,
+              t2.CODE AS mouldCode ,
+              t4.create_time,
+              t4.create_user
+          FROM
+              fw_plan_injection_molding t1
+              LEFT JOIN fw_mould_devices t2 ON t1.mould_id = t2.id
+              LEFT JOIN (SELECT  max(id) id,mould_devices_id  from  fw_mould_use_record mould_devices_id   GROUP BY mould_devices_id ) t3  on t3.mould_devices_id = t2.id
+              LEFT JOIN fw_mould_use_record t4 on t4.id = t3.id and t4.opreate = 0 and t4.task_status = 1
+          WHERE
+              t1.product_code = #{productCode}
+    </select>
+    <select id="findStartOneDay" resultType="com.fw.entity.plan.InjectionMolding">
+        SELECT fpim.*,CASE
+                        WHEN EXISTS (
+                        SELECT 1
+                        FROM fw_mould_house fmh
+                        WHERE fmh.injection_molding_id = fpim.id
+                        ) THEN 'true'
+                        ELSE 'false'
+                    END AS checked
+        FROM fw_plan_injection_molding fpim
+        WHERE TIMESTAMPDIFF(MINUTE,NOW(),fpim.start_time) &lt;= 24*60 and fpim.status in (0);
+    </select>
+</mapper>
+

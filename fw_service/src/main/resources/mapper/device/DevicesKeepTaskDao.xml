@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.device.dao.DevicesKeepTaskDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.device.DevicesKeepTask">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="execute_time" property="executeTime" jdbcType="TIMESTAMP"/>
+        <result column="execute_user" property="executeUser" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="VARCHAR"/>
+        <result column="conclusion" property="conclusion" jdbcType="VARCHAR"/>
+        <result column="keep_plan_id" property="keepPlanId" jdbcType="INTEGER"/>
+        <result column="non_execution" property="nonExecution" jdbcType="VARCHAR"/>
+        <result column="non_execut_cause" property="nonExecutCause" jdbcType="VARCHAR"/>
+        <result column="keep_order" property="keepOrder" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="carry_day" property="carryDay" jdbcType="VARCHAR"/>
+        <result column="form_code" property="formCode" jdbcType="VARCHAR"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+        <result column="end_time" property="endTime" jdbcType="TIMESTAMP"/>
+        <result column="delay_user" property="delayUser" jdbcType="VARCHAR"/>
+        <result column="delay_time" property="delayTime" jdbcType="TIMESTAMP"/>
+        <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+        <result column="keep_photo" property="keepPhoto" jdbcType="VARCHAR"/>
+        <result column="keep_time" property="keepTime" jdbcType="TIMESTAMP"/>
+        <result column="devices_id" property="devicesId" jdbcType="VARCHAR"/>
+        <collection property="devicesKeepItem" column="id" select="getDevicesTask"/>
+        <collection property="planExecuteRecords" column="id" select="getExecuteRecord"/>
+    </resultMap>
+
+    <resultMap id="BaseKeepItemMap" type="com.fw.entity.device.DevicesKeepItem">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="devices_classify" property="devicesClassify" jdbcType="VARCHAR"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <collection property="lists" column="id" select="findKeepItemById"/>
+    </resultMap>
+
+    <resultMap id="BaseExecuteRecord" type="com.fw.entity.device.DevicesPlanExecuteRecord">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="keep_task_id" property="keepTaskId" jdbcType="INTEGER"/>
+        <result column="keep_item_id" property="keepItemId" jdbcType="INTEGER"/>
+        <result column="keep_item_result" property="keepItemResult" jdbcType="INTEGER"/>
+        <result column="reason" property="reason" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <select id="findKeepItemById" parameterType="integer" resultType="com.fw.entity.device.KeepItemExtension">
+        select id,keep_item_id, columns, rows,deleted
+        from fw_keep_item_extension where keep_item_id = #{id}
+    </select>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,create_time,execute_time, execute_user, status, conclusion, keep_plan_id,
+        non_execution, non_execut_cause, keep_order,carry_day,form_code,note,end_time,
+        delay_user,delay_time,start_time,keep_photo,keep_time,devices_id
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.device.DevicesKeepTask" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_devices_keep_task
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="executeTime != null  and executeTime != ''">execute_time,</if>
+            <if test="executeUser != null and executeUser != ''">execute_user,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="conclusion != null and conclusion != ''">conclusion,</if>
+            <if test="keepPlanId != null and keepPlanId != ''">keep_plan_id,</if>
+            <if test="nonExecution != null  and nonExecution != ''">non_execution,</if>
+            <if test="nonExecutCause != null and nonExecutCause != ''">non_execut_cause,</if>
+            <if test="keepOrder != null  and keepOrder != ''">keep_order,</if>
+            <if test="carryDay != null  and carryDay != ''">carry_day,</if>
+            <if test="formCode != null  and formCode != ''">form_code,</if>
+            <if test="note != null  and note != ''">note,</if>
+            <if test="endTime != null  and endTime != ''">end_time,</if>
+            <if test="delayUser != null  and delayUser != ''">delay_user,</if>
+            <if test="delayTime != null  and delayTime != ''">delay_time,</if>
+            <if test="startTime != null  and startTime != ''">start_time,</if>
+            <if test="keepPhoto != null  and keepPhoto != ''">keep_photo,</if>
+            <if test="keepTime != null  and keepTime != ''">keep_time,</if>
+            <if test="devicesId != null  and devicesId != ''">devices_id</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="executeTime != null  and executeTime != ''">#{executeTime},</if>
+            <if test="executeUser != null and executeUser != '' ">#{executeUser},</if>
+            <if test="status != null and status != '' ">#{status},</if>
+            <if test="conclusion != null and conclusion != ''">#{conclusion},</if>
+            <if test="keepPlanId != null and keepPlanId != ''">#{keepPlanId},</if>
+            <if test="nonExecution != null  and nonExecution != ''">#{nonExecution},</if>
+            <if test="nonExecutCause != null and nonExecutCause != '' ">#{nonExecutCause},</if>
+            <if test="keepOrder != null  and keepOrder != ''">#{keepOrder},</if>
+            <if test="carryDay != null  and carryDay != ''">#{carryDay},</if>
+            <if test="formCode != null  and formCode != ''">#{formCode},</if>
+            <if test="note != null  and note != ''">#{note},</if>
+            <if test="endTime != null  and endTime != ''">#{endTime},</if>
+            <if test="delayUser != null  and delayUser != ''">#{delayUser},</if>
+            <if test="delayTime != null  and delayTime != ''">#{delayTime},</if>
+            <if test="startTime != null  and startTime != ''">#{startTime},</if>
+            <if test="keepPhoto != null  and keepPhoto != ''">#{keepPhoto},</if>
+            <if test="keepTime != null  and keepTime != ''">#{keepTime},</if>
+            <if test="devicesId != null  and devicesId != ''">#{devicesId}</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.device.DevicesKeepTask">
+        update fw_devices_keep_task
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="status != null ">status = #{status},</if>
+            <if test="carryDay != null ">carry_day = #{carryDay},</if>
+            <if test="nonExecution != null  and nonExecution != ''">non_execution = #{nonExecution},</if>
+            <if test="note != null  and note != ''">note = #{note},</if>
+            <if test="endTime != null  and endTime != ''">end_time = #{endTime},</if>
+            <if test="formCode != null  and formCode != ''">form_code = #{formCode},</if>
+            <if test="delayUser != null  and delayUser != ''">delay_user = #{delayUser},</if>
+            <if test="delayTime != null  and delayTime != ''">delay_time = #{delayTime},</if>
+            <if test="nonExecutCause != null ">non_execut_cause = #{nonExecutCause},</if>
+            <if test="executeUser != null ">execute_user = #{executeUser},</if>
+            <if test="executeTime != null and executeTime !=''">execute_time = #{executeTime},</if>
+            <if test="startTime != null and startTime !=''">start_time = #{startTime},</if>
+            <if test="keepPhoto != null and keepPhoto !=''">keep_photo = #{keepPhoto},</if>
+            <if test="keepTime != null and keepTime !=''">keep_time = #{keepTime},</if>
+            <if test="devicesId != null and devicesId !=''">devices_id = #{devicesId}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="findList" parameterType="com.fw.entity.device.DevicesKeepTask" resultMap="BaseResultMap">
+        SELECT
+        t1.*,
+        t2.product_devices_ids productDevicesIds,
+        t3.NAME keepTeamName,
+        t4.audit_result,
+        t4.audit_status,
+        t11.audit_idea,
+        t11.audit_user,
+        t6.path
+        FROM
+        fw_devices_keep_task t1
+        LEFT JOIN fw_devices_keep_plan t2 ON t1.keep_plan_id = t2.id
+        LEFT JOIN fw_devices_keep_team t3 ON t2.keep_team_id = t3.id
+        LEFT JOIN fw_jbpm_execution t4 ON t4.data_id = t1.id
+        AND t4.form_code = t1.form_code
+        LEFT JOIN ( SELECT max( t7.id ) id, t7.execution_id FROM fw_jbpm_hist_task t7 GROUP BY t7.execution_id ) t9 ON t4.id = t9.execution_id
+        LEFT JOIN fw_jbpm_hist_task t11 ON t11.id = t9.id
+        LEFT JOIN fw_basic_attachment t6 ON t1.keep_photo = t6.data_id
+        WHERE
+        1 = 1
+        <if test="keepOrder != null  and keepOrder != ''">
+            and t1.keep_order like concat('%/', #{keepOrder}, '%') ESCAPE '/'
+        </if>
+        <if test="productDevicesIds != null">
+            and
+            <foreach collection="productDevicesIds" open="(" separator="or " close=")" item="item">
+                find_in_set(#{item},t1.devices_id)
+            </foreach>
+        </if>
+        <if test="taskStatus != null ">
+            and find_in_set (t1.status,#{taskStatus})
+        </if>
+        <if test="auditStatus != null ">
+            and t4.audit_result = #{auditStatus}
+        </if>
+        and IF(t1.status = 2,  t4.audit_result != 1,  (t4.audit_result in (0,1,2) or t4.audit_result is null) )
+        order by
+        t1.id desc
+    </select>
+
+    <update id="batchUpdate" parameterType="com.fw.entity.device.DevicesKeepTask">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update fw_devices_keep_task
+            <set>
+                non_execut_cause = #{item.nonExecutCause}
+            </set>
+            where id = #{item.id}
+        </foreach>
+    </update>
+
+    <select id="selectById" parameterType="integer" resultType="com.fw.entity.device.DevicesKeepTask">
+        select t1.*,t2.audit_result as auditResult,t2.id as executionId,
+        t4.product_devices_ids as productDevicesIds,t5.`name` as keepTeamName
+        from fw_devices_keep_task t1
+        left join fw_jbpm_execution t2 on t2.data_id = t1.id and t2.form_code = t1.form_code
+        left join fw_devices_keep_plan t4 on t1.keep_plan_id = t4.id
+		left join fw_devices_keep_team t5 on t4.keep_team_id = t5.id
+        where t1.id = #{id}
+    </select>
+
+    <select id="findHistoryList" parameterType="com.fw.entity.device.DevicesKeepTask" resultMap="BaseResultMap">
+        SELECT
+        t1.*,
+        t2.product_devices_ids productDevicesIds,
+        t3.NAME keepTeamName,
+        t4.audit_status,
+        t4.audit_result,
+        t11.audit_idea,
+        t11.audit_user,
+        t4.id AS executionId
+        FROM
+        fw_devices_keep_task t1
+        LEFT JOIN fw_devices_keep_plan t2 ON t1.keep_plan_id = t2.id
+        LEFT JOIN fw_devices_keep_team t3 ON t2.keep_team_id = t3.id
+        LEFT JOIN fw_jbpm_execution t4 ON t4.data_id = t1.id
+        AND t4.form_code = t1.form_code
+        LEFT JOIN ( SELECT max( t7.id ) id, t7.execution_id FROM fw_jbpm_hist_task t7 GROUP BY t7.execution_id ) t9 ON t4.id = t9.execution_id
+        LEFT JOIN fw_jbpm_hist_task t11 ON t11.id = t9.id
+        WHERE
+        1 = 1
+        <if test="keepOrder != null  and keepOrder != ''">
+            and t1.keep_order like concat('%/', #{keepOrder}, '%') ESCAPE '/'
+        </if>
+        <if test="productDevicesIds != null">
+            and
+            <foreach collection="productDevicesIds" open="(" separator="or " close=")" item="item">
+                find_in_set(#{item},t1.devices_id)
+            </foreach>
+        </if>
+        <if test="userIds != null ">
+            and
+            <foreach collection="userIds" open="(" separator="or " close=")" item="item">
+                find_in_set(#{item},t1.execute_user)
+            </foreach>
+        </if>
+        <if test="executeTime != null and executeTime != '' ">
+            and date_format(t1.execute_time,'%Y-%m-%d') = date_format(#{executeTime},'%Y-%m-%d')
+        </if>
+        <if test="taskStatus != null ">
+            and find_in_set (t1.status,#{taskStatus})
+        </if>
+        and (t4.audit_result =1 or t4.audit_result is null)
+        order by
+        t1.id desc
+    </select>
+
+    <select id="getDevicesTask" parameterType="integer" resultMap="BaseKeepItemMap">
+        SELECT
+            t3.id,
+            t3.create_time,
+            t3.NAME,
+            t3.devices_classify,
+            t3.content,
+            t3.deleted,
+            t3.instructor,
+            t4.path AS webPath,
+            t4.NAME AS fileName,
+            t4.suffix
+        FROM
+            fw_devices_keep_item t3
+            LEFT JOIN fw_basic_attachment t4 ON t3.instructor = t4.data_id
+        WHERE
+            FIND_IN_SET(t3.id,
+           (SELECT team.keep_item_ids  FROM fw_devices_keep_team team
+        WHERE id = ( SELECT t2.keep_team_id FROM fw_devices_keep_task t1 LEFT JOIN fw_devices_keep_plan t2 ON t1.keep_plan_id = t2.id WHERE t1.id = #{id} )))
+        AND t3.deleted = 0
+    </select>
+
+    <select id="getExecuteRecord" parameterType="integer" resultMap="BaseExecuteRecord">
+       select id,keep_task_id,keep_item_id, keep_item_result, reason
+       from fw_devices_plan_execute_record
+       where keep_task_id = #{id}
+    </select>
+
+    <select id="getUnfinishedTask" parameterType="integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from fw_devices_keep_task where id = #{id}
+    </select>
+
+    <select id="isKeepOrder" parameterType="string" resultType="Integer">
+        select count(0) from fw_devices_keep_task where keep_order = #{order}
+    </select>
+
+    <select id="getKeepTask" parameterType="integer" resultType="com.fw.entity.device.DevicesKeepTask">
+        select
+        t1.*,
+        t2.audit_result as auditResult,
+        t2.id as executionId
+        from
+        fw_devices_keep_task t1
+        left join fw_jbpm_execution t2 on t2.data_id = t1.id
+        and t2.form_code = t1.form_code
+        where
+        t1.id = #{id}
+    </select>
+
+    <select id="isExistPlan" resultType="java.lang.Integer">
+        select count(*) from fw_devices_keep_task
+        <if test="list!= null">
+            where keep_plan_id in
+            <foreach collection="list" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="findByNearNow" resultType="com.fw.entity.device.DevicesKeepTask">
+        select fmkt.* from `fw_devices_keep_task` fmkt
+        left join `fw_devices_keep_plan` fmkp on fmkp.id = fmkt.`keep_plan_id`
+        where CONCAT(',',product_devices_ids,',') LIKE CONCAT('%',#{productDeviceId},'%')
+        and fmkp.`status` = 1 and fmkt.`status` = 4 and end_time &lt;= #{nowTime}
+        order by fmkt.`end_time` desc
+        limit 0,1
+    </select>
+
+    <select id="findCode" resultType="java.lang.String">
+        select ifnull(concat(left(max(keep_order),4),lpad(right(max(keep_order),6)+1,6,0)),#{code})keep_order from fw_devices_keep_task
+    </select>
+
+</mapper>

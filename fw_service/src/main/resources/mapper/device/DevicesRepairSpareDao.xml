@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.device.dao.DevicesRepairSpareDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.device.DevicesRepairSpare">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="devices_repair_id" property="devicesRepairId" jdbcType="INTEGER"/>
+        <result column="repair_plan" property="repairPlan" jdbcType="INTEGER"/>
+        <result column="use_count" property="useCount" jdbcType="INTEGER"/>
+        <result column="devices_spare_id" property="devicesSpareId" jdbcType="INTEGER"/>
+        <result column="devicesSpareName" property="devicesSpareName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,devices_repair_id,repair_plan,use_count,devices_spare_id
+    </sql>
+
+    <insert id="insert" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_devices_repair_spare
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="devicesRepairId != null">devices_repair_id,</if>
+            <if test="repairPlan != null">repair_plan,</if>
+            <if test="useCount != null">use_count,</if>
+            <if test="devicesSpareId != null">devices_spare_id,</if>
+        </trim>
+        values
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="devicesRepairId != null">#{devicesRepairId},</if>
+                <if test="repairPlan != null ">#{repairPlan},</if>
+                <if test="useCount != null">#{useCount},</if>
+                <if test="devicesSpareId != null">#{devicesSpareId}</if>
+            </trim>
+    </insert>
+
+    <insert id="insertAll" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_devices_repair_spare
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            devices_repair_id,repair_plan,use_count,devices_spare_id
+        </trim>
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                #{item.devicesRepairId},#{item.repairPlan},#{item.useCount},#{item.devicesSpareId}
+            </trim>
+        </foreach>
+
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.device.DevicesRepairSpare" >
+        update fw_devices_repair_spare
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="repairPlan != null">repair_plan = #{repairPlan},</if>
+            <if test="useCount != null">use_count = #{useCount},</if>
+        </trim>
+        where devices_repair_id = #{devicesRepairId} and devices_spare_id = #{devicesSpareId}
+    </update>
+
+    <select id="findReparSpare" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List"></include>
+        from fw_devices_repair_spare
+        where devices_repair_id = #{devicesRepairId} and devices_spare_id = #{devicesSpareId}
+    </select>
+
+    <select id="findReparSpareList" resultMap="BaseResultMap">
+        select
+            t1.id,t1.devices_repair_id,t1.repair_plan,t1.use_count,t1.devices_spare_id,t2.name as devicesSpareName
+        from fw_devices_repair_spare t1 left join fw_product_devices_spare t2 on t1.devices_spare_id = t2.id
+        where t1.devices_repair_id = #{devicesRepairId}
+    </select>
+
+    <delete id="delete" parameterType="java.lang.Integer">
+        delete from fw_devices_repair_spare where devices_repair_id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="deleteByDevicesId" parameterType="java.lang.Integer">
+        delete from fw_devices_repair_spare where devices_repair_id = #{devicesRepairId}
+    </delete>
+
+    <!-- 根据维修设备编码查询备品备件的库存情况及使用情况 -->
+  <!--  <select id="findSpareStoreAndUse" resultType="java.util.LinkedHashMap" parameterType="java.lang.String">
+        SELECT
+            repair.code as repairCode,
+            repair.product_devices_id as devicesCode,
+            spare.devices_spare_id AS devicesSpareId,
+            storeSpare.code,
+            storeSpare.name,
+            storeSpare.store_count as storeCount,
+            spare.use_count as useCount
+        FROM
+	        fw_devices_repair repair
+	    LEFT JOIN fw_devices_repair_spare spare ON repair.id = spare.devices_repair_id
+	    LEFT JOIN fw_product_devices_spare storeSpare on spare.devices_spare_id = storeSpare.id
+	    where 1=1
+	    <if test="code != null and code != ''"> and repair.code like concat('%/', #{code}, '%') ESCAPE '/'</if>
+    </select>-->
+
+    <resultMap id="selectDevicesRepairResult" type="com.fw.entity.device.DevicesRepair">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <collection property="listSpare" column="id" select="selectDeviceSpareInfo" />
+    </resultMap>
+
+    <!-- 根据维修设备编码查询备品备件的库存情况及使用情况 -->
+    <select id="findSpareStoreAndUse" resultMap="selectDevicesRepairResult" parameterType="java.lang.String">
+        SELECT
+        repair.id,
+        repair.code as code,
+        repair.product_devices_id as productDevicesId
+        FROM
+        fw_devices_repair repair
+        where 1=1 and task_received = 1
+        <if test="code != null and code != ''"> and repair.code like concat('%/', #{code}, '%') ESCAPE '/'</if>
+    </select>
+
+    <select id="selectDeviceSpareInfo" resultType="com.fw.entity.device.DevicesRepairSpare">
+        SELECT
+            t1.use_count useCount,
+            t1.devices_repair_id devicesRepairId,
+            t1.devices_spare_id devicesSpareId,
+            t2.code devicesSpareCode,
+            t2.name devicesSpareName,
+            t2.store_count devicesSpareStoreCount
+        FROM
+         fw_devices_repair_spare t1
+        JOIN fw_product_devices_spare t2 on t1.devices_spare_id = t2.id
+        where t1.devices_repair_id = #{id}
+    </select>
+
+</mapper>
+

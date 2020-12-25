@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.quality.dao.QualityFirstendCheckDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.quality.QualityFirstendCheck">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="check_no" property="checkNo" jdbcType="VARCHAR"/>
+        <result column="product_devices_id" property="productDevicesId" jdbcType="INTEGER" />
+        <result column="mould_no" property="mouldNo" jdbcType="VARCHAR" />
+        <result column="product_code" property="productCode" jdbcType="VARCHAR" />
+        <result column="product_id" property="productId" jdbcType="INTEGER"/>
+        <result column="materialName" property="materialName" jdbcType="VARCHAR"/>
+        <result column="materialCode" property="materialCode" jdbcType="VARCHAR"/>
+        <result column="checkClassify" property="checkClassify" jdbcType="VARCHAR"/>
+        <result column="auditResult" property="auditResult" jdbcType="INTEGER"/>
+        <result column="check_type" property="checkType" jdbcType="INTEGER"/>
+        <result column="non_execution" property="nonExecution" jdbcType="VARCHAR"/>
+        <result column="non_execut_cause" property="nonExecutCause" jdbcType="VARCHAR"/>
+        <result column="carry_day" property="carryDay" jdbcType="INTEGER"/>
+        <result column="is_out" property="isOut" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER" />
+        <result column="check_time" property="checkTime" jdbcType="TIMESTAMP"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="endTime" property="endTime" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        create_time,
+        check_no, product_devices_id, product_code, product_id,
+        check_type, non_execution, non_execut_cause, carry_day, is_out, status, check_time,create_user,mould_no
+    </sql>
+
+
+   <!--classify:0 来料 1首末检/巡检 2入库 3出库-->
+    <select id="findList" resultMap="BaseResultMap">
+        select
+            t1.*,
+            t2.name as materialName,
+            t2.code as materialCode,
+            t5.audit_result as auditResult,
+            t4.check_classify as checkClassify,
+            DATE_FORMAT(t4.end_time,'%Y-%m-%d %H:%i:%s') as endTime
+        from  fw_quality_firstend_check t1
+        left join fw_logistics_product t2 on t1.product_id = t2.id
+        left join fw_quality_inspect_result t4 on t1.id = t4.data_id and t4.classify = 1
+        left join
+        (
+        select data_id, max( id ) id FROM fw_jbpm_execution WHERE form_code = 'pollingCoerceClose' OR form_code = 'pollingPostponeExe' GROUP BY data_id ) t3
+        on t1.id = t3.data_id
+        left join fw_jbpm_execution t5 on t5.id = t3.id
+        where 1=1
+        <if test="productCode !=null and productCode !=''">
+            and t1.product_code like concat('%/', #{productCode}, '%') ESCAPE '/'
+        </if>
+        <if test="checkType != null">
+            and t1.check_type = #{checkType}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            <![CDATA[ and t1.create_time >= #{startTime}]]>
+        </if>
+        <if test="stopTime != null and stopTime != ''">
+            <![CDATA[ and t1.create_time <= #{stopTime}]]>
+        </if>
+         <choose>
+             <when test="status !=null and status == 0">
+                 and t1.status in(0,1)
+             </when>
+            <when test="status !=null and status == 3">
+                and t1.status = 3
+            </when>
+         </choose>
+         ORDER BY t1.create_time DESC
+    </select>
+
+    <update id="update" parameterType="com.fw.entity.quality.QualityFirstendCheck">
+        update fw_quality_firstend_check
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="status != null">status = #{status},</if>
+            <if test="carryDay != null">carry_day = #{carryDay},</if>
+            <if test="nonExecution != null  and nonExecution != ''">non_execution = #{nonExecution},</if>
+            <if test="nonExecutCause != null  and nonExecutCause != ''">non_execut_cause = #{nonExecutCause},</if>
+            <if test="checkTime != null  and checkTime != ''">check_time = #{checkTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <insert id="save" parameterType="com.fw.entity.quality.QualityFirstendCheck" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_quality_firstend_check
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="checkNo != null  and checkNo != ''">check_no,</if>
+            <if test="productDevicesId != null">product_devices_id,</if>
+            <if test="productCode != null  and productCode != ''">product_code,</if>
+            <if test="mouldNo != null  and mouldNo != ''">mould_no,</if>
+            <if test="productId != null ">product_id,</if>
+            <if test="checkType != null">check_type,</if>
+            <if test="nonExecution != null  and nonExecution != ''">non_execution,</if>
+            <if test="nonExecutCause != null  and nonExecutCause != ''">non_execut_cause,</if>
+            <if test="carryDay != null">carry_day,</if>
+            <if test="isOut != null">is_out,</if>
+            <if test="status != null">status,</if>
+            <if test="createUser != null">create_user</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="checkNo != null  and checkNo != ''">#{checkNo},</if>
+            <if test="productDevicesId != null">#{productDevicesId},</if>
+            <if test="productCode != null  and productCode != ''">#{productCode},</if>
+            <if test="mouldNo != null  and mouldNo != ''">#{mouldNo},</if>
+            <if test="productId != null ">#{productId},</if>
+            <if test="checkType != null">#{checkType},</if>
+            <if test="nonExecution != null  and nonExecution != ''">#{nonExecution},</if>
+            <if test="nonExecutCause != null  and nonExecutCause != ''">#{nonExecutCause},</if>
+            <if test="carryDay != null">#{carryDay},</if>
+            <if test="isOut != null">#{isOut},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createUser != null">#{createUser}</if>
+        </trim>
+    </insert>
+
+    <select id="findFirstendCheckByid" parameterType="java.lang.Integer" resultType="com.fw.entity.quality.QualityFirstendCheck">
+        select
+        <include refid="Base_Column_List"></include>
+        from  fw_quality_firstend_check
+        where id = #{id}
+    </select>
+
+    <select id="findCode" resultType="java.lang.String">
+        select ifnull(concat(left(max(check_no),4),lpad(right(max(check_no),6)+1,6,0)),#{code})check_no from fw_quality_firstend_check
+    </select>
+
+</mapper>

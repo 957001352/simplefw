@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.logistics.dao.LogisticsOutSubpackageDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.logistics.LogisticsOutSubpackage">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="out_detail_id" property="outDetailId" jdbcType="INTEGER"/>
+        <result column="batch" property="batch" jdbcType="VARCHAR"/>
+        <result column="out_count" property="outCount" jdbcType="VARCHAR"/>
+        <result column="qr_code" property="qrCode" jdbcType="VARCHAR"/>
+        <result column="product_code" property="productCode" jdbcType="VARCHAR"/>
+        <result column="product_name" property="productName" jdbcType="VARCHAR"/>
+        <result column="unit" property="unit" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,out_detail_id,batch,out_count,qr_code,product_code,product_name,unit
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.logistics.LogisticsOutSubpackage">
+        insert into fw_logistics_out_subpackage
+        (out_detail_id, batch,out_count,qr_code,product_code,product_name,unit)
+        values
+        <foreach collection="logisticsOutSubpackages" item="logisticsOutSubpackage" index="i" separator=",">
+            (
+            #{logisticsOutSubpackage.outDetailId},
+            #{logisticsOutSubpackage.batch},
+            #{logisticsOutSubpackage.outCount},
+            #{logisticsOutSubpackage.qrCode},
+            #{logisticsOutSubpackage.productCode},
+            #{logisticsOutSubpackage.productName},
+            #{logisticsOutSubpackage.unit}
+            )
+        </foreach>
+    </insert>
+
+    <select id="findOutSubpackage" resultType="com.fw.entity.logistics.LogisticsOutSubpackage">
+        select * from fw_logistics_out_subpackage flos
+        inner join fw_logistics_out_house_detail flohd on flohd.id = flos.out_detail_id
+        where flohd.out_house_id = #{outHouseId}
+    </select>
+</mapper>

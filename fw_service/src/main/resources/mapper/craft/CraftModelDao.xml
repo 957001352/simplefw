@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.craft.dao.CraftModelDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.craft.CraftModel">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="document_code" property="documentCode" jdbcType="VARCHAR"/>
+        <result column="product_code" property="productCode" jdbcType="VARCHAR"/>
+        <result column="product_name" property="productName" jdbcType="VARCHAR"/>
+        <result column="mouldCode" property="mouldCode" jdbcType="VARCHAR" />
+        <result column="mould_id" property="mouldId" jdbcType="INTEGER" />
+        <result column="beat" property="beat" jdbcType="INTEGER" />
+        <result column="product_type" property="productType" jdbcType="INTEGER" />
+        <result column="bom_no" property="bomNo" jdbcType="VARCHAR"/>
+        <result column="model_type" property="modelType" jdbcType="INTEGER"/>
+        <result column="material_prepare" property="materialPrepare" jdbcType="INTEGER"/>
+        <result column="picking_time" property="pickingTime" jdbcType="INTEGER"/>
+        <result column="mixing_time" property="mixingTime" jdbcType="INTEGER"/>
+        <result column="feed_time" property="feedTime" jdbcType="INTEGER"/>
+        <result column="dry_time" property="dryTime" jdbcType="INTEGER"/>
+        <result column="water_monitor" property="waterMonitor" jdbcType="INTEGER"/>
+        <result column="heat_up" property="heatUp" jdbcType="INTEGER"/>
+        <result column="first_debug" property="firstDebug" jdbcType="INTEGER"/>
+        <result column="first_check" property="firstCheck" jdbcType="INTEGER"/>
+        <result column="product_prepare" property="productPrepare" jdbcType="INTEGER"/>
+        <result column="model_out" property="modelOut" jdbcType="INTEGER"/>
+        <result column="prenatal_care" property="prenatalCare" jdbcType="INTEGER"/>
+        <result column="model_debug" property="modelDebug" jdbcType="INTEGER"/>
+        <result column="model_up" property="modelUp" jdbcType="INTEGER"/>
+        <result column="model_down" property="modelDown" jdbcType="INTEGER"/>
+        <result column="file_ids" property="fileIds" jdbcType="VARCHAR"/>
+        <result column="Inspection_spec" property="inspectionSpecIds" jdbcType="VARCHAR"/>
+        <result column="none_sample" property="noneSampleIds" jdbcType="VARCHAR"/>
+        <result column="photo" property="photo" jdbcType="VARCHAR"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_user" property="updateUser" jdbcType="INTEGER"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <collection property="caftModelProcesscList" column="id" select="selectCaftModelProcesscList"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+       id,document_code,product_code,product_name,bom_no,model_type,material_prepare,picking_time,mixing_time
+       ,feed_time,dry_time,water_monitor,heat_up,first_debug,first_check,product_prepare,model_out,prenatal_care
+       ,model_debug,model_up,model_down,file_ids,photo,create_user,create_time,update_user,update_time,beat,mould_id,Inspection_spec,none_sample,product_type
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.craft.CraftModel" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_craft_model
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="documentCode != null and documentCode  != ''">document_code,</if>
+            <if test="productCode != null  and productCode != ''">product_code,</if>
+            <if test="productName != null  and productName != ''">product_name,</if>
+            <if test="mouldId != null">mould_id,</if>
+            <if test="beat != null">beat,</if>
+            <if test="productType != null">product_type,</if>
+            <if test="bomNo != null  and bomNo != ''">bom_no,</if>
+            <if test="modelType != null">model_type,</if>
+            <if test="materialPrepare != null">material_prepare,</if>
+            <if test="pickingTime != null">picking_time,</if>
+            <if test="mixingTime != null">mixing_time,</if>
+            <if test="feedTime != null">feed_time,</if>
+            <if test="dryTime != null">dry_time,</if>
+            <if test="waterMonitor != null">water_monitor,</if>
+            <if test="heatUp != null">heat_up,</if>
+            <if test="firstDebug != null">first_debug,</if>
+            <if test="firstCheck != null">first_check,</if>
+            <if test="productPrepare != null">product_prepare,</if>
+            <if test="modelOut != null">model_out,</if>
+            <if test="prenatalCare != null">prenatal_care,</if>
+            <if test="modelDebug != null">model_debug,</if>
+            <if test="modelUp != null">model_up,</if>
+            <if test="modelDown != null">model_down,</if>
+            <if test="fileIds != null and fileIds !=''">file_ids,</if>
+            <if test="inspectionSpecIds != null and inspectionSpecIds !=''">Inspection_spec,</if>
+            <if test="noneSampleIds != null and noneSampleIds !=''">none_sample,</if>
+            <if test="photo != null and photo !=''">photo,</if>
+            <if test="createUser != null">create_user,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="documentCode != null and  documentCode  != ''">#{documentCode},</if>
+            <if test="productCode != null  and productCode != ''">#{productCode},</if>
+            <if test="productName != null  and productName != ''">#{productName},</if>
+            <if test="mouldId != null">#{mouldId},</if>
+            <if test="beat != null">#{beat},</if>
+            <if test="productType != null">#{productType},</if>
+            <if test="bomNo != null  and bomNo != ''">#{bomNo},</if>
+            <if test="modelType != null">#{modelType},</if>
+            <if test="materialPrepare != null">#{materialPrepare},</if>
+            <if test="pickingTime != null">#{pickingTime},</if>
+            <if test="mixingTime != null">#{mixingTime},</if>
+            <if test="feedTime != null">#{feedTime},</if>
+            <if test="dryTime != null">#{dryTime},</if>
+            <if test="waterMonitor != null">#{waterMonitor},</if>
+            <if test="heatUp != null">#{heatUp},</if>
+            <if test="firstDebug != null">#{firstDebug},</if>
+            <if test="firstCheck != null">#{firstCheck},</if>
+            <if test="productPrepare != null">#{productPrepare},</if>
+            <if test="modelOut != null">#{modelOut},</if>
+            <if test="prenatalCare != null">#{prenatalCare},</if>
+            <if test="modelDebug != null">#{modelDebug},</if>
+            <if test="modelUp != null">#{modelUp},</if>
+            <if test="modelDown != null">#{modelDown},</if>
+            <if test="fileIds != null and fileIds !=''">#{fileIds},</if>
+            <if test="inspectionSpecIds != null and inspectionSpecIds !=''">#{inspectionSpecIds},</if>
+            <if test="noneSampleIds != null and noneSampleIds !=''">#{noneSampleIds},</if>
+            <if test="photo != null and photo !=''">#{photo},</if>
+            <if test="createUser != null">#{createUser},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.craft.CraftModel">
+        update fw_craft_model
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="documentCode != null and documentCode  != ''">document_code = #{documentCode},</if>
+            <if test="productCode != null  and productCode != ''">product_code = #{productCode},</if>
+            <if test="productName != null  and productName != ''">product_name = #{productName},</if>
+            <if test="mouldId != null">mould_id = #{mouldId},</if>
+            <if test="beat != null">beat = #{beat},</if>
+            <if test="productType != null">product_type = #{productType},</if>
+            <if test="bomNo != null  and bomNo != ''">bom_no = #{bomNo},</if>
+            <if test="modelType != null">model_type = #{modelType},</if>
+            <if test="materialPrepare != null">material_prepare = #{materialPrepare},</if>
+            <if test="pickingTime != null">picking_time = #{pickingTime},</if>
+            <if test="mixingTime != null">mixing_time = #{mixingTime},</if>
+            <if test="feedTime != null">feed_time = #{feedTime},</if>
+            <if test="dryTime != null">dry_time = #{dryTime},</if>
+            <if test="waterMonitor != null">water_monitor = #{waterMonitor},</if>
+            <if test="heatUp != null">heat_up = #{heatUp},</if>
+            <if test="firstDebug != null">first_debug = #{firstDebug},</if>
+            <if test="firstCheck != null">first_check = #{firstCheck},</if>
+            <if test="productPrepare != null">product_prepare = #{productPrepare},</if>
+            <if test="modelOut != null">model_out = #{modelOut},</if>
+            <if test="prenatalCare != null">prenatal_care = #{prenatalCare},</if>
+            <if test="modelDebug != null">model_debug = #{modelDebug},</if>
+            <if test="modelUp != null">model_up = #{modelUp},</if>
+            <if test="modelDown != null">model_down = #{modelDown},</if>
+            <if test="fileIds != null and fileIds !=''">file_ids = #{fileIds},</if>
+            <if test="inspectionSpecIds != null and inspectionSpecIds !=''">Inspection_spec = #{inspectionSpecIds},</if>
+            <if test="noneSampleIds != null and noneSampleIds !=''">none_sample = #{noneSampleIds},</if>
+            <if test="photo != null and photo !=''">photo = #{photo},</if>
+            <if test="updateUser != null">update_user = #{updateUser},</if>
+            update_time = NOW()
+        </trim>
+        where id = #{id}
+    </update>
+
+
+    <select id="findList" resultMap="BaseResultMap">
+        select
+        t1.*,t2.code as mouldCode
+        from
+        fw_craft_model t1 left join fw_mould_devices t2  on t1.mould_id = t2.id
+        where 1=1
+        <if test="productCode != null and productCode !=''">
+           and t1.product_code like concat('%/', #{productCode}, '%') ESCAPE '/'
+        </if>
+        <if test="productName != null and productName !=''">
+           and  t1.product_name like concat('%/', #{productName}, '%') ESCAPE '/'
+        </if>
+        <if test="modelType !=null">
+            and t1.model_type = #{modelType}
+        </if>
+        order by t1.create_time desc
+    </select>
+
+
+    <resultMap id="BaseCaftModelProcess" type="com.fw.entity.craft.CraftModelProcess">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="devices_id" property="devicesId" jdbcType="INTEGER"/>
+        <result column="card_id" property="cardId" jdbcType="INTEGER"/>
+        <result column="priority" property="priority" jdbcType="INTEGER"/>
+        <result column="craftModelid" property="craftModelId" jdbcType="INTEGER"/>
+        <result column="cardName" property="cardName" jdbcType="VARCHAR"/>
+    </resultMap>
+    <select id="selectCaftModelProcesscList" resultMap="BaseCaftModelProcess">
+        select
+        t1.*,t2.name as cardName
+        from
+        fw_craft_molde_process t1
+        left join fw_craft_card t2 on t1.card_id = t2.id
+        where craft_model_id = #{id}
+        order by t1.priority asc
+    </select>
+
+
+    <delete id="delete" parameterType="java.util.List">
+        delete from fw_craft_model where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="findCaftModelById" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select count(id) from fw_craft_model where id = #{id}
+     </select>
+    <select id="findByProductCode" resultMap="BaseResultMap">
+        select * from fw_craft_model where product_code = #{productCode}
+    </select>
+
+    <select id="findByProductId" resultMap="BaseResultMap">
+        select fcm.*
+        from fw_craft_model fcm
+        left join fw_logistics_product flp on flp.code = fcm.product_code
+        where flp.id = #{productId}
+    </select>
+
+
+    <!-- 排除新增或更新是产品编码是否存在-->
+    <select id="excludeExist" resultType="java.lang.Integer">
+        select count(id) from fw_craft_model where 1=1
+        <if test="id != null"> and id not in (#{id})</if>
+        <if test="productCode != null and productCode !=''"> and product_code = #{productCode}</if>
+    </select>
+
+    <select id="findProductCodeAndDevices" resultType="com.fw.entity.craft.CraftModel">
+        SELECT
+            m.id,
+            m.beat,
+            ca.id as cardId,
+            ca.code as cardCode,
+            c.picture
+        FROM
+            fw_craft_model m
+            INNER JOIN fw_craft_molde_process p ON ( p.craft_model_id = m.id ) AND p.devices_id = #{devicesId}
+            INNER JOIN fw_craft_card_params c ON c.id = p.card_id
+            INNER JOIN fw_craft_card ca ON ca.id = c.card_id
+        WHERE
+            m.product_code = #{productCode}
+    </select>
+</mapper>
+

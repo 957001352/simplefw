@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.produce.dao.ProduceDutyDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.produce.ProduceDuty">
+        <result column="id" property="id" />
+        <result column="create_time" property="createTime" />
+        <result column="operate_user" property="operateUser" />
+        <result column="create_user" property="createUser" />
+        <result column="productDeviceId" property="productDeviceId" />
+        <result column="productOrder" property="productOrder" />
+        <result column="productName" property="productName" />
+        <result column="plan_molding_id" property="planMoldingId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        create_time,
+        operate_user, create_user, plan_molding_id
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.produce.ProduceDuty" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_produce_duty
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="operateUser != null">operate_user,</if>
+            <if test="createUser != null">create_user,</if>
+            <if test="planMoldingId != null">plan_molding_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="operateUser != null">#{operateUser},</if>
+            <if test="createUser != null">#{createUser},</if>
+            <if test="planMoldingId != null">#{planMoldingId},</if>
+        </trim>
+    </insert>
+
+    <select id="findList" resultMap="BaseResultMap">
+        select
+         t1.*,
+         t2.product_code as productOrder,
+         t2.product_devices_id as productDeviceId,
+         t3.name as productName
+         from fw_produce_duty t1
+         left join fw_plan_injection_molding t2 on t1.plan_molding_id = t2.id
+         left join fw_logistics_product t3 on t2.product_id = t3.id
+         where 1=1
+         order by create_time desc
+    </select>
+
+</mapper>

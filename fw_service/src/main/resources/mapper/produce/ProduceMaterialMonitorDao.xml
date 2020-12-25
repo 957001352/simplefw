@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.produce.dao.ProduceMaterialMonitorDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.produce.ProduceMaterialMonitor">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="product_id" property="productId" jdbcType="INTEGER"/>
+        <result column="product_code" property="productCode" jdbcType="VARCHAR"/>
+        <result column="product_name" property="productName" jdbcType="VARCHAR"/>
+        <result column="take_user" property="takeUser" jdbcType="VARCHAR"/>
+        <result column="take_time" property="takeTime" jdbcType="TIMESTAMP"/>
+        <result column="check_user" property="checkUser" jdbcType="VARCHAR"/>
+        <result column="check_time" property="checkTime" jdbcType="TIMESTAMP"/>
+        <result column="store_user" property="storeUser" jdbcType="VARCHAR"/>
+        <result column="store_time" property="storeTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        product_id, product_code, product_name, take_user, take_time, check_user, check_time, store_user, store_time
+    </sql>
+
+    <!-- 批量插入-->
+    <insert id="insert" parameterType="com.fw.entity.produce.ProduceMaterialMonitor" useGeneratedKeys="true" keyProperty="id">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            insert into fw_produce_material_monitor
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="item.id !=null">id,</if>
+                <if test="item.productId!= null ">product_id,</if>
+                <if test="item.productCode != null and item.productCode!=''">product_code,</if>
+                <if test="item.productName != null and item.productName!=''">product_name,</if>
+                <if test="item.takeUser!= null ">take_user,</if>
+                <if test="item.takeTime!= null and item.takeTime!=''">take_time,</if>
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="item.id !=null">#{item.id},</if>
+                <if test="item.productId!= null ">#{item.productId},</if>
+                <if test="item.productCode != null and item.productCode!=''">#{item.productCode},</if>
+                <if test="item.productName != null and item.productName!=''">#{item.productName},</if>
+                <if test="item.takeUser!= null ">#{item.takeUser},</if>
+                <if test="item.takeTime!= null and item.takeTime!=''">#{item.takeTime},</if>
+            </trim>
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.produce.ProduceMaterialMonitor">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update fw_produce_material_monitor
+                <trim prefix="SET" suffixOverrides=",">
+                    <if test="item.checkUser != null and item.checkUser != ''">check_user = #{item.checkUser},</if>
+                    <if test="item.checkTime != null and item.checkTime != ''">check_time = #{item.checkTime},</if>
+                    <if test="item.storeUser != null and item.storeUser != ''">store_user = #{item.storeUser},</if>
+                    <if test="item.storeTime != null and item.storeTime != ''">store_time = #{item.storeTime},</if>
+                </trim>
+                where id = #{item.id}
+        </foreach>
+    </update>
+
+    <select id="findList" resultMap="BaseResultMap">
+        select * from fw_produce_material_monitor where 1=1
+        <if test="productCode != null and productCode!=''">and product_code like concat('%/',#{productCode},'%') ESCAPE '/' </if>
+        <if test="productName != null and productName!=''">and product_name like concat('%/',#{productName},'%') ESCAPE '/' </if>
+        <choose> <!--0入库日期 1领料日期-->
+            <when test="timeType == 0">
+                <if test="startTime != null and startTime != ''">
+                    <![CDATA[ and store_time >= #{startTime}]]>
+                </if>
+                <if test="stopTime != null and stopTime != ''">
+                    <![CDATA[ and store_time <= #{stopTime}]]>
+                </if>
+            </when>
+            <otherwise>
+                <if test="startTime != null and startTime != ''">
+                    <![CDATA[ and pick_time >= #{startTime}]]>
+                </if>
+                <if test="stopTime != null and stopTime != ''">
+                    <![CDATA[ and pick_time <= #{stopTime}]]>
+                </if>
+            </otherwise>
+        </choose>
+
+    </select>
+</mapper>

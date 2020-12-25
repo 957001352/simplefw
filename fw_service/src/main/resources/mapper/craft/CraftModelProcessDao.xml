@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.craft.dao.CraftModelProcessDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseCaftModelProcess" type="com.fw.entity.craft.CraftModelProcess">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="devices_id" property="devicesId" jdbcType="INTEGER"/>
+        <result column="card_id" property="cardId" jdbcType="INTEGER"/>
+        <result column="priority" property="priority" jdbcType="INTEGER"/>
+        <result column="craft_model_id" property="craftModelId" jdbcType="INTEGER"/>
+    </resultMap>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+       id,devices_id,card_id,priority,craftModelid,craftModelName
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.craft.CraftModelProcess" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_craft_molde_process
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="devicesId != null">devices_id,</if>
+            <if test="cardId != null">card_id,</if>
+            <if test="priority != null">priority,</if>
+            <if test="craftModelId != null">craft_model_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="devicesId != null">#{devicesId},</if>
+            <if test="cardId != null">#{cardId},</if>
+            <if test="priority != null">#{priority},</if>
+            <if test="craftModelId != null">#{craftModelId},</if>
+        </trim>
+    </insert>
+
+    <insert id="insertAll" parameterType="java.util.List">
+        insert into fw_craft_molde_process
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            devices_id,card_id,priority,craft_model_id
+        </trim>
+        values
+        <foreach collection="list" separator="," index="index" item="item">
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                #{item.devicesId},#{item.cardId},#{item.priority},#{item.craftModelId}
+            </trim>
+        </foreach>
+    </insert>
+
+    <delete id="deleteByCraftModelId" parameterType="java.lang.Integer">
+        delete from fw_craft_molde_process where craft_model_id = #{craftModelId}
+    </delete>
+
+    <delete id="deleteByCraftModelIds" parameterType="java.util.List">
+        delete from fw_craft_molde_process where craft_model_id in
+            <foreach collection="list" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+    </delete>
+</mapper>
+

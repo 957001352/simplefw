@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.quality.dao.QualityOutCheckDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.quality.QualityOutCheck">
+        <result column="id" property="id" jdbcType="INTEGER" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="check_no" property="checkNo" jdbcType="VARCHAR"/>
+        <result column="out_time" property="outTime" jdbcType="TIMESTAMP"/>
+        <result column="customer" property="customer" jdbcType="VARCHAR"/>
+        <result column="product_id" property="productId" jdbcType="INTEGER"/>
+        <result column="mould_no" property="mouldNo" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="execute_user" property="executeUser" jdbcType="INTEGER"/>
+        <result column="execute_time" property="executeTime" jdbcType="TIMESTAMP"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="materialCode" property="materialCode" jdbcType="VARCHAR" />
+        <result column="materialName" property="materialName" jdbcType="VARCHAR" />
+        <result column="checkClassify" property="checkClassify" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        create_time,
+        check_no, out_time, customer, product_id, status, execute_user, execute_time, create_user,mould_no
+    </sql>
+
+    <insert id="save" parameterType="com.fw.entity.quality.QualityOutCheck" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_quality_out_check
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="checkNo !=null and checkNo !=''">check_no,</if>
+            <if test="outTime !=null and outTime !=''">out_time,</if>
+            <if test="customer !=null and customer !=''">customer,</if>
+            <if test="mouldNo !=null and mouldNo !=''">mould_no,</if>
+            <if test="productId !=null ">product_id,</if>
+            <if test="createUser !=null ">create_user,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="checkNo !=null and checkNo !=''">#{checkNo},</if>
+            <if test="outTime !=null and outTime !=''">#{outTime},</if>
+            <if test="customer !=null and customer !=''">#{customer},</if>
+            <if test="mouldNo !=null and mouldNo !=''">#{mouldNo},</if>
+            <if test="productId !=null ">#{productId},</if>
+            <if test="createUser !=null ">#{createUser},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.quality.QualityOutCheck">
+        update fw_quality_out_check
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="status != null">status = #{status},</if>
+            <if test="executeUser != null">execute_use = #{executeUser},</if>
+            execute_time = NOW()
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="findList" resultMap="BaseResultMap">
+        SELECT
+	        t1.*,
+            t2.code as materialCode,
+	        t2.name as materialName,
+            t3.check_classify as checkClassify
+        FROM
+	        fw_quality_out_check t1
+	    LEFT JOIN fw_logistics_product t2 ON t1.product_id = t2.id
+        left join fw_quality_inspect_result t3 on t1.id = t3.data_id and t3.classify = 3
+	    where 1=1
+            <if test="checkNo != null and checkNo!=''">
+                and t1.check_no like concat('%/', #{checkNo}, '%') ESCAPE '/'
+            </if>
+            <if test="customer != null and customer!=''">
+                and t1.customer like concat('%/', #{customer}, '%') ESCAPE '/'
+            </if>
+            <if test="materialCode != null and materialCode!=''">
+                and t2.code like concat('%/', #{materialCode}, '%') ESCAPE '/'
+            </if>
+            <if test="startTime != null and startTime != ''">
+                <![CDATA[ and t1.create_time >= #{startTime}]]>
+            </if>
+            <if test="stopTime != null and stopTime != ''">
+                <![CDATA[ and t1.create_time <= #{stopTime}]]>
+            </if>
+            <if test="status !=null">
+                and t1.status = #{status}
+            </if>
+        ORDER BY create_time DESC
+    </select>
+
+</mapper>

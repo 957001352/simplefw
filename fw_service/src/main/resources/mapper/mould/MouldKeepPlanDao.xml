@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.mould.dao.MouldKeepPlanDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.mould.MouldKeepPlan">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="keep_team_id" property="keepTeamId" jdbcType="INTEGER"/>
+        <result column="mould_devices_ids" property="mouldDevicesIds" jdbcType="VARCHAR"/>
+        <result column="keep_cycle" property="keepCycle" jdbcType="INTEGER"/>
+        <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+        <result column="notice_time" property="noticeTime" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="last_time" property="lastTime" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="keep_fre" property="keepFre" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,create_time,name, keep_team_id, mould_devices_ids, keep_cycle, start_time, notice_time,status,last_time,keep_fre
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.mould.MouldKeepPlan" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_mould_keep_plan
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="name != null  and name != ''">name,</if>
+            <if test="keepTeamId != null">keep_team_id,</if>
+            <if test="mouldDevicesIds != null">mould_devices_ids,</if>
+            <if test="keepCycle != null">keep_cycle,</if>
+            <if test="startTime != null  and startTime != ''">start_time,</if>
+            <if test="noticeTime != null">notice_time,</if>
+            <if test="status != null">status,</if>
+            <if test="lastTime != null  and lastTime != ''">last_time,</if>
+            <if test="keepFre != null  and keepFre != ''">keep_fre</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="keepTeamId != null ">#{keepTeamId},</if>
+            <if test="mouldDevicesIds != null">#{mouldDevicesIds},</if>
+            <if test="keepCycle != null ">#{keepCycle},</if>
+            <if test="startTime != null  and startTime != ''">#{startTime},</if>
+            <if test="noticeTime != null ">#{noticeTime},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="lastTime != null  and lastTime != ''">#{lastTime},</if>
+            <if test="keepFre != null  and keepFre != ''">#{keepFre}</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.mould.MouldKeepPlan">
+        update fw_mould_keep_plan
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''">name = #{name},</if>
+            <if test="keepTeamId != null ">keep_team_id = #{keepTeamId},</if>
+            <if test="mouldDevicesIds != null ">mould_devices_ids = #{mouldDevicesIds},</if>
+            <if test="keepCycle != null ">keep_cycle = #{keepCycle},</if>
+            <if test="startTime != null  and startTime != ''">start_time = #{startTime},</if>
+            <if test="noticeTime != null ">notice_time = #{noticeTime},</if>
+            <if test="status != null ">status = #{status},</if>
+            <if test="lastTime != null ">last_time = #{lastTime},</if>
+            <if test="keepFre != null  and keepFre != ''">keep_fre = #{keepFre},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="java.util.List">
+        delete from fw_mould_keep_plan where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="selectById" parameterType="integer" resultType="com.fw.entity.mould.MouldKeepPlan">
+        select
+        <include refid="Base_Column_List"/>
+        from fw_mould_keep_plan where id = #{id}
+    </select>
+
+    <select id="findList" parameterType="com.fw.entity.mould.MouldKeepPlan" resultMap="BaseResultMap">
+        SELECT t7.* , t9.execute_time FROM(
+            SELECT
+            t1.id,
+            t1.NAME,
+            t1.keep_team_id,
+            t1.mould_devices_ids,
+            t1.keep_cycle,
+            t1.start_time,
+            t1.notice_time,
+            t1.create_time,
+            t1.last_time,
+            t1.STATUS,
+            t1.keep_fre,
+            t2.`name` keepTeamName,
+            group_concat( t3.CODE ) CODE
+            FROM
+            fw_mould_keep_plan t1
+            LEFT JOIN fw_mould_keep_team t2 ON t2.id = t1.keep_team_id
+            LEFT JOIN fw_mould_devices t3 ON find_in_set( t3.id, t1.mould_devices_ids )
+            GROUP BY
+            t1.id
+        ) t7 LEFT JOIN (SELECT max(t8.id) id,t8.keep_plan_id from  fw_mould_keep_task t8  GROUP BY t8.keep_plan_id ) t6 on t7.id = t6.keep_plan_id
+            LEFT JOIN fw_mould_keep_task t9 on t9.id = t6.id
+            WHERE 1 = 1
+        <if test="name != null  and name != ''">
+            and t7.name like concat('%/', #{name}, '%') ESCAPE '/'
+        </if>
+        <if test="keepTeamName != null  and keepTeamName != ''">
+            and t7.name like concat('%/', #{keepTeamName}, '%') ESCAPE '/'
+        </if>
+        <if test="mouldCode != null  and mouldCode != ''">
+            and t7.code like concat('%/', #{mouldCode}, '%') ESCAPE '/'
+        </if>
+        order by t7.id desc
+    </select>
+
+    <select id="findAll" parameterType="com.fw.entity.mould.MouldKeepPlan" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from fw_mould_keep_plan
+    </select>
+
+    <select id="findAllfail" parameterType="com.fw.entity.mould.MouldKeepPlan" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from fw_mould_keep_plan
+        where date_format(last_time,'%Y-%m-%d') &lt;= now()  and  keep_fre = 1
+    </select>
+
+    <select id="verifyName" parameterType="java.lang.String" resultType="boolean">
+        select count(*)  from fw_mould_keep_plan where name = #{name}
+    </select>
+
+    <select id="findNonOpening" parameterType="com.fw.entity.mould.MouldKeepPlan" resultMap="BaseResultMap">
+        SELECT
+            t1.id as mouldId,
+            t1.CODE,
+            t1.init_count,
+            t1.total_count,
+            t2.id,
+            t2.create_time,
+            t2.NAME,
+            t2.keep_team_id,
+            t2.mould_devices_ids,
+            t2.keep_cycle,
+            t2.start_time,
+            t2.notice_time,
+            t2.STATUS,
+            t2.last_time,
+            t2.keep_fre
+        FROM
+            fw_mould_devices t1
+            JOIN fw_mould_keep_plan t2 ON find_in_set( t1.id, t2.mould_devices_ids )
+            AND t2.keep_fre = 2
+    </select>
+
+</mapper>

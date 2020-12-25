@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.produce.dao.ProduceFeedingDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.produce.ProduceFeeding">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="feed_no" property="feedNo" jdbcType="VARCHAR"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="product_order" property="productOrder" jdbcType="VARCHAR"/>
+        <result column="product_devices_id" property="productDevicesId" jdbcType="INTEGER"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+        <collection property="produceFeedingDetails" column="id" select="com.fw.service.produce.dao.ProduceFeedingDetailDao.findProduceFeedingDetails"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,create_time, feed_no, create_user, product_order, product_devices_id, note
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.produce.ProduceFeeding" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_produce_feeding
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="feedNo != null  and feedNo != ''">feed_no,</if>
+            <if test="createUser != null  and createUser != ''">create_user,</if>
+            <if test="productOrder != null  and productOrder != ''">product_order,</if>
+            <if test="productDevicesId != null and productDevicesId !=''">product_devices_id,</if>
+            <if test="note != null and note !=''">note</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="feedNo != null  and feedNo != ''">#{feedNo},</if>
+            <if test="createUser != null  and createUser != ''">#{createUser},</if>
+            <if test="productOrder != null  and productOrder != ''">#{productOrder},</if>
+            <if test="productDevicesId != null  and productDevicesId != ''">#{productDevicesId},</if>
+            <if test="note != null and note !=''">#{note}</if>
+        </trim>
+    </insert>
+
+    <select id="findList" parameterType="com.fw.entity.produce.ProduceFeeding" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from fw_produce_feeding where 1=1
+        <if test="productOrder != null and productOrder !=''">
+            and product_order like concat('%/', #{productOrder}, '%') ESCAPE '/'
+        </if>
+        order by id  desc
+    </select>
+
+    <select id="findCode" resultType="java.lang.String">
+        select ifnull(concat(left(max(feed_no),4),lpad(right(max(feed_no),6)+1,6,0)),#{code})feed_no from fw_produce_feeding
+    </select>
+
+    <select id="getProduceFeeding" parameterType="java.lang.String" resultType="com.fw.entity.produce.ProduceFeeding">
+        select <include refid="Base_Column_List"/>
+        from fw_produce_feeding where product_order = #{productOrder}
+    </select>
+
+</mapper>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.craft.dao.CollectDeviceDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.craft.CollectDevice">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="deviceId" property="deviceId" jdbcType="VARCHAR"/>
+        <result column="param_key" property="paramKey" jdbcType="VARCHAR"/>
+        <result column="param_value" property="paramValue" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+    </resultMap>
+    <select id="findByProductCode" resultType="com.fw.entity.craft.CollectDevice">
+        select * from fw_collect_device where  deviceId = #{productCode}
+    </select>
+    <select id="findByParamKey" resultType="com.fw.entity.craft.CollectDevice">
+        select * from fw_collect_device where  param_key in (${paramKey})
+    </select>
+
+</mapper>
+

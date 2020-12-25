@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.basic.dao.PdaLoginLogDao">
+
+    <insert id="insert" parameterType="com.fw.entity.e2c.PdaLoginLog" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_pda_login_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="userId != null  and userId != ''">user_id,</if>
+            <if test="loginTime != null  and loginTime != ''">login_time,</if>
+            <if test="exitTime != null  and exitTime != ''">exit_time,</if>
+            <if test="productDevicesId != null ">product_devices_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="userId != null  and userId != ''">#{userId},</if>
+            <if test="loginTime != null  and loginTime != ''">#{loginTime},</if>
+            <if test="exitTime != null  and exitTime != ''">#{exitTime},</if>
+            <if test="productDevicesId != null">#{productDevicesId},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.e2c.PdaLoginLog">
+        update fw_pda_login_log
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null  and userId != ''">user_id = #{userId},</if>
+            <if test="loginTime != null  and loginTime != ''">login_time = #{loginTime},</if>
+            <if test="exitTime != null  and exitTime != ''">exit_time = #{exitTime},</if>
+            <if test="productDevicesId != null ">product_devices_id = #{productDevicesId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <select id="findList" resultType="com.fw.entity.e2c.PdaLoginLog">
+        select * from fw_pda_login_log
+    </select>
+    <select id="findUnFinishLog" resultType="com.fw.entity.e2c.PdaLoginLog">
+        select * from fw_pda_login_log where user_id = #{userId} and product_devices_id = #{productDevicesId} and exit_time is null
+    </select>
+</mapper>

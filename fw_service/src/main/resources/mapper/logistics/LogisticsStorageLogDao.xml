@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.logistics.dao.LogisticsStorageLogDao">
+
+
+    <insert id="insert" parameterType="com.fw.entity.logistics.LogisticsStorageLog" useGeneratedKeys="true" keyProperty="id">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+        insert into fw_logistics_storage_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="item.storageDetailId != null  and item.storageDetailId != ''">storage_detail_id,</if>
+            <if test="item.storageCount != null">storage_count,</if>
+            <if test="item.beforeCount != null">before_count,</if>
+            <if test="item.afterCount != null">after_count,</if>
+            <if test="item.opreateType != null">opreate_type,</if>
+            <if test="item.opreateDetailId != null and item.opreateDetailId !=''">opreate_detail_id,</if>
+            <if test="item.opreateUser != null">opreate_user</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="item.storageDetailId != null  and item.storageDetailId != ''">#{item.storageDetailId},</if>
+            <if test="item.storageCount != null">#{item.storageCount},</if>
+            <if test="item.storageCount != null">#{item.storageCount},</if>
+            <if test="item.beforeCount != null">#{item.beforeCount},</if>
+            <if test="item.opreateType != null ">#{item.opreateType},</if>
+            <if test="item.opreateDetailId != null and item.opreateDetailId !=''">#{item.opreateDetailId},</if>
+            <if test="item.opreateUser != null ">#{item.opreateUser}</if>
+        </trim>
+        </foreach>
+    </insert>
+    <select id="findList" resultType="com.fw.entity.logistics.LogisticsStorageLog">
+        select * from fw_logistics_storage_log t
+    </select>
+</mapper>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.collect.dao.DeviceDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.collect.Device">
+        <result column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="deviceId" property="deviceId"/>
+        <result column="param_key" property="paramKey"/>
+        <result column="param_value" property="paramValue"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,create_time,deviceId, param_key, param_value
+    </sql>
+
+    <select id="findDevice" parameterType="java.lang.String" resultType="com.fw.entity.collect.Device">
+        select <include refid="Base_Column_List"/>  from fw_collect_device where deviceId = #{deviceCode} and param_key = 'tmCycleTime'
+    </select>
+
+</mapper>

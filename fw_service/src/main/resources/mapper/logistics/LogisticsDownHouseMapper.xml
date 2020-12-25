@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.logistics.dao.LogisticsDownHouseDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseDownResultMap" type="com.fw.entity.logistics.LogisticsDownHouse">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="storage_location_id" property="storageLocationId" jdbcType="INTEGER"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMap" type="com.fw.entity.logistics.LogisticsDownHouse">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="storage_location_id" property="storageLocationId" jdbcType="INTEGER"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+       <collection property="logisticsDownHouseDetails" column="id" select="getLogisticsDownHouseDetail"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,create_time,storage_location_id, create_user, note
+    </sql>
+
+    <resultMap id="LogisticsDownHouseDetailMap" type="com.fw.entity.logistics.LogisticsDownHouseDetail">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="storage_detail_id" property="storageDetailId" jdbcType="INTEGER"/>
+        <result column="storage_count" property="storageCount" jdbcType="INTEGER"/>
+        <result column="product_date" property="productDate" jdbcType="TIMESTAMP"/>
+        <result column="batch" property="batch" jdbcType="VARCHAR"/>
+        <result column="storage_location_id" property="storageLocationId" jdbcType="INTEGER"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+        <result column="down_house_id" property="downHouseId" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <select id="getLogisticsDownHouseDetail" parameterType="integer" resultMap="LogisticsDownHouseDetailMap">
+        SELECT
+        t1.id,
+        t1.storage_detail_id,
+        t1.storage_count,
+        t1.product_date,
+        t1.batch,
+        t1.storage_location_id,
+        t1.note,
+        t1.down_house_id,
+        t3.name	as productName,
+        t3.code as code,
+        t3.unit as unit
+        FROM
+	    fw_logistics_down_house_detail  t1
+        LEFT JOIN  fw_logistics_storage_detail t2 on t1.storage_detail_id = t2.id
+        LEFT JOIN fw_logistics_product t3 on t2.product_id = t3.id
+        WHERE
+        down_house_id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.fw.entity.logistics.LogisticsDownHouse" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_logistics_down_house
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="createTime != null  and createTime != ''">create_time,</if>
+            <if test="storageLocationId != null  and storageLocationId != ''">storage_location_id,</if>
+            <if test="createUser != null  and createUser != ''">create_user,</if>
+            <if test="note != null and note !=''">note</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="createTime != null  and createTime != ''">#{createTime},</if>
+            <if test="storageLocationId != null  and storageLocationId != ''">#{storageLocationId},</if>
+            <if test="createUser != null  and createUser != ''">#{createUser},</if>
+            <if test="note != null and note !=''">#{note}</if>
+        </trim>
+    </insert>
+
+    <select id="findDownList" parameterType="com.fw.entity.logistics.LogisticsDownHouse" resultMap="BaseDownResultMap">
+        SELECT
+        t1.* ,
+        t2.name,
+        t2.code as code
+        FROM
+        fw_logistics_down_house t1
+        LEFT JOIN fw_logistics_storage_location t2 on t1.storage_location_id = t2.id
+        where 1=1
+        <if test="code != null  and code != ''">
+            and t2.code like concat('%/', #{code}, '%') ESCAPE '/'
+        </if>
+        ORDER BY  t1.id desc
+    </select>
+
+    <select id="getDownHouse" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>  from fw_logistics_down_house where id = #{id}
+    </select>
+
+</mapper>

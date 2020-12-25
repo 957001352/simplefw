@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.quality.dao.QualityInspectionChangeLogDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.quality.QualityInspectionChangeLog">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="reason" property="reason" jdbcType="VARCHAR"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="version" property="version" jdbcType="VARCHAR"/>
+        <result column="inspection_id" property="inspectionId" jdbcType="INTEGER"/>
+        <result column="inspection_content" property="inspectionContent" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,create_time,reason, content, create_user, version, inspection_id,inspection_content
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.quality.QualityInspectionChangeLog" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_quality_inspection_change_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="reason != null  and reason != ''">reason,</if>
+            <if test="content != null  and content != ''">content,</if>
+            <if test="createUser != null  and createUser != ''">create_user,</if>
+            <if test="version != null  and version != ''">version,</if>
+            <if test="inspectionId != null  and inspectionId != ''">inspection_id,</if>
+            <if test="inspectionContent != null  and inspectionContent != ''">inspection_content</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="reason != null  and reason != ''">#{reason},</if>
+            <if test="content != null  and content != ''">#{content},</if>
+            <if test="createUser != null  and createUser != ''">#{createUser},</if>
+            <if test="version != null  and version != ''">#{version},</if>
+            <if test="inspectionId != null  and inspectionId != ''">#{inspectionId},</if>
+            <if test="inspectionContent != null  and inspectionContent != ''">#{inspectionContent}</if>
+        </trim>
+    </insert>
+
+    <select id="getInspectionChangeLog" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT
+            t1.id,
+            t1.create_time,
+            t1.reason,
+            t1.content,
+            t1.create_user,
+            t1.version,
+            t1.inspection_id,
+            t1.inspection_content,
+            t2.drawing,
+            t2.customer,
+            t2.classify,
+            t3.NAME as productName,
+            t3.CODE
+        FROM
+            fw_quality_inspection_change_log t1
+            LEFT JOIN fw_quality_inspection t2 ON t1.inspection_id = t2.id
+            LEFT JOIN fw_logistics_product t3 ON t2.product_id = t3.id
+        WHERE
+            t1.id = #{id}
+    </select>
+
+</mapper>

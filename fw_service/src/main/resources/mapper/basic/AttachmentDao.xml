@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.basic.dao.AttachmentDao">
+    <insert id="insert" parameterType="com.fw.domain.BaseFile" keyProperty="id">
+        INSERT INTO fw_basic_attachment (name, save_name, path, suffix, create_time, data_id)
+        VALUES(#{name},#{saveName},#{path},#{suffix},now(),#{dataId})
+    </insert>
+
+    <select id="findById" resultType="com.fw.domain.BaseFile">
+        select id,name,save_name saveName,path,suffix,create_time createTime,
+                data_id dataId,replace(path,#{rootPath},'/attach/') webPath
+        from fw_basic_attachment
+        where id = #{id} order by create_time
+    </select>
+
+    <select id="findByDataId" resultType="com.fw.domain.BaseFile">
+        select id,name,save_name saveName,path,suffix,create_time createTime,
+                data_id dataId,replace(path,#{rootPath},'\\attach\\') webPath
+        from fw_basic_attachment
+        where data_id = #{dataId} order by create_time
+    </select>
+    <delete id="deleteById">
+        delete from fw_basic_attachment where id = #{id}
+    </delete>
+
+    <delete id="deleteByDataId">
+        delete from fw_basic_attachment where data_id = #{dataId}
+    </delete>
+
+    <select id="findByArrayDataId" resultType="com.fw.domain.BaseFile">
+        select id,name,save_name saveName,path,suffix,create_time createTime,
+                data_id dataId,replace(path,#{rootPath},'/attach/') webPath
+        from fw_basic_attachment
+        where 1=1
+        <if test="split != null and split != ''">
+             and data_id in
+             <foreach collection="split" item="id" separator="," open="(" close=")">
+                 #{id}
+             </foreach>
+        </if>
+        order by create_time
+    </select>
+</mapper>

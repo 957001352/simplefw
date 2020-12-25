@@ -1,0 +1,8 @@
+debug: false
+server:
+  port: 10102
+  tomcat:
+    max-swallow-size: -1
+spring:
+  application:
+    name: fw_erp_service

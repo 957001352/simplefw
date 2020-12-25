@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.device.dao.DevicesCheckItemDao">
+
+
+    <insert id="insert" parameterType="com.fw.entity.device.DevicesCheckItem" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_devices_check_item
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="name != null  and name != ''">name,</if>
+            <if test="devicesClassify != null  and devicesClassify != ''">devices_classify,</if>
+            <if test="content != null  and content != ''">content</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="devicesClassify != null  and devicesClassify != ''">#{devicesClassify},</if>
+            <if test="content != null  and content != ''">#{content}</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.device.DevicesCheckItem">
+        update fw_devices_check_item
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''">name = #{name},</if>
+            <if test="devicesClassify != null  and devicesClassify != ''">devices_classify = #{devicesClassify},</if>
+            <if test="content != null  and content != ''">content = #{content}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="delete" parameterType="java.util.List">
+        update  fw_devices_check_item set deleted=1  where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </update>
+    <select id="selectById" parameterType="integer" resultType="com.fw.entity.device.DevicesCheckItem">
+        select * from fw_devices_check_item where id = #{id}
+    </select>
+    <select id="findList" resultType="com.fw.entity.device.DevicesCheckItem">
+        select *  from fw_devices_check_item where deleted=0
+        <if test="name != null  and name != ''">
+            and name like concat('%/', #{name}, '%') ESCAPE '/'
+        </if>
+        <if test="devicesClassify != null">
+            and devices_classify = #{devicesClassify}
+        </if>
+        <if test="content != null">
+            and content like concat('%/', #{content}, '%') ESCAPE '/'
+        </if>
+        order by create_time desc
+    </select>
+    <select id="isRepeatName" resultType="Integer">
+        SELECT count(*) FROM fw_devices_check_item  WHERE deleted=0 and name=#{name}
+        <if test="id!= null">
+            AND id!=#{id}
+        </if>
+    </select>
+</mapper>
+

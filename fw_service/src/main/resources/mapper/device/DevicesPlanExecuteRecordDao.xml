@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.device.dao.DevicesPlanExecuteRecordDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.device.DevicesPlanExecuteRecord">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="keep_task_id" property="keepTaskId" jdbcType="INTEGER"/>
+        <result column="keep_item_id" property="keepItemId" jdbcType="INTEGER"/>
+        <result column="keep_item_result" property="keepItemResult" jdbcType="INTEGER"/>
+        <result column="reason" property="reason" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, keep_task_id, keep_item_id, keep_item_result,reason
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.device.DevicesPlanExecuteRecord" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into fw_devices_plan_execute_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="keepTaskId != null  and keepTaskId != ''">keep_task_id,</if>
+            <if test="keepItemId != null and keepItemId != ''">keep_item_id,</if>
+            <if test="keepItemResult != null and keepItemResult != ''">keep_item_result,</if>
+            <if test="reason != null and reason != ''">reason</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="keepTaskId != null  and keepTaskId != ''">#{keepTaskId},</if>
+            <if test="keepItemId != null  and keepItemId != ''">#{keepItemId},</if>
+            <if test="keepItemResult != null  and keepItemResult != ''">#{keepItemResult},</if>
+            <if test="reason != null  and reason != ''">#{reason}</if>
+        </trim>
+    </insert>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            insert into fw_devices_plan_execute_record (keep_task_id,keep_item_id,keep_item_result,reason)
+            values (#{item.keepTaskId},#{item.keepItemId},#{item.keepItemResult},#{item.reason})
+        </foreach>
+    </insert>
+
+</mapper>

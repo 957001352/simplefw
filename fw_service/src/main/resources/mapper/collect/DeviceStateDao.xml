@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.collect.dao.DeviceStateDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.collect.DeviceState">
+        <result column="id" property="id"/>
+        <result column="deviceId" property="deviceId"/>
+        <result column="tmOnlineState" property="tmOnlineState"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,deviceId, tmOnlineState
+    </sql>
+
+    <select id="findDevice" parameterType="java.lang.String" resultType="com.fw.entity.collect.DeviceState">
+        select <include refid="Base_Column_List"/>  from fw_collect_device_state where deviceId = #{deviceCode}
+    </select>
+</mapper>

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.logistics.dao.LogisticsBackHouseDao">
+    <!-- 通用查询映射结果 -->
+
+    <resultMap id="BaseResultMap" type="com.fw.entity.logistics.LogisticsBackHouse">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="house_no" property="houseNo" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="execute_time" property="executeTime" jdbcType="TIMESTAMP"/>
+        <result column="execute_user" property="executeUser" jdbcType="INTEGER"/>
+        <result column="sotre_date" property="sotreDate" jdbcType="TIMESTAMP"/>
+        <result column="product_code" property="productCode" jdbcType="VARCHAR"/>
+        <result column="product_devices_id" property="productDevicesId" jdbcType="VARCHAR"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+     </resultMap>
+
+    <resultMap id="BaseBackHouseResultMap" type="com.fw.entity.logistics.LogisticsBackHouse">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="house_no" property="houseNo" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="execute_time" property="executeTime" jdbcType="TIMESTAMP"/>
+        <result column="execute_user" property="executeUser" jdbcType="INTEGER"/>
+        <result column="sotre_date" property="sotreDate" jdbcType="TIMESTAMP"/>
+        <result column="product_code" property="productCode" jdbcType="VARCHAR"/>
+        <result column="product_devices_id" property="productDevicesId" jdbcType="VARCHAR"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+        <collection property="logisticsBackHouseDetails" column="id" select="getBackHouseDetails"/>
+    </resultMap>
+
+    <resultMap id="LogisticsBackHouseDetailMap" type="com.fw.entity.logistics.LogisticsBackHouseDetail">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="back_house_id" property="backHouseId" jdbcType="INTEGER"/>
+        <result column="product_id" property="productId" jdbcType="INTEGER"/>
+        <result column="storage_count" property="storageCount" jdbcType="INTEGER"/>
+        <result column="apply_count" property="applyCount" jdbcType="INTEGER"/>
+        <result column="fw_batch" property="fwBatch" jdbcType="VARCHAR"/>
+        <result column="storage_location_id" property="storageLocationId" jdbcType="INTEGER"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+            id,create_time,house_no, status, execute_time, execute_user, sotre_date, product_code, note,product_devices_id
+    </sql>
+
+    <select id="getBackHouseDetails" parameterType="com.fw.entity.logistics.LogisticsBackHouseDetail" resultMap="LogisticsBackHouseDetailMap">
+        SELECT
+            t1.id,
+            t1.back_house_id,
+            t1.product_id,
+            t1.storage_count,
+            t1.apply_count,
+            t1.fw_batch,
+            t1.storage_location_id,
+            t1.note,
+            t2.NAME as productName,
+            t2.CODE as code,
+            t2.unit
+        FROM
+	        fw_logistics_back_house_detail t1
+	        LEFT JOIN fw_logistics_product t2 ON t1.product_id = t2.id
+        WHERE
+	        t1.back_house_id = #{id}
+    </select>
+
+    <select id="findList" parameterType="com.fw.entity.logistics.LogisticsBackHouse" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM fw_logistics_back_house where 1=1
+        <if test="status != null">
+            and status = #{status}
+        </if>
+        <if test="productOrder != null  and productOrder != ''">
+            and product_code like concat('%/', #{productOrder}, '%') ESCAPE '/'
+        </if>
+        <if test="houseNo != null  and houseNo != ''">
+            and house_no like concat('%/', #{houseNo}, '%') ESCAPE '/'
+        </if>
+        order by id desc
+    </select>
+
+    <update id="updateStatus" parameterType="com.fw.entity.logistics.LogisticsBackHouse">
+            update fw_logistics_back_house set status = 1  where id = #{id}
+    </update>
+
+    <select id="findHistoryList" parameterType="com.fw.entity.logistics.LogisticsBackHouse" resultMap="BaseResultMap">
+        SELECT
+        DISTINCT(t1.id),
+        t1.house_no,
+        t1.create_time,
+        t1.execute_user,
+        t1.sotre_date,
+        t1.product_code,
+        t1.execute_time,
+        t1.note
+        FROM
+        fw_logistics_back_house t1
+        LEFT JOIN fw_logistics_back_house_detail t2 ON t1.id = t2.back_house_id
+        LEFT JOIN fw_logistics_product t3 ON t2.product_id = t3.id
+        WHERE
+        t1.STATUS = 1
+        <if test="houseNo != null  and houseNo != ''">
+            and t1.house_no like concat('%/', #{houseNo}, '%') ESCAPE '/'
+        </if>
+        <if test="code != null  and code != ''">
+            and t3.code like concat('%/', #{code}, '%') ESCAPE '/'
+        </if>
+        <if test="productCode != null  and productCode != ''">
+            and t1.product_code like concat('%/', #{productCode}, '%') ESCAPE '/'
+        </if>
+        <if test="startExecuteTime != null  and startExecuteTime != ''">
+            <![CDATA[ and t1.execute_time >= #{startExecuteTime} ]]>
+        </if>
+        <if test="endExecuteTime != null and endExecuteTime != ''">
+            <![CDATA[ and t1.execute_time <= #{endExecuteTime} ]]>
+        </if>
+        order by t1.id desc
+    </select>
+
+    <select id="getBackHouse" parameterType="com.fw.entity.logistics.LogisticsBackHouse" resultMap="BaseBackHouseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from fw_logistics_back_house where id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.fw.entity.logistics.LogisticsBackHouse" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_logistics_back_house
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="houseNo != null  and houseNo != ''">house_no,</if>
+            <if test="status != null ">status,</if>
+            <if test="executeTime != null  and executeTime != ''">execute_time,</if>
+            <if test="executeUser != null  and executeUser != ''">execute_user,</if>
+            <if test="productCode != null  and productCode != ''">product_code,</if>
+            <if test="productDevicesId != null">product_devices_id,</if>
+            <if test="note != null and note !=''">note</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="houseNo != null  and houseNo != ''">#{houseNo},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="executeTime != null  and executeTime != ''">#{executeTime},</if>
+            <if test="executeUser != null  and executeUser != ''">#{executeUser},</if>
+            <if test="productCode != null  and productCode != ''">#{productCode},</if>
+            <if test="productDevicesId != null">#{productDevicesId},</if>
+            <if test="note != null and note !=''">#{note}</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.logistics.LogisticsBackHouse">
+        update fw_logistics_back_house
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="houseNo != null  and houseNo != ''">house_no = #{houseNo},</if>
+            <if test="status != null ">status = #{status},</if>
+            <if test="executeTime != null  and executeTime != ''">execute_time = #{executeTime},</if>
+            <if test="executeUser != null  and executeUser != ''">execute_user = #{executeUser},</if>
+            <if test="productCode != null  and productCode != ''">product_code = #{productCode},</if>
+            <if test="productDevicesId != null">product_devices_id = #{productDevicesId},</if>
+            <if test="note != null and note !=''">note = #{note}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="selectById" parameterType="integer" resultType="com.fw.entity.logistics.LogisticsBackHouse">
+        select
+        <include refid="Base_Column_List"/>
+        from fw_logistics_back_house where id = #{id}
+    </select>
+
+    <select id="findCode" resultType="java.lang.String">
+        select ifnull(concat(left(max(house_no),4),lpad(right(max(house_no),6)+1,6,0)),#{code})house_no from fw_logistics_back_house
+    </select>
+
+    <delete id="delete" parameterType="java.util.List">
+        delete from fw_logistics_back_house where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+</mapper>

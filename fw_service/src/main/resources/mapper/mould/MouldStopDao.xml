@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.mould.dao.MouldStopDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.mould.MouldStop">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="mould_devices_id" property="mouldDevicesId" jdbcType="INTEGER"/>
+        <result column="creat_user" property="creatUser" jdbcType="INTEGER"/>
+        <result column="reason" property="reason" jdbcType="VARCHAR"/>
+        <result column="data_id" property="dataId" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,mould_devices_id,creat_user,reason,data_id,create_time from fw_mould_devices_stop
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.mould.MouldStop" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_mould_devices_stop
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="mouldDevicesId != null  and mouldDevicesId != ''">mould_devices_id,</if>
+            <if test="creatUser != null  and creatUser != ''">creat_user,</if>
+            <if test="reason != null  and reason != ''">reason,</if>
+            <if test="dataId != null and dataId != ''">data_id,</if>
+            <if test="createTime != null  and createTime != ''">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="mouldDevicesId != null  and mouldDevicesId != ''">#{mouldDevicesId},</if>
+            <if test="creatUser != null  and creatUser != ''">#{creatUser},</if>
+            <if test="reason != null  and reason != ''">#{reason},</if>
+            <if test="dataId != null  and dataId != ''">#{dataId},</if>
+            <if test="createTime != null  and createTime != ''">#{createTime},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.mould.MouldStop">
+        update fw_mould_devices_stop
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="mouldDevicesId != null  and mouldDevicesId != ''">mould_devices_id = #{mouldDevicesId}</if>
+            <if test="creatUser != null  and creatUser != ''">creat_user = #{creatUser},</if>
+            <if test="reason != null  and reason != ''">reason = #{reason},</if>
+            <if test="dataId != null and dataId != ''">data_id = #{dataId},</if>
+            <if test="createTime != null  and createTime != ''">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="findList" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List" />
+    </select>
+</mapper>
+

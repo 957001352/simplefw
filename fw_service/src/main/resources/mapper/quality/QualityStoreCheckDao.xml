@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.quality.dao.QualityStoreCheckDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.quality.QualityStoreCheck">
+        <result column="id" property="id" jdbcType="INTEGER" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="check_no" property="checkNo" jdbcType="VARCHAR" />
+        <result column="product_devices_id" property="productDevicesId" jdbcType="INTEGER"/>
+        <result column="product_code" property="productCode" jdbcType="VARCHAR" />
+        <result column="mould_no" property="mouldNo" jdbcType="VARCHAR"/>
+        <result column="product_id" property="productId" jdbcType="INTEGER"/>
+        <result column="check_time" property="checkTime" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="createUserName" property="createUserName" jdbcType="VARCHAR" />
+        <result column="materialCode" property="materialCode" jdbcType="VARCHAR" />
+        <result column="materialName" property="materialName" jdbcType="VARCHAR" />
+        <result column="checkClassify" property="checkClassify" jdbcType="VARCHAR"/>
+        <result column="count" property="count" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        create_time,
+        check_no, product_devices_id, product_code, product_id, check_time, status, create_user,mould_no
+    </sql>
+
+    <insert id="save" parameterType="com.fw.entity.quality.QualityStoreCheck" keyProperty="id" useGeneratedKeys="true">
+        insert into fw_quality_store_check
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="checkNo !=null and checkNo !=''">check_no,</if>
+            <if test="productDevicesId !=null ">product_devices_id,</if>
+            <if test="productCode !=null and productCode !=''">product_code,</if>
+            <if test="mouldNo !=null and mouldNo !=''">mould_no,</if>
+            <if test="productId !=null ">product_id,</if>
+            <if test="createUser !=null ">create_user,</if>
+            <if test="count !=null ">count</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="checkNo !=null and checkNo !=''">#{checkNo},</if>
+            <if test="productDevicesId !=null ">#{productDevicesId},</if>
+            <if test="productCode !=null and productCode !=''">#{productCode},</if>
+            <if test="mouldNo !=null and mouldNo !=''">#{mouldNo},</if>
+            <if test="productId !=null ">#{productId},</if>
+            <if test="createUser !=null ">#{createUser},</if>
+            <if test="count !=null ">#{count}</if>
+        </trim>
+    </insert>
+
+    <select id="findList" resultMap="BaseResultMap">
+        SELECT
+	        t1.*,
+            t2.code as materialCode,
+	        t2.name as materialName,
+	        t3.check_classify as checkClassify
+        FROM
+	        fw_quality_store_check t1
+        LEFT JOIN fw_logistics_product t2 ON t1.product_id = t2.id
+        left join fw_quality_inspect_result t3 on t1.id = t3.data_id and t3.classify = 2
+	    where 1=1
+	    <if test="productCode != null and productCode!=''">
+            and t1.product_code like concat('%/', #{productCode}, '%') ESCAPE '/'
+        </if>
+	    <if test="checkNo != null and checkNo!=''">
+            and t1.check_no like concat('%/', #{checkNo}, '%') ESCAPE '/'
+        </if>
+        <if test="materialCode !=null and materialCode!=''">
+            and t2.code like concat('%/', #{materialCode}, '%') ESCAPE '/'
+        </if>
+        <if test="startTime != null and startTime != ''">
+            <![CDATA[ and t1.create_time >= #{startTime}]]>
+        </if>
+        <if test="stopTime != null and stopTime != ''">
+            <![CDATA[ and t1.create_time <= #{stopTime}]]>
+        </if>
+         <if test="status !=null">
+             and t1.status = #{status}
+         </if>
+    </select>
+
+    <update id="udpate" parameterType="com.fw.entity.quality.QualityStoreCheck">
+        update fw_quality_store_check
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="status != null">status = #{status},</if>
+            check_time = NOW()
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="findCode" resultType="java.lang.String">
+        select ifnull(concat(left(max(check_no),4),lpad(right(max(check_no),6)+1,6,0)),#{code})check_no from fw_quality_store_check
+    </select>
+
+</mapper>

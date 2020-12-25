@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.logistics.dao.LogisticsPickingDao">
+
+
+    <insert id="insert" parameterType="com.fw.entity.logistics.LogisticsPicking" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_logistics_picking
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="outHouseId != null ">out_house_id,</if>
+            <if test="createUser != null">create_user,</if>
+            <if test="note != null  and note != ''">note</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="outHouseId != null">#{outHouseId},</if>
+            <if test="createUser != null">#{createUser},</if>
+            <if test="note != null  and note != ''">#{note}</if>
+        </trim>
+    </insert>
+
+    <select id="findList" resultMap="logisticsPickingResultList">
+        select  l.*,o.house_no
+        from fw_logistics_picking l
+        left join fw_logistics_out_house o on l.out_house_id=o.id
+        WHERE 1=1
+        <if test="outHouseId != null">
+            and l.out_house_id = #{outHouseId}
+        </if>
+    </select>
+    <resultMap id="logisticsPickingResultList" type="com.fw.entity.logistics.LogisticsPicking">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="out_house_id" property="outHouseId" jdbcType="INTEGER"/>
+        <collection property="logisticsOutHouseDetailList" column="out_house_id" select="findDetailListByOutHouseId"/>
+    </resultMap>
+    <select id="findDetailListByOutHouseId" resultType="java.util.LinkedHashMap">
+       select flohd.id,flohd.storage_count storageCount,flohd.fw_batch fwBatch,
+			  flp.id as productId,flp.unit,flp.code productCode,flp.name productName,flsd.provider_batch providerBatch
+        from fw_logistics_out_house_detail flohd
+        left join fw_logistics_storage_detail flsd on flsd.id = flohd.storage_detail_id
+		left join fw_logistics_product flp on flp.id=flsd.product_id
+        where flohd.out_house_id = #{outHouseId}
+    </select>
+
+    <select id="getLogisticsPicking" resultType="com.fw.entity.logistics.LogisticsPicking">
+        SELECT
+            t3.create_time,
+            t3.create_user
+        FROM
+            fw_logistics_out_house_detail t1
+            LEFT JOIN fw_logistics_out_house t2 ON t1.out_house_id = t2.id
+            LEFT JOIN fw_logistics_picking t3 ON t2.id = t3.out_house_id
+        WHERE
+            t1.product_order = #{productOrder} limit 1
+    </select>
+
+</mapper>

@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.mould.dao.MouldStorageDao">
+    <resultMap id="BaseResultMap" type="com.fw.entity.mould.MouldStorageInfo">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="unit" property="unit" jdbcType="VARCHAR"/>
+        <result column="max_store" property="maxStore" jdbcType="INTEGER"/>
+        <result column="min_store" property="minStore" jdbcType="INTEGER"/>
+        <result column="store_count" property="storeCount" jdbcType="INTEGER"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_user" property="updateUser" jdbcType="INTEGER"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="location" property="location" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="BaseOutInDetailMap" type="com.fw.entity.mould.MouldStorageOutInDetail">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="devices_spare_id" property="devicesSpareId" jdbcType="INTEGER"/>
+        <result column="devicesSpareName" property="devicesSpareName" jdbcType="VARCHAR"/>
+        <result column="spareCode" property="spareCode" jdbcType="VARCHAR"/>
+        <result column="use_count" property="useCount" jdbcType="INTEGER"/>
+        <result column="location" property="location" jdbcType="VARCHAR"/>
+        <result column="operate" property="operate" jdbcType="INTEGER"/>
+        <result column="out_in" property="outIn" jdbcType="INTEGER"/>
+    </resultMap>
+
+    
+    <resultMap id="BaseOutMap" type="com.fw.entity.mould.MouldSpareOut">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="out_no" property="outNo" jdbcType="VARCHAR"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+        <collection property="storageOutInDetailList" column="id" select="findSpareOutDetail" />
+    </resultMap>
+
+    <resultMap id="BaseInMap" type="com.fw.entity.mould.MouldSpareIn">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="in_no" property="inNo" jdbcType="VARCHAR"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+        <collection property="storageOutInDetailList" column="id" select="findSpareInDetail" />
+    </resultMap>
+
+
+    <select id="selectOutDetailById" resultMap="BaseOutMap" >
+        select * from fw_mould_spare_out where 1=1
+        <if test="id != null"> and id = #{id}</if>
+    </select>
+
+    <select id="selectInDetailById" resultMap="BaseInMap">
+        select * from fw_mould_spare_in where 1=1
+        <if test="id != null"> and id = #{id}</if>
+    </select>
+
+    <select id="findSpareInDetail" resultMap="BaseOutInDetailMap">
+        select t1.*
+        ,t2.name as devicesSpareName
+        ,t2.code as spareCode
+         from fw_mould_outin_detail t1  join fw_mould_devices_spare t2 on t1.devices_spare_id = t2.id where 1=1
+         and operate = 0
+        <if test="id != null"> and out_in = #{id}</if>
+    </select>
+
+    <select id="findSpareOutDetail" resultMap="BaseOutInDetailMap">
+        select t1.*
+        ,t2.name as devicesSpareName
+        ,t2.code as spareCode
+        from fw_mould_outin_detail t1  join fw_mould_devices_spare t2 on t1.devices_spare_id = t2.id where 1=1
+        and operate = 1
+        <if test="id != null"> and out_in = #{id}</if>
+    </select>
+
+   <!--根据物料编码或名称查询 -->
+    <select id="selectSpareByCodeAndName" resultType="java.lang.Integer">
+        select count(id) from fw_mould_devices_spare where code = #{code} or name = #{name}
+    </select>
+
+    <!--根据物料编码或名称查询 -->
+    <select id="selectSpareById" resultType="java.lang.Integer">
+        select count(id) from fw_mould_devices_spare where id = #{id}
+    </select>
+
+    <!-- 新建模具备品备件基础信息 -->
+    <insert id="insertSpareInfo" parameterType="com.fw.entity.mould.MouldStorageInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_mould_devices_spare
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="code != null and code != ''">code,</if>
+                <if test="name != null and name != ''">name,</if>
+                <if test="unit != null and unit !='' ">unit,</if>
+                <if test="maxStore != null">max_store,</if>
+                <if test="minStore != null">min_store,</if>
+                <if test="createUser != null">create_user</if>
+            </trim>
+        values
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="code != null and code != ''">#{code},</if>
+                <if test="name != null and name != ''">#{name},</if>
+                <if test="unit != null and unit !='' ">#{unit},</if>
+                <if test="maxStore != null">#{maxStore},</if>
+                <if test="minStore != null">#{minStore},</if>
+                <if test="createUser != null">#{createUser}</if>
+            </trim>
+    </insert>
+    <!-- 更新模具备品备件基础信息 -->
+    <update id="updateSpareInfo" parameterType="com.fw.entity.mould.MouldStorageInfo">
+        update fw_mould_devices_spare
+            <trim prefix="SET" suffixOverrides=",">
+                <if test="code != null and code != ''">code = #{code},</if>
+                <if test="name != null and name != ''">name = #{name},</if>
+                <if test="unit != null and unit !='' ">unit = #{unit},</if>
+                <if test="maxStore != null">max_store = #{maxStore},</if>
+                <if test="minStore != null">min_store = #{minStore},</if>
+                <if test="updateUser != null">update_user = #{updateUser}</if>
+            </trim>
+            where id = #{id}
+    </update>
+
+    <!-- 删除模具备品备件基础信息 -->
+    <delete id="deleteSpareInfo" parameterType="java.util.List">
+        delete from fw_mould_devices_spare where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="findListSpareInfo" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select * from  fw_mould_devices_spare where 1=1
+        <if test="code != null and code != ''">and code like concat('%/', #{code}, '%') ESCAPE '/'</if>
+        <if test="name != null and name != ''">and name like concat('%/', #{name}, '%') ESCAPE '/'</if>
+        order by create_time desc
+    </select>
+
+    <!-- 新建入库单 -->
+    <insert id="insertIn" parameterType="com.fw.entity.mould.MouldSpareIn" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_mould_spare_in
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="inNo != null and inNo != ''">in_no,</if>
+            <if test="orderNo != null and orderNo != ''">order_no,</if>
+            <if test="createUser != null ">create_user,</if>
+            create_time,
+            <if test="note != null  and note != ''">note</if>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="inNo != null and inNo != ''">#{inNo},</if>
+            <if test="orderNo != null and orderNo != ''">#{orderNo},</if>
+            <if test="createUser != null ">#{createUser},</if>
+            now(),
+            <if test="note != null  and note != ''">#{note}</if>
+        </trim>
+    </insert>
+
+    <!-- 新建入库明细 -->
+    <insert id="insertInOrOutDetail" parameterType="java.util.List">
+        insert into fw_mould_outin_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            devices_spare_id,use_count,operate,out_in
+        </trim>
+        values
+        <foreach collection="list" item="item" index="index" separator="," >
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                #{item.devicesSpareId},#{item.useCount},
+                <choose>
+                    <!--operate 0入库  1出库 -->
+                    <when test="item.operate == 0">
+                        0,
+                    </when>
+                    <otherwise>
+                        1,
+                    </otherwise>
+                </choose>
+                #{item.outIn}
+            </trim>
+        </foreach>
+    </insert>
+
+    <!-- 新建出库单 -->
+    <insert id="insertOut" parameterType="com.fw.entity.mould.MouldSpareOut" useGeneratedKeys="true" keyProperty="id">
+         insert into fw_mould_spare_out
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="outNo != null and outNo != ''">out_no,</if>
+                <if test="orderNo != null and orderNo != ''">order_no,</if>
+                <if test="createUser != null ">create_user,</if>
+                create_time,
+                <if test="note != null  and note != ''">note</if>
+            </trim>
+        values
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="outNo != null and outNo != ''">#{outNo},</if>
+                <if test="orderNo != null and orderNo != ''">#{orderNo},</if>
+                <if test="createUser != null ">#{createUser},</if>
+                now(),
+                <if test="note != null  and note != ''">#{note}</if>
+            </trim>
+    </insert>
+    
+    <!-- 更新模具备品备件库存数量(添加) -->
+    <update id="updateIn" parameterType="com.fw.entity.mould.MouldStorageInfo">
+        update fw_mould_devices_spare set store_count = IFNULL(store_count,0) + #{inCount} where id = #{deviceSpareId}
+    </update>
+
+    <!-- 更新模具备品备件库存数量(减少) -->
+    <update id="updateOut">
+         update fw_mould_devices_spare set store_count = IFNULL(store_count,0) - #{outCount} where id = #{deviceSpareId}
+    </update>
+
+    <!-- 模具维修备品备件库存信息 -->
+    <select id="findMouldSpareStoreList" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+            code,
+            name,
+            max_store,
+            min_store,
+            store_count
+        from fw_mould_devices_spare
+        where 1=1
+        <if test="name != null  and name != ''">
+            and name like concat('%/', #{name}, '%') ESCAPE '/'
+        </if>
+        order by create_time desc
+    </select>
+
+
+    <!-- 查询库存数量 -->
+    <select id="selectMouldStoreCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select store_count as storeCount from fw_mould_devices_spare where id = #{deviceSpareId}
+    </select>
+
+    <!--查看出入库信息-->
+    <select id="selectInOutInfo" resultType="java.util.LinkedHashMap">
+        SELECT
+                A.outIn,
+                A.operate,
+                A.outInNo,
+                A.order_no as orderNo,
+                DATE_FORMAT(A.createTime,'%Y-%m-%d %H:%i:%s') as createTime,
+                A.create_user as createUser,
+                A.note
+        FROM
+            (
+            SELECT
+                sout.id  AS outIn,
+                sout.out_no AS outInNo,
+                sout.order_no,
+                sout.create_time as createTime,
+                sout.create_user,
+                sout.note,
+                1 as operate
+            FROM
+            fw_mould_spare_out sout
+            UNION ALL
+            SELECT
+                sin.id AS outIn,
+                sin.in_no AS outInNo,
+                sin.order_no,
+                sin.create_time as createTime,
+                sin.create_user,
+                sin.note,
+                0 as operate
+            FROM
+            fw_mould_spare_in sin
+            ) A
+        WHERE 1=1
+            <if test="outInNo != null and outInNo != ''">
+                and outInNo like concat('%/', #{outInNo}, '%') ESCAPE '/'
+            </if>
+            <if test="operate != null">
+                and operate = #{operate}
+            </if>
+            <if test="startDate !=null and startDate !='' ">
+                <![CDATA[ and date_format( A.createTime,'%Y-%m-%d') >= #{startDate}]]>
+            </if>
+            <if test="endDate != null and endDate != ''">
+                <![CDATA[ and date_format( A.createTime,'%Y-%m-%d') <= #{endDate}]]>
+            </if>
+        order by A.createTime desc
+    </select>
+
+    <select id="findStorageById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select * from fw_mould_devices_spare where id = #{id}
+    </select>
+
+    <select id="findStorageByNotInId" resultType="com.fw.entity.mould.MouldStorageInfo">
+        select * from fw_mould_devices_spare where id not in(#{id}) and (name = #{name} or code = #{code})
+    </select>
+
+
+    <!-- 根据模具维修编码查询备品备件的库存情况及使用情况 -->
+<!--    <select id="findMouldSpareStoreAndUse" resultType="java.util.LinkedHashMap" parameterType="java.lang.String">
+        SELECT
+            t1.code AS mouldRepairCode,
+            t1.mould_id AS mouldId,
+            t2.mould_spare_id as mouldSpareId,
+            t3.code,
+            t3.name,
+            t3.store_count as storeCount,
+            t2.use_count as useCount
+        FROM
+        fw_mould_repair t1
+        JOIN fw_moudle_repair_spare t2 ON t1.id = t2.mould_repair_id
+        JOIN fw_mould_devices_spare t3 on t2.mould_spare_id = t3.id
+        where 1=1
+        <if test="code != null and code != ''"> and t1.code like concat('%/', #{code}, '%') ESCAPE '/'</if>
+    </select>-->
+
+    <resultMap id="MouldRepairResultMap" type="com.fw.entity.mould.MouldRepair">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <collection property="mouldRepairSpareList" column="id" select="selectMouldSpareInfo"/>
+    </resultMap>
+
+    <!-- 根据模具维修编码查询备品备件的库存情况及使用情况 -->
+    <select id="findMouldSpareStoreAndUse" resultMap="MouldRepairResultMap" parameterType="java.lang.String">
+        SELECT
+        id,code,mould_id
+        FROM
+        fw_mould_repair
+        where 1=1 and task_received = 1
+        <if test="code != null and code != ''"> and code like concat('%/', #{code}, '%') ESCAPE '/'</if>
+    </select>
+
+    <select id="selectMouldSpareInfo" resultType="com.fw.entity.mould.MouldRepairSpare">
+         SELECT
+            t1.mould_spare_id as mouldSpareId,
+            t1.use_count as useCount,
+            t2.code mouldSpareCode,
+            t2.name mouldSpareName,
+            t2.store_count as storeCount
+        FROM
+        fw_mould_repair_spare t1
+        JOIN fw_mould_devices_spare t2 on t1.mould_spare_id = t2.id
+        where mould_repair_id = #{id}
+    </select>
+
+    <select id="findInCode" resultType="java.lang.String">
+        select ifnull(concat(left(max(in_no),4),lpad(right(max(in_no),6)+1,6,0)),#{code})code from fw_mould_spare_in
+    </select>
+
+    <select id="findOutCode" resultType="java.lang.String">
+        select ifnull(concat(left(max(out_no),4),lpad(right(max(out_no),6)+1,6,0)),#{code})code from fw_mould_spare_out
+    </select>
+
+</mapper>

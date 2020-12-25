@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.craft.dao.CardLogDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.craft.CardLog">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+        <result column="update_type" property="updateType" jdbcType="INTEGER"/>
+        <result column="reason" property="reason" jdbcType="VARCHAR"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="params_id" property="paramsId" jdbcType="INTEGER"/>
+        <result column="craft_pre_data" property="craftPreData" jdbcType="VARCHAR"/>
+        <result column="craft_after_data" property="craftAfterData" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id,create_user,create_time, update_type, reason,content,params_id
+    </sql>
+    <insert id="insert" parameterType="com.fw.entity.craft.CardLog" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_craft_card_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="createUser != null">create_user,</if>
+            <if test="createTime != null  and createTime != ''">create_time,</if>
+            <if test="updateType != null">update_type,</if>
+            <if test="reason != null  and reason != ''">reason,</if>
+            <if test="content != null  and content != ''">content,</if>
+            <if test="paramsId != null">params_id,</if>
+            <if test="craftPreData != null  and craftPreData != ''">craft_pre_data,</if>
+            <if test="craftAfterData != null  and craftAfterData != ''">craft_after_data,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="createUser != null">#{createUser},</if>
+            <if test="createTime != null  and createTime != ''">#{createTime},</if>
+            <if test="updateType != null">#{updateType},</if>
+            <if test="reason != null  and reason != ''">#{reason},</if>
+            <if test="content != null  and content != ''">#{content},</if>
+            <if test="paramsId != null">#{paramsId},</if>
+            <if test="craftPreData != null  and craftPreData != ''">#{craftPreData},</if>
+            <if test="craftAfterData != null  and craftAfterData != ''">#{craftAfterData},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.craft.CardLog">
+        update fw_craft_card_log
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="createUser != null">create_user = #{createUser},</if>
+            <if test="createTime != null  and createTime != ''">create_time = #{createTime},</if>
+            <if test="updateType != null">update_type = #{updateType},</if>
+            <if test="reason != null  and reason != ''">reason = #{reason},</if>
+            <if test="content != null  and content != ''">content = #{content},</if>
+            <if test="paramsId != null">params_id = #{paramsId},</if>
+            <if test="craftPreData != null  and craftPreData != ''">craft_pre_data = #{craftPreData},</if>
+            <if test="craftAfterData != null  and craftAfterData != ''">craft_after_data = #{craftAfterData},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <delete id="delete">
+        delete from fw_craft_card_log where id in
+        <foreach collection="ids" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="findList" resultType="com.fw.entity.craft.CardLog">
+        select fccl.id,fccl.create_user,fccl.create_time, fccl.update_type, fccl.reason,fccl.content,fccl.params_id,fje.id execution_id,fje.audit_status,fccp.part_code,fccp.part_name,fccp.document_no,fccp.product_id,fccp.code,fccp.card_id
+        from fw_craft_card_log fccl
+        left join fw_jbpm_execution fje on fccl.id = fje.data_id and form_code = #{fromCode}
+        right join fw_craft_card_params fccp on fccl.params_id = fccp.id
+        where 1=1
+        <if test="paramsId != null and paramsId != ''">
+            and fccl.params_id = #{paramsId}
+        </if>
+        <if test="cardLogId != null and cardLogId != ''">
+            and fccl.id = #{cardLogId}
+        </if>
+        order by fccl.create_time desc
+    </select>
+    <select id="findById" resultType="com.fw.entity.craft.CardLog">
+        select fccl.*,fccp.part_code,fccp.part_name,fccp.document_no,fccp.product_id,fccp.code,fccp.card_id
+        from fw_craft_card_log fccl
+        right join fw_craft_card_params fccp on fccl.params_id = fccp.id
+        where fccl.id = #{id}
+    </select>
+
+</mapper>
+

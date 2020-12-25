@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.quality.dao.QualityInspectionDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.quality.QualityInspection">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="product_id" property="productId" jdbcType="INTEGER"/>
+        <result column="drawing" property="drawing" jdbcType="VARCHAR"/>
+        <result column="customer" property="customer" jdbcType="VARCHAR"/>
+        <result column="classify" property="classify" jdbcType="INTEGER"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+        <result column="inspection" property="inspection" jdbcType="INTEGER"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="update_user" property="updateUser" jdbcType="INTEGER"/>
+        <result column="version" property="version" jdbcType="VARCHAR"/>
+        <collection property="qualityInspectionDetails" column="id" select="getDetail"/>
+        <collection property="qualityInspectionChangeLogs" column="id" select="getChangeLog"/>
+    </resultMap>
+
+    <resultMap id="QualityInspectionDetailMap" type="com.fw.entity.quality.QualityInspectionDetail">
+        <result column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="feature" property="feature" jdbcType="VARCHAR"/>
+        <result column="special" property="special" jdbcType="VARCHAR"/>
+        <result column="process" property="process" jdbcType="VARCHAR"/>
+        <result column="standard" property="standard" jdbcType="VARCHAR"/>
+        <result column="evaluate" property="evaluate" jdbcType="VARCHAR"/>
+        <result column="measure" property="measure" jdbcType="VARCHAR"/>
+        <result column="quota" property="quota" jdbcType="VARCHAR"/>
+        <result column="control" property="control" jdbcType="VARCHAR"/>
+        <result column="inspection_id" property="inspectionId" jdbcType="INTEGER"/>
+        <result column="classify" property="classify" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <resultMap id="QualityInspectionChangeLogMap" type="com.fw.entity.quality.QualityInspectionChangeLog">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="reason" property="reason" jdbcType="VARCHAR"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="version" property="version" jdbcType="VARCHAR"/>
+        <result column="inspection_id" property="inspectionId" jdbcType="INTEGER"/>
+        <result column="inspection_content" property="inspectionContent" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="getDetail" parameterType="integer" resultMap="QualityInspectionDetailMap">
+        SELECT
+            t1.id,
+            t1.feature,
+            t1.special,
+            t1.process,
+            t1.standard,
+            t1.evaluate,
+            t1.measure,
+            t1.quota,
+            t1.control,
+            t1.inspection_id,
+            t1.classify,
+            t2.name,
+            t2.path as webPath,
+            t2.path,
+            t2.suffix
+        FROM
+            fw_quality_inspection_detail t1
+        LEFT JOIN fw_basic_attachment t2 ON t1.id = t2.data_id
+        WHERE
+            t1.inspection_id = #{id}
+    </select>
+
+    <select id="getChangeLog" parameterType="integer" resultMap="QualityInspectionChangeLogMap">
+        SELECT
+            t1.id,
+            t1.create_time,
+            t1.reason,
+            t1.content,
+            t1.create_user,
+            t1.version,
+            t1.inspection_id,
+            t1.inspection_content,
+            t11.audit_idea AS auditIdea,
+            t2.audit_status AS auditStatus,
+            t2.audit_result AS auditResult,
+            t2.end_time AS endTime
+        FROM
+        fw_quality_inspection_change_log t1
+            LEFT JOIN fw_jbpm_execution t2 ON t2.data_id = t1.id AND t2.form_code = 'inspectionChange'
+            LEFT JOIN (SELECT max( t7.id ) id, t7.execution_id FROM fw_jbpm_hist_task t7  GROUP BY t7.execution_id) t9 ON t2.id = t9.execution_id
+            LEFT JOIN fw_jbpm_hist_task t11 ON t11.id = t9.id
+        WHERE
+            t1.inspection_id = #{id}
+    </select>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,create_time,update_time,product_id, drawing, customer, classify, note, inspection, create_user, update_user,version
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.quality.QualityInspection" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_quality_inspection
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="updateTime != null  and updateTime != ''">update_time,</if>
+            <if test="productId != null">product_id,</if>
+            <if test="drawing != null and drawing !=''">drawing,</if>
+            <if test="customer != null and customer !=''">customer,</if>
+            <if test="classify != null">classify,</if>
+            <if test="note != null  and note != ''">note,</if>
+            <if test="inspection != null">inspection,</if>
+            <if test="createUser != null  and createUser != ''">create_user,</if>
+            <if test="updateUser != null  and updateUser != ''">update_user,</if>
+            <if test="version != null  and version != ''">version</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="updateTime != null  and updateTime != ''">#{updateTime},</if>
+            <if test="productId != null">#{productId},</if>
+            <if test="drawing != null and drawing !=''">#{drawing},</if>
+            <if test="customer != null and customer !=''">#{customer},</if>
+            <if test="classify != null">#{classify},</if>
+            <if test="note != null  and note != ''">#{note},</if>
+            <if test="inspection != null">#{inspection},</if>
+            <if test="createUser != null  and createUser != ''">#{createUser},</if>
+            <if test="updateUser != null  and updateUser != ''">#{updateUser},</if>
+            <if test="version != null  and version != ''">#{version}</if>
+        </trim>
+    </insert>
+
+    <select id="selectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>  from fw_quality_inspection where id = #{id}
+    </select>
+
+    <update id="update" parameterType="com.fw.entity.quality.QualityInspection">
+        update fw_quality_inspection
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="updateTime != null  and updateTime != ''">update_time = #{updateTime},</if>
+            <if test="productId != null">product_id = #{productId},</if>
+            <if test="drawing != null and drawing !=''">drawing = #{drawing},</if>
+            <if test="customer != null and customer !=''">customer = #{customer},</if>
+            <if test="classify != null">classify = #{classify},</if>
+            <if test="note != null  and note != ''">note = #{note},</if>
+            <if test="inspection != null">inspection = #{inspection},</if>
+            <if test="createUser != null  and createUser != ''">create_user = #{createUser},</if>
+            <if test="updateUser != null  and updateUser != ''">update_user = #{updateUser},</if>
+            <if test="version != null  and version != ''">version = #{version}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="findList" parameterType="com.fw.entity.quality.QualityInspection" resultMap="BaseResultMap">
+        SELECT
+            t1.id,
+            t1.create_time,
+            t1.update_time,
+            t1.product_id,
+            t1.drawing,
+            t1.customer,
+            t1.classify,
+            t1.note,
+            t1.inspection,
+            t1.create_user,
+            t1.update_user,
+            t1.version,
+            t2.CODE,
+            t2.NAME AS productName,
+            t5.reason,
+            t5.content,
+            t5.create_time AS changeTime,
+            t6.audit_status AS auditStatus,
+            t6.audit_result AS auditResult,
+            t6.end_time AS endTime
+        FROM
+            fw_quality_inspection t1
+            LEFT JOIN fw_logistics_product t2 ON t1.product_id = t2.id
+            LEFT JOIN
+            (SELECT max(t3.id) id,t3.inspection_id from fw_quality_inspection_change_log t3 GROUP BY t3.inspection_id ) t4 on t4.inspection_id = t1.id
+            LEFT JOIN fw_quality_inspection_change_log t5 on t5.id = t4.id
+            LEFT JOIN fw_jbpm_execution t6  ON t6.data_id = t4.id AND t6.form_code = 'inspectionChange'
+        WHERE
+        1 =1
+        <if test="code != null  and code != ''">
+            and t2.code like concat('%/', #{code}, '%') ESCAPE '/'
+        </if>
+        <if test="preciseCode != null  and preciseCode != ''">
+            and t2.code = #{preciseCode}
+        </if>
+        <if test="productName != null  and productName != ''">
+            and t2.name like concat('%/', #{productName}, '%') ESCAPE '/'
+        </if>
+        and t1.classify  =  #{classify}
+        order by t1.id desc
+    </select>
+
+    <select id="selectByProductId" parameterType="java.lang.Integer" resultType="com.fw.entity.quality.QualityInspection">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from fw_quality_inspection WHERE  product_id = #{productId} and classify = 1
+    </select>
+
+    <select id="getInspectionDetail" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from fw_quality_inspection WHERE  id = #{id}
+    </select>
+
+    <select id="verifyCode" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT count(*) from fw_quality_inspection where product_id = #{productId}  and classify = #{classify}
+    </select>
+
+</mapper>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.logistics.dao.LogisticsOutHouseDetailDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.logistics.LogisticsOutHouseDetail">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="out_house_id" property="outHouseId" jdbcType="INTEGER"/>
+        <result column="storage_detail_id" property="storageDetailId" jdbcType="INTEGER"/>
+        <result column="storage_count" property="storageCount" jdbcType="INTEGER"/>
+        <result column="apply_count" property="applyCount" jdbcType="INTEGER"/>
+        <result column="fw_batch" property="fwBatch" jdbcType="VARCHAR"/>
+        <result column="storage_location_id" property="storageLocationId" jdbcType="INTEGER"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+        <result column="product_order" property="productOrder" jdbcType="VARCHAR"/>
+        <result column="feed_count" property="feedCount" jdbcType="INTEGER"/>
+        <association property="logisticsProduct" column="storage_detail_id" select="com.fw.service.logistics.dao.LogisticsProductDao.findByStorageDetailId"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,out_house_id, storage_detail_id, storage_count,apply_count,fw_batch,storage_location_id,note,product_order,feed_count
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.logistics.LogisticsStoreHouseDetail" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_logistics_out_house_detail
+        (out_house_id, storage_detail_id, storage_count,apply_count,fw_batch,storage_location_id,note,product_order,feed_count)
+        values
+        <foreach collection="logisticsOutHouseDetails" item="logisticsOutHouseDetail" index="i" separator=",">
+            (
+            #{logisticsOutHouseDetail.outHouseId},
+            #{logisticsOutHouseDetail.storageDetailId},
+            #{logisticsOutHouseDetail.storageCount},
+            #{logisticsOutHouseDetail.applyCount},
+            #{logisticsOutHouseDetail.fwBatch},
+            #{logisticsOutHouseDetail.storageLocationId},
+            #{logisticsOutHouseDetail.note},
+            #{logisticsOutHouseDetail.productOrder},
+            #{logisticsOutHouseDetail.feedCount},
+            )
+        </foreach>
+    </insert>
+    <insert id="insertOne" parameterType="com.fw.entity.logistics.LogisticsStoreHouseDetail" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_logistics_out_house_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="outHouseId != null  and outHouseId != ''">out_house_id,</if>
+            <if test="storageDetailId != null and storageDetailId != ''">storage_detail_id,</if>
+            <if test="storageCount != null and storageCount != ''">storage_count,</if>
+            <if test="applyCount != null and applyCount != ''">apply_count,</if>
+            <if test="fwBatch != null and fwBatch != ''">fw_batch,</if>
+            <if test="storageLocationId != null">storage_location_id,</if>
+            <if test="note != null and note != ''">note,</if>
+            <if test="productOrder != null and productOrder != ''">product_order,</if>
+            <if test="feedCount != null and feedCount != ''">feed_count</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="outHouseId != null  and outHouseId != ''">#{outHouseId},</if>
+            <if test="storageDetailId != null and storageDetailId != ''">#{storageDetailId},</if>
+            <if test="storageCount != null and storageCount != ''">#{storageCount},</if>
+            <if test="applyCount != null and applyCount != ''">#{applyCount},</if>
+            <if test="fwBatch != null and fwBatch != ''">#{fwBatch},</if>
+            <if test="storageLocationId != null">#{storageLocationId},</if>
+            <if test="note != null and note != ''">#{note},</if>
+            <if test="productOrder != null and productOrder != ''">#{productOrder},</if>
+            <if test="feedCount != null and feedCount != ''">#{feedCount}</if>
+        </trim>
+    </insert>
+
+    <select id="findByOutHouseId" resultMap="BaseResultMap">
+        SELECT flohd.*
+        FROM fw_logistics_out_house_detail flohd
+        where flohd.out_house_id = #{outHouseId}
+    </select>
+    <select id="findByOutHouseIdProduct" resultType="com.fw.entity.logistics.LogisticsOutHouseDetail">
+        SELECT flohd.*
+        FROM fw_logistics_out_house_detail flohd
+        left join fw_logistics_storage_detail flsd on flsd.id = flohd.storage_detail_id
+        where flohd.out_house_id = #{outHouseId} and flsd.product_id = #{productId}
+    </select>
+    <update id="update">
+        <foreach collection="logisticsOutHouseDetails" item="logistic,sOutHouseDetail" separator=";">
+            update fw_logistics_out_house_detail
+            <trim prefix="SET" suffixOverrides=",">
+                <if test="logisticsOutHouseDetail.outHouseId != null and logisticsOutHouseDetail.outHouseId != ''">out_house_id = #{logisticsOutHouseDetail.outHouseId},</if>
+                <if test="logisticsOutHouseDetail.storageDetailId != null and logisticsOutHouseDetail.storageDetailId != ''">storage_detail_id = #{logisticsOutHouseDetail.storageDetailId},</if>
+                <if test="logisticsOutHouseDetail.storageCount != null">storage_count = #{logisticsOutHouseDetail.storageCount},</if>
+                <if test="logisticsOutHouseDetail.applyCount != null">apply_count = #{logisticsOutHouseDetail.applyCount},</if>
+                <if test="logisticsOutHouseDetail.fwBatch != null and logisticsOutHouseDetail.fwBatch != ''">fw_batch = #{logisticsOutHouseDetail.fwBatch},</if>
+                <if test="logisticsOutHouseDetail.storageLocationId != null and logisticsOutHouseDetail.storageLocationId != ''">storage_location_id = #{logisticsOutHouseDetail.storageLocationId},</if>
+                <if test="logisticsOutHouseDetail.note != null and logisticsOutHouseDetail.note != ''">note = #{logisticsOutHouseDetail.note},</if>
+                <if test="logisticsOutHouseDetail.productOrder != null and logisticsOutHouseDetail.productOrder != ''">product_order = #{logisticsOutHouseDetail.productOrder},</if>
+                <if test="logisticsOutHouseDetail.feedCount != null and logisticsOutHouseDetail.feedCount != ''">feed_count = #{logisticsOutHouseDetail.feedCount}</if>
+            </trim>
+            where id = #{logisticsOutHouseDetail.id}
+        </foreach>
+    </update>
+
+    <select id="findDetailByProductOrder" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM fw_logistics_out_house_detail
+        WHERE  product_order = #{productOrder}
+    </select>
+
+    <select id="getStorageCount" resultType="com.fw.entity.logistics.LogisticsOutHouseDetail">
+        SELECT
+            t1.storage_detail_id as storageDetailId,
+            t3.NAME as  productName,
+            t3.CODE as productCode,
+            sum( t1.storage_count - IFNULL(t1.feed_count,0)) AS storageCount
+        FROM
+            fw_logistics_out_house_detail t1
+            LEFT JOIN fw_logistics_storage_detail t2 ON t1.storage_detail_id = t2.id
+            LEFT JOIN fw_logistics_product t3 ON t2.product_id = t3.id
+        WHERE
+            t1.storage_detail_id = #{storageDetailId} and t1.storage_count > IFNULL(t1.feed_count,0)
+    </select>
+
+    <select id="findByDetailId" resultType="com.fw.entity.logistics.LogisticsOutHouseDetail">
+        SELECT id,(storage_count-IFNULL(feed_count,0)) storage_count
+        FROM fw_logistics_out_house_detail
+        WHERE  storage_detail_id = #{storageDetailId}  and storage_count > IFNULL(feed_count,0) order by  storage_count desc
+    </select>
+
+    <update id="updateFeedCount">
+        update fw_logistics_out_house_detail set feed_count = #{feedCount} where id = #{id}
+    </update>
+</mapper>

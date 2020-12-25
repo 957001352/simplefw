@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.mould.dao.MouldUseRecordDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.mould.MouldUseRecord">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="product_devices_id" property="productDevicesId" jdbcType="INTEGER"/>
+        <result column="mould_devices_id" property="mouldDevicesId" jdbcType="INTEGER"/>
+        <result column="product_code" property="productCode" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="opreate" property="opreate" jdbcType="INTEGER"/>
+        <result column="end_file" property="endFile" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="task_status" property="taskStatus" jdbcType="INTEGER"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="injection_molding_id" property="injectionMoldingId" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,product_devices_id,mould_devices_id,product_code,create_time,opreate,end_file,status,task_status,create_user,injection_molding_id
+        from fw_mould_use_record
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.mould.MouldUseRecord" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_mould_use_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productDevicesId != null">product_devices_id,</if>
+            <if test="mouldDevicesId != null">mould_devices_id,</if>
+            <if test="productCode != null  and productCode != ''">product_code,</if>
+            <if test="createTime != null  and createTime != ''">create_time,</if>
+            <if test="opreate != null">opreate,</if>
+            <if test="endFile != null  and endFile != ''">end_file,</if>
+            <if test="status != null">status,</if>
+            <if test="taskStatus != null">task_status,</if>
+            <if test="createUser != null">create_user,</if>
+            <if test="injectionMoldingId != null">injection_molding_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="productDevicesId != null">#{productDevicesId},</if>
+            <if test="mouldDevicesId != null">#{mouldDevicesId},</if>
+            <if test="productCode != null  and productCode != ''">#{productCode},</if>
+            <if test="createTime != null  and createTime != ''">#{createTime},</if>
+            <if test="opreate != null">#{opreate},</if>
+            <if test="endFile != null  and endFile != ''">#{endFile},</if>
+            <if test="status != null">#{status},</if>
+            <if test="taskStatus != null">#{taskStatus},</if>
+            <if test="createUser != null">#{createUser},</if>
+            <if test="injectionMoldingId != null">#{injectionMoldingId},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.mould.MouldUseRecord">
+        update fw_mould_use_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productDevicesId != null">product_devices_id = #{productDevicesId}</if>
+            <if test="mouldDevicesId != null">mould_devices_id = #{mouldDevicesId},</if>
+            <if test="productCode != null  and productCode != ''">product_code = #{productCode},</if>
+            <if test="createTime != null  and createTime != ''">create_time = #{createTime},</if>
+            <if test="opreate != null  and opreate != ''">opreate = #{opreate},</if>
+            <if test="endFile != null  and endFile != ''">end_file = #{endFile},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="taskStatus != null">task_status = #{taskStatus},</if>
+            <if test="createUser != null">create_user = #{createUser},</if>
+            <if test="injectionMoldingId != null">injection_molding_id = #{injectionMoldingId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="findList" resultType="com.fw.entity.mould.MouldUseRecord" >
+        select
+        fmur.*,fmd.code mould_code,fmd.name mould_name
+        from fw_mould_use_record fmur
+        left join fw_mould_devices fmd on fmd.id = fmur.mould_devices_id
+        <if test="mouldCode != null and mouldCode != ''">
+            and fmd.code like concat('%',#{mouldCode},'%')
+        </if>
+        where 1=1
+        <if test="status != null">
+            and fmur.status = #{status}
+        </if>
+        order by create_time desc
+    </select>
+
+    <select id="findOne" resultType="com.fw.entity.mould.MouldUseRecord" >
+        select
+        fmur.*,fmd.code mould_code,fmd.name mould_name
+        from fw_mould_use_record fmur
+        left join fw_mould_devices fmd on fmd.id = fmur.mould_devices_id
+        where fmur.id = #{id}
+        order by create_time desc
+    </select>
+</mapper>
+

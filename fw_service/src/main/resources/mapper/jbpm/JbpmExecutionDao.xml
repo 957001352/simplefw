@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.jbpm.dao.JbpmExecutionDao">
+
+
+    <insert id="insertExecution" parameterType="com.fw.entity.jbpm.JbpmExecution" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_jbpm_execution
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="deploymentId != null  and deploymentId != ''">deployment_id,</if>
+            <if test="jbpmNo != null and jbpmNo != ''">jbpm_no,</if>
+            <if test="createUser != null  and createUser != ''">create_user,</if>
+            <if test="dataId != null and dataId != ''">data_id,</if>
+            <if test="formCode != null and formCode != ''">form_code,</if>
+            <if test="auditStatus != null and auditStatus != ''">audit_status</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="deploymentId != null  and deploymentId != ''">#{deploymentId},</if>
+            <if test="jbpmNo != null and jbpmNo != ''">#{jbpmNo},</if>
+            <if test="createUser != null  and createUser != ''">#{createUser},</if>
+            <if test="dataId != null and dataId != ''">#{dataId},</if>
+            <if test="formCode != null and formCode != ''">#{formCode},</if>
+            <if test="auditStatus != null and auditStatus != ''">#{auditStatus}</if>
+        </trim>
+    </insert>
+
+    <update id="updateExecution" parameterType="com.fw.entity.jbpm.JbpmExecution">
+        update fw_jbpm_execution
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="auditResult != null">audit_result = #{auditResult},</if>
+            <if test="auditStatus != null  and auditStatus != ''">audit_status = #{auditStatus},</if>
+            <if test="endTime != null  and endTime != ''">end_time = #{endTime}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="findFirstJbpmNode" resultType="com.fw.entity.jbpm.JbpmDeployprop">
+        select t.* from fw_jbpm_deployprop t where deployment_id=#{jbpmId}  order by t.id limit 1
+    </select>
+
+    <select id="findNextJbpmNode" resultType="com.fw.entity.jbpm.JbpmDeployprop">
+        select t.* from fw_jbpm_deployprop t where deployment_id=#{jbpmId}  and id>#{noteId} order by t.id limit 1
+    </select>
+
+
+    <insert id="insertTask" parameterType="com.fw.entity.jbpm.JbpmTask">
+        insert into fw_jbpm_task
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="deploymentId != null  and deploymentId != ''">deployment_id,</if>
+            <if test="executionId != null and executionId != ''">execution_id,</if>
+            <if test="deploypropId != null  and deploypropId != ''">deployprop_id,</if>
+            <if test="auditUser != null and auditUser != ''">audit_user,</if>
+            <if test="dataId != null and dataId != ''">data_id</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="deploymentId != null  and deploymentId != ''">#{deploymentId},</if>
+            <if test="executionId != null and executionId != ''">#{executionId},</if>
+            <if test="deploypropId != null  and deploypropId != ''">#{deploypropId},</if>
+            <if test="auditUser != null and auditUser != ''">#{auditUser},</if>
+            <if test="dataId != null and dataId != ''">#{dataId}</if>
+        </trim>
+    </insert>
+    <delete id="deleteWaitTask" parameterType="java.util.List">
+        delete from fw_jbpm_task where execution_id =#{executionId}
+    </delete>
+
+    <insert id="insertHistHask" parameterType="com.fw.entity.jbpm.JbpmHistTask">
+        insert into fw_jbpm_hist_task
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="deploymentId != null  and deploymentId != ''">deployment_id,</if>
+            <if test="executionId != null and executionId != ''">execution_id,</if>
+            <if test="auditNode != null  and auditNode != ''">audit_node,</if>
+            <if test="auditUser != null and auditUser != ''">audit_user,</if>
+            <if test="auditResult != null">audit_result,</if>
+            <if test="auditIdea != null and auditIdea != ''">audit_idea,</if>
+            <if test="createTime != null and createTime != ''">create_time</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="deploymentId != null  and deploymentId != ''">#{deploymentId},</if>
+            <if test="executionId != null and executionId != ''">#{executionId},</if>
+            <if test="auditNode != null  and auditNode != ''">#{auditNode},</if>
+            <if test="auditUser != null and auditUser != ''">#{auditUser},</if>
+            <if test="auditResult != null">#{auditResult},</if>
+            <if test="auditIdea != null and auditIdea != ''">#{auditIdea},</if>
+            <if test="createTime != null and createTime != ''">#{createTime}</if>
+        </trim>
+    </insert>
+
+
+    <select id="findWaitTaskList" resultMap="histTaskResult">
+        select j.*,d.name deployment_name,t.deployprop_id,t.create_time task_create_time,f.url form_url
+          from  fw_jbpm_execution j
+          left join fw_jbpm_deployment d on j.deployment_id=d.id
+          left join fw_jbpm_task t on t.execution_id=j.id
+          left join fw_jbpm_form f on f.id=d.form_id
+        where find_in_set(#{auditUser},t.audit_user)
+        <if test="jbpmNo != null  and jbpmNo != ''">
+            and d.name like concat('%/', #{jbpmNo}, '%') ESCAPE '/'
+        </if>
+        <if test="userIds != null">
+            and
+            <foreach collection="userIds" open="(" separator="or " close=")" item="item">
+                j.create_user=#{item}
+            </foreach>
+        </if>
+        <if test="startTime != null  and startTime != ''">
+            and date_format(j.create_time,'%Y-%m-%d') =#{startTime}
+           <!-- and date_format(j.create_time,'%Y-%m-%d') &gt;=#{startTime}-->
+        </if>
+        <if test="endTime != null  and endTime != ''">
+            and date_format(j.create_time,'%Y-%m-%d') &lt;=#{endTime}
+        </if>
+        order by j.create_time desc
+    </select>
+
+
+
+
+    <select id="findHistTaskList" resultMap="histTaskResult">
+        select j.*,d.name deployment_name,f.url form_url
+        from fw_jbpm_execution j
+        left join fw_jbpm_deployment d on j.deployment_id=d.id
+        left join fw_jbpm_hist_task t on t.execution_id=j.id
+        left join fw_jbpm_form f on f.id=d.form_id
+        where t.audit_user=#{auditUser}
+        <if test="jbpmNo != null  and jbpmNo != ''">
+            and d.name like concat('%/', #{jbpmNo}, '%') ESCAPE '/'
+        </if>
+        <if test="userIds != null">
+            and
+            <foreach collection="userIds" open="(" separator="or " close=")" item="item">
+                j.create_user=#{item}
+            </foreach>
+        </if>
+        <if test="startTime != null  and startTime != ''">
+        <!--  and date_format(j.create_time,'%Y-%m-%d') &gt;=#{startTime}-->
+            and date_format(j.create_time,'%Y-%m-%d') =#{startTime}
+        </if>
+        <if test="endTime != null  and endTime != ''">
+            and date_format(j.create_time,'%Y-%m-%d') &lt;=#{endTime}
+        </if>
+        group by j.id
+        order by j.create_time desc
+    </select>
+
+
+
+
+    <resultMap type="com.fw.entity.jbpm.JbpmExecution" id="histTaskResult">
+        <result property="id" jdbcType="INTEGER"    column="id"    />
+        <collection property="histTaskList" column="id" select="findHistTaskDeatilList" />
+    </resultMap>
+    <select id="findHistTaskDeatilList" resultType="com.fw.entity.jbpm.JbpmHistTask">
+        select t.* from fw_jbpm_hist_task t
+        where t.execution_id=#{executionId}
+        order by t.create_time
+    </select>
+    <select id="findChecking" resultType="com.fw.entity.jbpm.JbpmExecution">
+        select * from fw_jbpm_execution where form_code = #{formCode} and end_time is null
+    </select>
+    <select id="findCode" resultType="java.lang.String">
+       select ifnull(concat(left(max(jbpm_no),4),lpad(right(max(jbpm_no),6)+1,6,0)),#{code}) code from fw_jbpm_execution
+    </select>
+</mapper>
+

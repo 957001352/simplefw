@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.device.dao.DevicesKeepPlanDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.device.DevicesKeepPlan">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="keep_team_id" property="keepTeamId" jdbcType="INTEGER"/>
+        <result column="product_devices_ids" property="productDevicesIds" jdbcType="VARCHAR"/>
+        <result column="keep_cycle" property="keepCycle" jdbcType="INTEGER"/>
+        <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+        <result column="notice_time" property="noticeTime" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="last_time" property="lastTime" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,create_time,name, keep_team_id, product_devices_ids, keep_cycle, start_time, notice_time,status,last_time
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.device.DevicesKeepPlan" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_devices_keep_plan
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="name != null  and name != ''">name,</if>
+            <if test="keepTeamId != null">keep_team_id,</if>
+            <if test="productDevicesIds != null">product_devices_ids,</if>
+            <if test="keepCycle != null">keep_cycle,</if>
+            <if test="startTime != null  and startTime != ''">start_time,</if>
+            <if test="noticeTime != null">notice_time,</if>
+            <if test="status != null">status,</if>
+            <if test="lastTime != null  and lastTime != ''">last_time</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="keepTeamId != null ">#{keepTeamId},</if>
+            <if test="productDevicesIds != null">#{productDevicesIds},</if>
+            <if test="keepCycle != null ">#{keepCycle},</if>
+            <if test="startTime != null  and startTime != ''">#{startTime},</if>
+            <if test="noticeTime != null ">#{noticeTime},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="lastTime != null  and lastTime != ''">#{lastTime}</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.device.DevicesKeepPlan">
+        update fw_devices_keep_plan
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''">name = #{name},</if>
+            <if test="keepTeamId != null ">keep_team_id = #{keepTeamId},</if>
+            <if test="productDevicesIds != null ">product_devices_ids = #{productDevicesIds},</if>
+            <if test="keepCycle != null ">keep_cycle = #{keepCycle},</if>
+            <if test="startTime != null  and startTime != ''">start_time = #{startTime},</if>
+            <if test="noticeTime != null ">notice_time = #{noticeTime},</if>
+            <if test="status != null ">status = #{status},</if>
+            <if test="lastTime != null  and lastTime != ''">last_time = #{lastTime}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="java.util.List">
+        delete from fw_devices_keep_plan where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="selectById" parameterType="integer" resultType="com.fw.entity.device.DevicesKeepPlan">
+        select
+        <include refid="Base_Column_List"/>
+        from fw_devices_keep_plan where id = #{id}
+    </select>
+
+    <select id="findList" parameterType="com.fw.entity.device.DevicesKeepPlan" resultMap="BaseResultMap">
+        SELECT
+            t1.*,
+            t2.`name` keepTeamName,
+            t5.execute_time previouTime
+        FROM
+            fw_devices_keep_plan t1
+            LEFT JOIN fw_devices_keep_team t2 ON t1.keep_team_id = t2.id
+            LEFT JOIN (SELECT  max(t4.id) id ,t4.keep_plan_id from fw_devices_keep_task t4  GROUP BY t4.keep_plan_id) t3 ON t1.id = t3.keep_plan_id
+            LEFT JOIN  fw_devices_keep_task t5 on t3.id = t5.id
+        WHERE 1=1
+        <if test="name != null  and name != ''">
+            and t1.name like concat('%/', #{name}, '%') ESCAPE '/'
+        </if>
+        <if test="keepTeamName != null  and keepTeamName != ''">
+            and t2.name like concat('%/', #{keepTeamName}, '%') ESCAPE '/'
+        </if>
+        <if test="productDevicesIds != null">
+            and
+            <foreach collection="productDevicesIds" open="(" separator="or " close=")" item="item">
+                find_in_set(#{item},t1.product_devices_ids)
+            </foreach>
+        </if>
+        order by t1.create_time desc
+    </select>
+
+    <select id="findAll" parameterType="com.fw.entity.device.DevicesKeepPlan" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from fw_devices_keep_plan
+    </select>
+
+    <select id="findAllfail" parameterType="com.fw.entity.device.DevicesKeepPlan" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from fw_devices_keep_plan
+        where date_format(last_time,'%Y-%m-%d') &lt;= now()
+    </select>
+
+    <select id="verifyName" parameterType="java.lang.String" resultType="boolean">
+        select count(*)  from fw_devices_keep_plan where name = #{name}
+    </select>
+
+</mapper>

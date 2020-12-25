@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.mould.dao.MouldStorageHouseDao">
+    <!--  仓库管理-->
+    <insert id="insertStorage" parameterType="com.fw.entity.mould.MouldStorageHouse" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_mould_storage_house
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="name != null  and name != ''">name,</if>
+            <if test="status != null">status</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="status != null">#{status}</if>
+        </trim>
+    </insert>
+
+    <update id="updateStorage" parameterType="com.fw.entity.mould.MouldStorageHouse">
+        update fw_mould_storage_house
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''">name = #{name},</if>
+            <if test="status != null">status=#{status}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteStorage" parameterType="java.util.List">
+        delete from fw_mould_storage_house where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+    <select id="selectStorageById" parameterType="integer" resultType="com.fw.entity.mould.MouldStorageHouse">
+        select * from fw_mould_storage_house where id = #{id}
+    </select>
+    <select id="findStorageList" resultType="com.fw.entity.mould.MouldStorageHouse">
+        select *  from fw_mould_storage_house where 1=1
+        <if test="name != null  and name != ''">
+            and name like concat('%/', #{name}, '%') ESCAPE '/'
+        </if>
+        order by id
+    </select>
+
+
+    <select id="isRepeatStorageName" resultType="java.lang.Integer">
+        SELECT count(*) FROM fw_mould_storage_house  WHERE  name=#{name}
+        <if test="id!= null">
+            AND id!=#{id}
+        </if>
+    </select>
+    <select id="findStorageIsEableDelete" resultType="java.lang.Integer">
+        select count(*) from fw_mould_storage_location
+        <if test="list!= null">
+            where  storage_house_id in
+            <foreach collection="list" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <!--  库位管理-->
+    <insert id="insertLocation" parameterType="com.fw.entity.mould.MouldStorageLocation" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_mould_storage_location
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="name != null  and name != ''">name,</if>
+            <if test="storageHouseId != null">storage_house_id,</if>
+            <if test="status != null">status</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="storageHouseId != null">#{storageHouseId},</if>
+            <if test="status != null">#{status}</if>
+        </trim>
+    </insert>
+
+    <update id="updateLocation" parameterType="com.fw.entity.mould.MouldStorageLocation">
+        update fw_mould_storage_location
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''">name = #{name},</if>
+            <if test="storageHouseId != null">storage_house_id =#{storageHouseId},</if>
+            <if test="status != null">status=#{status}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteLocation" parameterType="java.util.List">
+        delete from fw_mould_storage_location where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+    <select id="selectLocationById" parameterType="integer" resultType="com.fw.entity.mould.MouldStorageLocation">
+        select * from fw_mould_storage_location where id = #{id}
+    </select>
+    <select id="findLocationList" resultType="com.fw.entity.mould.MouldStorageLocation">
+        select l.id,l.name,l.status,l.storage_house_id,m.id mould_id,
+               m.code mould_code,m.name mould_name,if(m.id>0,1,0) is_band,m.group_name,m.parent_id
+        from fw_mould_storage_location l
+        left join (select p.*,group_concat(c.name) group_name from fw_mould_devices p
+                     left join fw_mould_devices c on find_in_set(c.id,p.parent_id)
+                    group by p.id) m on l.id=m.now_location_id
+        where 1=1
+        <if test="storageHouseId != null  and storageHouseId != ''">
+            and l.storage_house_id=#{storageHouseId}
+        </if>
+        <if test="location != null  and location != ''">
+            and l.name like concat('%/', #{location}, '%') ESCAPE '/'
+        </if>
+        <if test="mould != null  and mould != ''">
+            and m.name like concat('%/', #{mould}, '%') ESCAPE '/'
+        </if>
+        <if test="mouldCode != null  and mouldCode != ''">
+            and m.code like concat('%/', #{mouldCode}, '%') ESCAPE '/'
+        </if>
+        <if test="status != null">
+            and l.status=#{status}
+        </if>
+        <if test="isBand != null">
+            and if(m.id>0,1,0)=#{isBand}
+        </if>
+        order by id
+    </select>
+    <select id="findLocationIsEableDelete" resultType="java.lang.Integer">
+        select count(*) from fw_mould_devices
+        <if test="list!= null">
+            where  now_location_id in
+            <foreach collection="list" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="isRepeatLocationName" resultType="java.lang.Integer">
+        SELECT count(*) FROM fw_mould_storage_location  WHERE  name=#{name}
+        <if test="id!= null">
+            AND id!=#{id}
+        </if>
+    </select>
+
+
+
+    <select id="findEmptyLocationList" resultType="com.fw.entity.mould.MouldStorageLocation">
+        select l.*,h.name storage_house_name
+          from fw_mould_storage_location l
+          left join fw_mould_storage_house h on l.storage_house_id=h.id
+         where l.id not in(select now_location_id from fw_mould_devices m)
+        <if test="name != null  and name != ''">
+            and l.name like concat('%/', #{name}, '%') ESCAPE '/'
+        </if>
+        order by l.id
+    </select>
+
+</mapper>
+

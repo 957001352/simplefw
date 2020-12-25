@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.device.dao.DevicesKeepItemDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.device.DevicesKeepItem">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="devices_classify" property="devicesClassify" jdbcType="VARCHAR"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="deleted" property="deleted" jdbcType="INTEGER"/>
+        <result column="cycle" property="cycle" jdbcType="INTEGER"/>
+        <result column="instructor" property="instructor" jdbcType="VARCHAR"/>
+        <collection property="lists"  column="id" select="findKeepItemById"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,create_time,name, devices_classify, content,deleted,cycle,instructor
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.device.DevicesKeepItem" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_devices_keep_item
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="name != null  and name != ''">name,</if>
+            <if test="devicesClassify != null  and devicesClassify != ''">devices_classify,</if>
+            <if test="content != null  and content != ''">content,</if>
+            <if test="deleted != null ">deleted,</if>
+            <if test="cycle != null ">cycle,</if>
+            <if test="instructor != null and instructor != ''">instructor</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="devicesClassify != null  and devicesClassify != ''">#{devicesClassify},</if>
+            <if test="content != null  and content != ''">#{content},</if>
+            <if test="deleted != null">#{deleted},</if>
+            <if test="cycle != null">#{cycle},</if>
+            <if test="instructor != null and instructor !=''">#{instructor}</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.device.DevicesKeepItem">
+        update fw_devices_keep_item
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''">name = #{name},</if>
+            <if test="devicesClassify != null  and devicesClassify != ''">devices_classify = #{devicesClassify},</if>
+            <if test="content != null  and content != ''">content = #{content},</if>
+            <if test="deleted != null ">deleted = #{deleted},</if>
+            <if test="cycle != null ">cycle = #{cycle},</if>
+            <if test="instructor != null and instructor != ''">instructor = #{instructor}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="selectById" parameterType="integer" resultType="com.fw.entity.device.DevicesKeepItem">
+        select
+        t1.id,t1.create_time,t1.name, t1.devices_classify, t1.content,t1.deleted,t1.cycle,t1.instructor,
+        t2.name as fileName,t2.path as webPath,t2.suffix
+        from fw_devices_keep_item  t1 left join fw_basic_attachment t2 on t2.data_id = t1.instructor where t1.id = #{id} and t1.deleted = 0
+    </select>
+
+    <delete id="delete" parameterType="java.util.List">
+        update fw_devices_keep_item set deleted = 1
+        where id in
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="findList" parameterType="com.fw.entity.device.DevicesKeepItem" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from fw_devices_keep_item where 1=1 and deleted = 0
+        <if test="name != null  and name != ''">
+            and name like concat('%/', #{name}, '%') ESCAPE '/'
+        </if>
+        <if test="devicesClassify != null">
+            and devices_classify = #{devicesClassify}
+        </if>
+        order by create_time desc
+    </select>
+
+    <select id="findKeepItemById" parameterType="integer" resultType="com.fw.entity.device.KeepItemExtension">
+        select id,keep_item_id, columns, rows,deleted
+        from fw_keep_item_extension where keep_item_id = #{id} and deleted = 0
+    </select>
+
+    <select id="findAll" parameterType="com.fw.entity.device.DevicesKeepItem" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from fw_devices_keep_item where  deleted = 0 order by create_time desc
+    </select>
+
+    <select id="findItemByIds"  parameterType="string" resultType="java.lang.String">
+        select name from fw_devices_keep_item where deleted = 0 and id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="findKeepItemByIds"  parameterType="string" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from fw_devices_keep_item where deleted = 0 and id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="verifyName" parameterType="java.lang.String" resultType="boolean">
+        select count(*)  from fw_devices_keep_item where deleted = 0 and name = #{name}
+    </select>
+
+    <select id="getKeepItemByCycle" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from fw_devices_keep_item where  deleted = 0 and cycle = #{cycle} order by id desc
+    </select>
+</mapper>
+

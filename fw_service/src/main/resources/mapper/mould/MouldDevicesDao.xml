@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.mould.dao.MouldDevicesDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.mould.MouldDevices">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="life_time" property="lifeTime" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="use_time" property="useTime" jdbcType="TIMESTAMP"/>
+        <result column="now_location_id" property="nowLocationId" jdbcType="INTEGER"/>
+        <result column="turn_status" property="turnStatus" jdbcType="INTEGER"/>
+        <result column="molding" property="molding" jdbcType="VARCHAR"/>
+        <result column="cavity" property="cavity" jdbcType="VARCHAR"/>
+        <result column="material" property="material" jdbcType="VARCHAR"/>
+        <result column="init_count" property="initCount" jdbcType="INTEGER"/>
+        <result column="parent_id" property="parentId" jdbcType="VARCHAR"/>
+        <result column="old_location_id" property="oldLocationId" jdbcType="INTEGER"/>
+
+        <result column="weight" property="weight" jdbcType="INTEGER"/>
+        <result column="sizes" property="sizes" jdbcType="VARCHAR"/>
+        <result column="vender" property="vender" jdbcType="VARCHAR"/>
+        <result column="client_name" property="clientName" jdbcType="VARCHAR"/>
+        <result column="data_id" property="dataId" jdbcType="VARCHAR"/>
+        <result column="product" property="product" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+
+        <result column="extend_attr" property="extendAttr" jdbcType="VARCHAR"/>
+        <result column="total_count" property="totalCount" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,code,name,life_time,status,create_time,use_time,now_location_id,turn_status,molding,cavity,material,
+        init_count,parent_id,old_location_id,weight,sizes,vender,client_name,data_id,product,type,extend_attr,total_count from fw_mould_devices
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.mould.MouldDevices" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_mould_devices
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="code != null  and code != ''">code,</if>
+            <if test="name != null  and name != ''">name,</if>
+            <if test="lifeTime != null  and lifeTime != ''">life_time,</if>
+            <if test="status != null">status,</if>
+            <if test="createTime != null  and createTime != ''">create_time,</if>
+            <if test="useTime != null  and useTime != ''">use_time,</if>
+            <if test="nowLocationId != null  and nowLocationId != ''">now_location_id,</if>
+            <if test="turnStatus != null">turn_status,</if>
+
+            <if test="molding != null  and molding != ''">molding,</if>
+            <if test="cavity != null  and cavity != ''">cavity,</if>
+            <if test="material != null  and material != ''">material,</if>
+            <if test="initCount != null">init_count,</if>
+            <if test="parentId != null and parentId != ''">parent_id,</if>
+            <if test="oldLocationId != null">old_location_id,</if>
+
+            <if test="weight != null  and weight != ''">weight,</if>
+            <if test="sizes != null  and sizes != ''">sizes,</if>
+            <if test="vender != null  and vender != ''">vender,</if>
+            <if test="clientName != null  and clientName != ''">client_name,</if>
+            <if test="product != null and product != ''">product,</if>
+            <if test="dataId != null and dataId != ''">data_id,</if>
+            <if test="type != null">type</if>
+
+            <if test="extendAttr != null and extendAttr != ''">extend_attr,</if>
+            <if test="totalCount != null">total_count,</if>
+
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="code != null  and code != ''">#{code},</if>
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="lifeTime != null  and lifeTime != ''">#{lifeTime},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createTime != null  and createTime != ''">#{createTime},</if>
+            <if test="useTime != null  and useTime != ''">#{useTime},</if>
+            <if test="nowLocationId != null  and nowLocationId != ''">#{nowLocationId},</if>
+            <if test="turnStatus != null">#{turnStatus},</if>
+
+            <if test="molding != null  and molding != ''">#{molding},</if>
+            <if test="cavity != null  and cavity != ''">#{cavity},</if>
+            <if test="material != null  and material != ''">#{material},</if>
+            <if test="initCount != null">#{initCount},</if>
+            <if test="parentId != null and parentId != ''">#{parentId},</if>
+            <if test="oldLocationId != null">#{oldLocationId},</if>
+
+            <if test="weight != null  and weight != ''">#{weight},</if>
+            <if test="sizes != null  and sizes != ''">#{sizes},</if>
+            <if test="vender != null  and vender != ''">#{vender},</if>
+            <if test="clientName != null  and clientName != ''">#{clientName},</if>
+            <if test="product != null and product != ''">#{product},</if>
+            <if test="dataId != null and dataId != ''">#{dataId},</if>
+            <if test="type != null">#{type}</if>
+
+            <if test="extendAttr != null and extendAttr != ''">#{extendAttr},</if>
+            <if test="totalCount != null">#{totalCount},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.mould.MouldDevices">
+        update fw_mould_devices
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="code != null  and code != ''">code = #{code},</if>
+            <if test="name != null  and name != ''">name = #{name},</if>
+            <if test="lifeTime != null  and lifeTime != ''">life_time = #{lifeTime},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createTime != null  and createTime != ''">create_time = #{createTime},</if>
+            <if test="useTime != null  and useTime != ''">use_time = #{useTime},</if>
+            <if test="nowLocationId != null">now_location_id = #{nowLocationId},</if>
+            <if test="turnStatus != null">turn_status = #{turnStatus},</if>
+            <if test="molding != null  and molding != ''">molding = #{molding},</if>
+            <if test="cavity != null  and cavity != ''">cavity = #{cavity},</if>
+            <if test="material != null  and material != ''">material = #{material},</if>
+            <if test="initCount != null">init_count = #{initCount},</if>
+            <if test="parentId != null and parentId != ''">parent_id = #{parentId},</if>
+            <if test="oldLocationId != null">old_location_id = #{oldLocationId},</if>
+
+            <if test="weight != null  and weight != ''">weight = #{weight},</if>
+            <if test="sizes != null  and sizes != ''">sizes = #{sizes},</if>
+            <if test="vender != null  and vender != ''">vender = #{vender},</if>
+            <if test="clientName != null">client_name = #{clientName},</if>
+            <if test="product != null and product != ''">product = #{product},</if>
+            <if test="dataId != null and dataId != ''">data_id = #{dataId},</if>
+            <if test="type != null">type=#{type},</if>
+
+            <if test="extendAttr != null and extendAttr != ''">extend_attr = #{extendAttr},</if>
+            <if test="totalCount != null">total_count=#{totalCount},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <delete id="delete">
+        delete from fw_mould_devices where id in
+        <foreach collection="ids" separator="," open="(" close=")" item="id">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="findList" resultType="com.fw.entity.mould.MouldDevices" >
+        select
+        fmd.*,replace(fba.path,#{rootPath},'/attach/') webPath,
+        CASE
+            WHEN EXISTS (
+                SELECT 1
+                FROM `fw_jbpm_execution` fjpm
+                WHERE fjpm.data_id = fmdt.id AND fjpm.`form_code` = #{formCode} AND fjpm.`end_time` IS NULL
+                ) THEN '1'
+            ELSE '0'
+        END AS audit_status
+        from fw_mould_devices fmd
+        left join  fw_basic_attachment fba on fmd.data_id = fba.data_id
+        left join  (SELECT max(id) id,mould_devices_id  FROM fw_mould_devices_turn group by mould_devices_id ) fmdt on fmdt.mould_devices_id = fmd.id
+        where 1=1
+        <if test="code != null  and code != ''">
+            and fmd.code like concat('%',#{code},'%')
+        </if>
+        <if test="mouldName != null  and mouldName != ''">
+            and fmd.name like concat('%',#{mouldName},'%')
+        </if>
+        <if test="status != null">
+            and fmd.status = #{status}
+        </if>
+        <if test="turnStatus != null">
+            and fmd.turn_status = #{turnStatus}
+        </if>
+        order by fmd.create_time desc
+    </select>
+    <select id="mouldCodeIsRepeat" parameterType="com.fw.entity.mould.MouldDevices" resultType="java.lang.Integer">
+        select count(1) from fw_mould_devices where code = #{code}
+        <if test="id != null">
+            and id != #{id}
+        </if>
+    </select>
+    <select id="findMouldNoBound" resultType="com.fw.entity.mould.MouldDevices">
+        select
+        <include refid="Base_Column_List" />
+        where now_location_id = 0
+    </select>
+    <select id="getMouldDevices" resultType="com.fw.entity.mould.MouldDevices">
+        select
+        <include refid="Base_Column_List" />
+        where status = 0
+    </select>
+    <select id="findMouldDevicesById" resultType="com.fw.entity.mould.MouldDevices">
+        select
+        <include refid="Base_Column_List" />
+        where id=#{id} and status = 0
+    </select>
+</mapper>
+

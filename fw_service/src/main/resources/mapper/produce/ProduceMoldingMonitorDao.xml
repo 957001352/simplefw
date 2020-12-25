@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.produce.dao.ProduceMoldingMonitorDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.produce.ProduceMoldingMonitor">
+        <result column="id" property="id"/>
+        <result column="plan_molding_id" property="planMoldingId"/>
+        <result column="product_order" property="productOrder"/>
+        <result column="product_devices_id" property="productDevicesId"/>
+        <result column="product_devices_code" property="productDevicesCode"/>
+        <result column="product_id" property="productId"/>
+        <result column="product_code" property="productCode"/>
+        <result column="product_name" property="productName"/>
+        <result column="mould_id" property="mouldId"/>
+        <result column="mould_code" property="mouldCode"/>
+        <result column="mould_name" property="mouldName"/>
+        <result column="craft_model_id" property="craftModelId"/>
+        <result column="craft_card_id" property="craftCardId"/>
+        <result column="craft_card_name" property="craftCardName"/>
+        <result column="craft_card_params" property="craftCardParams"/>
+        <result column="mould_up_user" property="mouldUpUser"/>
+        <result column="mould_up_time" property="mouldUpTime"/>
+        <result column="pick_user" property="pickUser"/>
+        <result column="pick_time" property="pickTime"/>
+        <result column="feed_user" property="feedUser"/>
+        <result column="feed_time" property="feedTime"/>
+        <result column="first_debug_user" property="firstDebugUser"/>
+        <result column="first_debug_time" property="firstDebugTime"/>
+        <result column="first_check_user" property="firstCheckUser"/>
+        <result column="first_check_time" property="firstCheckTime"/>
+        <result column="product_start_user" property="productStartUser"/>
+        <result column="product_start_time" property="productStartTime"/>
+        <result column="product_end_user" property="productEndUser"/>
+        <result column="product_end_time" property="productEndTime"/>
+        <result column="last_check_user" property="lastCheckUser"/>
+        <result column="last_check_time" property="lastCheckTime"/>
+        <result column="store_user" property="storeUser"/>
+        <result column="store_time" property="storeTime"/>
+        <result column="status" property="status"/>
+        <result column="plan_product_cycle" property="planProductCycle"/>
+        <result column="actua_product_cycle" property="actuaProductCycle"/>
+        <result column="debug_start_user" property="debugStartUser"/>
+        <result column="debug_start_time" property="debugStartTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,plan_molding_id, product_order, product_devices_id,
+        product_devices_code, product_id, product_code,
+        product_name, mould_id, mould_code, mould_name,
+        craft_model_id, craft_card_id, craft_card_name,
+        craft_card_params, mould_up_user, mould_up_time,
+        pick_user, pick_time, feed_user, feed_time, first_debug_user,
+        first_debug_time, first_check_user, first_check_time,
+        product_start_user, product_start_time, product_end_user,
+        product_end_time, last_check_user, last_check_time, store_user, store_time,
+        status,plan_product_cycle,actua_product_cycle,debug_start_time,debug_start_user
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.produce.ProduceMoldingMonitor" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_produce_molding_monitor
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="planMoldingId != null  and planMoldingId != ''">plan_molding_id,</if>
+            <if test="productOrder != null  and productOrder != ''">product_order,</if>
+            <if test="productDevicesId != null  and productDevicesId != ''">product_devices_id,</if>
+            <if test="productDevicesCode != null  and productDevicesCode != ''">product_devices_code,</if>
+            <if test="productId != null  and productId != ''">product_id,</if>
+            <if test="productCode != null  and productCode != ''">product_code,</if>
+            <if test="productName != null  and productName != ''">product_name,</if>
+            <if test="mouldId != null  and mouldId != ''">mould_id,</if>
+            <if test="mouldCode != null  and mouldCode != ''">mould_code,</if>
+            <if test="mouldName != null  and mouldName != ''">mould_name,</if>
+            <if test="craftModelId != null  and craftModelId != ''">craft_model_id,</if>
+            <if test="craftCardId != null  and craftCardId != ''">craft_card_id,</if>
+            <if test="craftCardName != null  and craftCardName != ''">craft_card_name,</if>
+            <if test="craftCardParams != null  and craftCardParams != ''">craft_card_params,</if>
+            <if test="mouldUpUser != null  and mouldUpUser != ''">mould_up_user,</if>
+            <if test="mouldUpTime != null  and mouldUpTime != ''">mould_up_time,</if>
+            <if test="pickUser != null  and pickUser != ''">pick_user,</if>
+            <if test="pickTime != null  and pickTime != ''">pick_time,</if>
+            <if test="feedUser != null  and feedUser != ''">feed_user,</if>
+            <if test="feedTime != null  and feedTime != ''">feed_time,</if>
+            <if test="firstDebugUser != null  and firstDebugUser != ''">first_debug_user,</if>
+            <if test="firstDebugTime != null  and firstDebugTime != ''">first_debug_time,</if>
+            <if test="firstCheckUser != null  and firstCheckUser != ''">first_check_user,</if>
+            <if test="firstCheckTime != null  and firstCheckTime != ''">first_check_time,</if>
+            <if test="productStartUser != null  and productStartUser != ''">product_start_user,</if>
+            <if test="productStartTime != null  and productStartTime != ''">product_start_time,</if>
+            <if test="productEndUser != null  and productEndUser != ''">product_end_user,</if>
+            <if test="productEndTime != null  and productEndTime != ''">product_end_time,</if>
+            <if test="lastCheckUser != null  and lastCheckUser != ''">last_check_user,</if>
+            <if test="lastCheckTime != null  and lastCheckTime != ''">last_check_time,</if>
+            <if test="storeUser != null  and storeUser != ''">store_user,</if>
+            <if test="storeTime != null  and storeTime != ''">store_time,</if>
+            <if test="status != null ">status,</if>
+            <if test="planProductCycle != null  and planProductCycle != ''">plan_product_cycle,</if>
+            <if test="actuaProductCycle != null  and actuaProductCycle != ''">actua_product_cycle,</if>
+            <if test="debugStartUser != null  and debugStartUser != ''">debug_start_user,</if>
+            <if test="debugStartTime != null  and debugStartTime != ''">debug_start_time</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="planMoldingId != null  and planMoldingId != ''">#{planMoldingId},</if>
+            <if test="productOrder != null  and productOrder != ''">#{productOrder},</if>
+            <if test="productDevicesId != null  and productDevicesId != ''">#{productDevicesId},</if>
+            <if test="productDevicesCode != null  and productDevicesCode != ''">#{productDevicesCode},</if>
+            <if test="productId != null  and productId != ''">#{productId},</if>
+            <if test="productCode != null  and productCode != ''">#{productCode},</if>
+            <if test="productName != null  and productName != ''">#{productName},</if>
+            <if test="mouldId != null  and mouldId != ''">${mouldId},</if>
+            <if test="mouldCode != null  and mouldCode != ''">#{mouldCode},</if>
+            <if test="mouldName != null  and mouldName != ''">#{mouldName},</if>
+            <if test="craftModelId != null  and craftModelId != ''">#{craftModelId},</if>
+            <if test="craftCardId != null  and craftCardId != ''">#{craftCardId},</if>
+            <if test="craftCardName != null  and craftCardName != ''">#{craftCardName},</if>
+            <if test="craftCardParams != null  and craftCardParams != ''">#{craftCardParams},</if>
+            <if test="mouldUpUser != null  and mouldUpUser != ''">#{mouldUpUser},</if>
+            <if test="mouldUpTime != null  and mouldUpTime != ''">#{mouldUpTime},</if>
+            <if test="pickUser != null  and pickUser != ''">#{pickUser},</if>
+            <if test="pickTime != null  and pickTime != ''">#{pickTime},</if>
+            <if test="feedUser != null  and feedUser != ''">#{feedUser},</if>
+            <if test="feedTime != null  and feedTime != ''">#{feedTime},</if>
+            <if test="firstDebugUser != null  and firstDebugUser != ''">#{firstDebugUser},</if>
+            <if test="firstDebugTime != null  and firstDebugTime != ''">#{firstDebugTime},</if>
+            <if test="firstCheckUser != null  and firstCheckUser != ''">#{firstCheckUser},</if>
+            <if test="firstCheckTime != null  and firstCheckTime != ''">#{firstCheckTime},</if>
+            <if test="productStartUser != null  and productStartUser != ''">#{productStartUser},</if>
+            <if test="productStartTime != null  and productStartTime != ''">#{productStartTime},</if>
+            <if test="productEndUser != null  and productEndUser != ''">#{productEndUser},</if>
+            <if test="productEndTime != null  and productEndTime != ''">#{productEndTime},</if>
+            <if test="lastCheckUser != null  and lastCheckUser != ''">#{lastCheckUser},</if>
+            <if test="lastCheckTime != null  and lastCheckTime != ''">#{lastCheckTime},</if>
+            <if test="storeUser != null  and storeUser != ''">#{storeUser},</if>
+            <if test="storeTime != null  and storeTime != ''">#{storeTime},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="planProductCycle != null  and planProductCycle != ''">#{planProductCycle},</if>
+            <if test="actuaProductCycle != null  and actuaProductCycle != ''"> #{actuaProductCycle},</if>
+            <if test="debugStartUser != null  and debugStartUser != ''"> #{debugStartUser},</if>
+            <if test="debugStartTime != null  and debugStartTime != ''"> #{debugStartTime}</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.produce.ProduceMoldingMonitor">
+        update fw_produce_molding_monitor
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="planMoldingId != null  and planMoldingId != ''">plan_molding_id = #{planMoldingId},</if>
+            <if test="productOrder != null  and productOrder != ''">product_order = #{productOrder},</if>
+            <if test="productDevicesId != null  and productDevicesId != ''">product_devices_id = #{productDevicesId},</if>
+            <if test="productDevicesCode != null  and productDevicesCode != ''">product_devices_code = #{productDevicesCode},</if>
+            <if test="productId != null  and productId != ''">product_id = #{productId},</if>
+            <if test="productCode != null  and productCode != ''">product_code = #{productCode},</if>
+            <if test="productName != null  and productName != ''">product_name = #{productName},</if>
+            <if test="mouldId != null  and mouldId != ''">mould_id = #{mouldId},</if>
+            <if test="mouldCode != null  and mouldCode != ''">mould_code = #{mouldCode},</if>
+            <if test="mouldName != null  and mouldName != ''">mould_name = #{mouldName},</if>
+            <if test="craftModelId != null  and craftModelId != ''">craft_model_id = #{craftModelId},</if>
+            <if test="craftCardId != null  and craftCardId != ''">craft_card_id = #{craftCardId},</if>
+            <if test="craftCardName != null  and craftCardName != ''">craft_card_name = #{craftCardName},</if>
+            <if test="craftCardParams != null  and craftCardParams != ''">craft_card_params = #{craftCardParams},</if>
+            <if test="mouldUpUser != null  and mouldUpUser != ''">mould_up_user = #{mouldUpUser},</if>
+            <if test="mouldUpTime != null  and mouldUpTime != ''">mould_up_time = #{mouldUpTime},</if>
+            <if test="pickUser != null  and pickUser != ''">pick_user = #{pickUser},</if>
+            <if test="pickTime != null  and pickTime != ''">pick_time = #{pickTime},</if>
+            <if test="feedUser != null  and feedUser != ''">feed_user = #{feedUser},</if>
+            <if test="feedTime != null  and feedTime != ''">feed_time = #{feedTime},</if>
+            <if test="firstDebugUser != null  and firstDebugUser != ''">first_debug_user = #{firstDebugUser},</if>
+            <if test="firstDebugTime != null  and firstDebugTime != ''">first_debug_time = #{firstDebugTime},</if>
+            <if test="firstCheckUser != null  and firstCheckUser != ''">first_check_user = #{firstCheckUser},</if>
+            <if test="firstCheckTime != null  and firstCheckTime != ''">first_check_time = #{firstCheckTime},</if>
+            <if test="productStartUser != null  and productStartUser != ''">product_start_user = #{productStartUser},</if>
+            <if test="productStartTime != null  and productStartTime != ''">product_start_time = #{productStartTime},</if>
+            <if test="productEndUser != null  and productEndUser != ''">product_end_user = #{productEndUser},</if>
+            <if test="productEndTime != null  and productEndTime != ''">product_end_time = #{productEndTime},</if>
+            <if test="lastCheckUser != null  and lastCheckUser != ''">last_check_user = #{lastCheckUser},</if>
+            <if test="lastCheckTime != null  and lastCheckTime != ''">last_check_time = #{lastCheckTime},</if>
+            <if test="storeUser != null  and storeUser != ''">store_user = #{storeUser},</if>
+            <if test="storeTime != null  and storeTime != ''">store_time = #{storeTime},</if>
+            <if test="status != null ">status = #{status},</if>
+            <if test="planProductCycle != null  and planProductCycle != ''">plan_product_cycle = #{planProductCycle},</if>
+            <if test="actuaProductCycle != null  and actuaProductCycle != ''">actua_product_cycle = #{actuaProductCycle},</if>
+            <if test="debugStartUser != null  and debugStartUser != ''">debug_start_user = #{debugStartUser},</if>
+            <if test="debugStartTime != null  and debugStartTime != ''">debug_start_time = #{debugStartTime}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="getMoldingMonitor" resultType="com.fw.entity.produce.ProduceMoldingMonitor">
+        select
+        <include refid="Base_Column_List"/> from fw_produce_molding_monitor
+        where product_order = #{productOrder}
+    </select>
+
+    <select id="getMoldingMonitorAndStatus"  resultType="com.fw.entity.produce.ProduceMoldingMonitor">
+        select
+        <include refid="Base_Column_List"/> from fw_produce_molding_monitor
+        where product_order = #{productOrder} and status != #{status}
+    </select>
+
+</mapper>

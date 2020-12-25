@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.logistics.dao.LogisticsOutHouseDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.logistics.LogisticsOutHouse">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="house_no" property="houseNo" jdbcType="VARCHAR"/>
+        <result column="house_type" property="houseType" jdbcType="VARCHAR"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="execute_time" property="executeTime" jdbcType="TIMESTAMP"/>
+        <result column="execute_user" property="executeUser" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="store_date" property="storeDate" jdbcType="TIMESTAMP"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+        <collection property="logisticsOutHouseDetailList" column="id" select="com.fw.service.logistics.dao.LogisticsOutHouseDetailDao.findByOutHouseId"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,house_no, house_type,product_code, order_no,provider_name,create_time,execute_time,execute_user,status,store_date,note
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.logistics.LogisticsStoreHouse">
+        insert into fw_logistics_out_house
+        (house_no, house_type,order_no,create_time,execute_time,execute_user,status,store_date,note)
+        values
+        <foreach collection="logisticsStoreHouses" item="logisticsStoreHouse" index="i" separator=",">
+            (
+            #{logisticsStoreHouse.houseNo},
+            #{logisticsStoreHouse.houseType},
+            #{logisticsStoreHouse.orderNo},
+            #{logisticsStoreHouse.createTime},
+            #{logisticsStoreHouse.executeTime},
+            #{logisticsStoreHouse.executeUser},
+            #{logisticsStoreHouse.status},
+            #{logisticsStoreHouse.storeDate},
+            #{logisticsStoreHouse.note}
+            )
+        </foreach>
+    </insert>
+    <insert id="planInsert" parameterType="com.fw.entity.logistics.LogisticsStoreHouse"  useGeneratedKeys="true" keyProperty="id">
+        insert into fw_logistics_out_house
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="houseNo != null  and houseNo != ''">house_no,</if>
+            <if test="houseType != null">house_type,</if>
+            <if test="orderNo != null  and orderNo != ''">order_no,</if>
+            <if test="storeDate != null and storeDate != ''">store_date</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="houseNo != null  and houseNo != ''">#{houseNo},</if>
+            <if test="houseType != null">#{houseType},</if>
+            <if test="orderNo != null  and orderNo != ''">#{orderNo},</if>
+            <if test="storeDate != null and storeDate != ''">#{storeDate}</if>
+        </trim>
+    </insert>
+    <update id="update">
+        update fw_logistics_out_house
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="houseNo != null and houseNo != ''">house_no = #{houseNo},</if>
+            <if test="houseType != null">house_type = #{houseType},</if>
+            <if test="orderNo != null and orderNo != ''">order_no = #{orderNo},</if>
+            <if test="createTime != null and createTime != ''">create_time = #{createTime},</if>
+            <if test="executeTime != null and executeTime != ''">execute_time = #{executeTime},</if>
+            <if test="executeUser != null and executeUser != ''">execute_user = #{executeUser},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="storeDate != null and storeDate != ''">store_date = #{storeDate},</if>
+            <if test="note != null and note != ''">note = #{note},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <select id="findList" resultMap="BaseResultMap">
+        select * from fw_logistics_out_house
+        where 1=1
+        <if test="houseTypes != null">
+            and
+            <foreach collection="houseTypes" item="ht" separator=" or ">
+                house_type = #{ht}
+            </foreach>
+        </if>
+        <if test="houseNo != null and houseNo != ''">
+            and house_no like concat('%',#{houseNo},'%')
+        </if>
+        <if test="status != null">
+            and
+            <foreach collection="status" item="st" separator=" or ">
+                status = #{st}
+            </foreach>
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and store_date &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and store_date &lt;= #{endTime}
+        </if>
+    </select>
+    <select id="findById" resultType="com.fw.entity.logistics.LogisticsStorageDetail">
+        SELECT flsd.*,flsl.code storage_code,flp.name product_name,flp.code product_code,flp.unit,flohd.apply_count,flohd.id out_detail_id
+        FROM fw_logistics_storage_detail flsd
+        LEFT JOIN fw_logistics_storage_location flsl ON flsl.id = flsd.storage_id
+        LEFT JOIN fw_logistics_product flp ON flp.id = flsd.product_id
+        LEFT JOIN fw_logistics_picking_order flohd ON flohd.product_code = flp.code
+        WHERE flsd.id = #{id} AND flohd.out_house_id = #{outHouseId}
+    </select>
+    <select id="findCode" resultType="java.lang.String">
+       select ifnull(concat(left(max(house_no),4),lpad(right(max(house_no),6)+1,6,0)),#{code})code from fw_logistics_out_house
+    </select>
+
+    <delete id="delete" parameterType="java.lang.Integer">
+        delete from fw_logistics_out_house where id = #{id}
+    </delete>
+
+    <update id="updateStatus">
+        update fw_logistics_out_house set status =1 where date_format(store_date,'%Y-%m-%d') &lt;date_format( now(),'%Y-%m-%d') and status=0
+    </update>
+
+    <select id="outScanQrCode" resultType="com.fw.entity.logistics.LogisticsStorageDetail">
+        select flsd.*,flsl.code storage_code,flp.name product_name,flp.code product_code,flp.unit,flohd.id delivery_plan_id
+        from fw_logistics_storage_detail flsd
+        left join fw_logistics_storage_location flsl on flsl.id = flsd.storage_id
+        left join fw_logistics_product flp on flp.id = flsd.product_id
+        left join fw_logistics_delivery_plan flohd on flohd.product_id = flsd.product_id
+        where flsd.id = #{id} and flohd.out_house_id = #{outHouseId}
+    </select>
+</mapper>

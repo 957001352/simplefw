@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.audit.dao.AuditQuestionDao">
+    <insert id="insert" parameterType="com.fw.entity.audit.AuditQuestion" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_audit_question
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="question != null  and question != ''">question,</if>
+            <if test="questionDesc != null">question_desc,</if>
+            <if test="createUser != null">create_user,</if>
+            <if test="dutyUser != null">duty_user,</if>
+            <if test="createFile != null  and createFile != ''">create_file</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="question != null  and question != ''">#{question},</if>
+            <if test="questionDesc != null">#{questionDesc},</if>
+            <if test="createUser != null">#{createUser},</if>
+            <if test="dutyUser != null">#{dutyUser},</if>
+            <if test="createFile != null  and createFile != ''">#{createFile}</if>
+        </trim>
+    </insert>
+    <update id="update" parameterType="com.fw.entity.audit.AuditQuestion">
+        update fw_audit_question
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="dutyUser != null">duty_user=#{dutyUser},</if>
+            <if test="dealUser != null">deal_user = #{dealUser},</if>
+            <if test="dealTime != null and dealTime !=''">deal_time = #{dealTime},</if>
+            <if test="dealResult != null and dealResult !=''">deal_result = #{dealResult},</if>
+            <if test="dealFile != null and dealFile !=''">deal_file = #{dealFile},</if>
+            <if test="status != null">status = #{status}</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <insert id="insertBatch" parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            insert into fw_audit_question
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="item.auditItemName != null  and item.auditItemName != ''">question,</if>
+                <if test="item.reason != null">question_desc,</if>
+                <if test="createUser != null">create_user,</if>
+                <if test="item.picture != null  and item.picture != ''">create_file</if>
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="item.auditItemName != null  and item.auditItemName != ''">#{item.auditItemName},</if>
+                <if test="item.reason != null">#{item.reason},</if>
+                <if test="createUser != null">#{createUser},</if>
+                <if test="item.picture != null  and item.picture != ''">#{item.picture}</if>
+            </trim>
+        </foreach>
+    </insert>
+    <update id="delete">
+        delete  from  fw_audit_question where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="selectById" parameterType="integer" resultType="com.fw.entity.audit.AuditQuestion">
+        select * from fw_audit_question where id = #{id}
+    </select>
+
+
+    <select id="findList" resultType="com.fw.entity.audit.AuditQuestion">
+        select * from   fw_audit_question  where 1=1
+        <if test="createUserIds != null">
+            and
+            <foreach collection="createUserIds" open="(" separator="or " close=")" item="item">
+                duty_user=#{item}
+            </foreach>
+        </if>
+        <if test="status != null">
+            and status=#{status}
+        </if>
+        order by create_time desc
+    </select>
+</mapper>
+

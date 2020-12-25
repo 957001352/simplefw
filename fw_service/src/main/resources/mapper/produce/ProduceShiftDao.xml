@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.produce.dao.ProduceShiftDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.produce.ProduceShift">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="operate_user" property="operateUser" jdbcType="INTEGER"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER" />
+        <result column="plan_molding_id" property="planMoldingId" jdbcType="INTEGER" />
+        <result column="matters" property="matters" jdbcType="VARCHAR"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        create_time,
+        operate_user, create_user, matters, note
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.produce.ProduceShift" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_produce_shift
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="operateUser != null">operate_user,</if>
+            <if test="createUser != null">create_user,</if>
+            <if test="matters != null and matters != ''">matters,</if>
+            <if test="planMoldingId != null">plan_molding_id,</if>
+            <if test="note != null and note != ''">note,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="operateUser != null">#{operateUser},</if>
+            <if test="createUser != null">#{createUser},</if>
+            <if test="matters != null and matters != ''">#{matters},</if>
+            <if test="planMoldingId != null">#{planMoldingId},</if>
+            <if test="note != null and note != ''">#{note},</if>
+        </trim>
+    </insert>
+
+    <select id="findList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from fw_produce_shift
+        where 1=1
+        <if test="planMoldingId != null">
+            and plan_molding_id = #{planMoldingId}
+        </if>
+    </select>
+
+</mapper>

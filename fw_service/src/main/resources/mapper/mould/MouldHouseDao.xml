@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.mould.dao.MouldHouseDao">
+    <!--  仓库管理-->
+    <insert id="insert" parameterType="com.fw.entity.mould.MouldHouse" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_mould_house
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="houseNo != null  and houseNo != ''">house_no,</if>
+            <if test="nowLocationId != null">now_location_id,</if>
+            <if test="mouldId != null">mould_id,</if>
+            <if test="createUser != null">create_user,</if>
+            <if test="operate != null">operate,</if>
+            <if test="oldLocationId != null">old_location_id</if>
+            <if test="injectionMoldingId != null">injection_molding_id</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="houseNo != null  and houseNo != ''">#{houseNo},</if>
+            <if test="nowLocationId != null">#{nowLocationId},</if>
+            <if test="mouldId != null">#{mouldId},</if>
+            <if test="createUser != null">#{createUser},</if>
+            <if test="operate != null">#{operate},</if>
+            <if test="oldLocationId != null">#{oldLocationId}</if>
+            <if test="injectionMoldingId != null">#{injectionMoldingId}</if>
+        </trim>
+    </insert>
+    <insert id="insertList">
+        insert into fw_mould_house
+        (house_no, now_location_id,mould_id,create_user,create_time,execute_time,execute_user,operate,status,old_location_id,injection_molding_id)
+        values
+        <foreach collection="mouldHouses" item="mouldHouse" index="i" separator=",">
+            (
+            #{mouldHouse.houseNo},
+            #{mouldHouse.nowLocationId},
+            #{mouldHouse.mouldId},
+            #{mouldHouse.createUser},
+            #{mouldHouse.createTime},
+            #{mouldHouse.executeTime},
+            #{mouldHouse.executeUser},
+            #{mouldHouse.operate},
+            #{mouldHouse.status},
+            #{mouldHouse.oldLocationId},
+            #{mouldHouse.injectionMoldingId}
+            )
+        </foreach>
+    </insert>
+    <update id="updateMouldStatus">
+        update fw_mould_devices
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="status != null">status = #{status},</if>
+            <if test="nowLocationId != null">now_location_id = #{nowLocationId},</if>
+            <if test="oldLocationId != null">old_location_id = #{oldLocationId}</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <update id="update" parameterType="com.fw.entity.mould.MouldHouse">
+        update fw_mould_house
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="status != null">status = #{status},</if>
+            <if test="executeTime != null  and executeTime != ''">execute_time = #{executeTime},</if>
+            <if test="executeUser != null  and executeUser != ''">execute_user = #{executeUser}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="java.util.List">
+        delete from fw_mould_house where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+    <select id="selectById" parameterType="integer" resultType="com.fw.entity.mould.MouldHouse">
+        select * from fw_mould_house where id = #{id}
+    </select>
+
+
+    <select id="selectMouldDevicesById" parameterType="integer" resultType="com.fw.entity.mould.MouldDevices">
+        select * from fw_mould_devices where id = #{id}
+    </select>
+
+    <select id="findList" resultType="com.fw.entity.mould.MouldHouse">
+        select h.*,n.name now_location,o.name old_location,m.name mould_name,m.code mould_code,
+               replace(f.path,#{rootPath},'/attach/') webPath
+          from fw_mould_house h
+          left join fw_mould_storage_location n on h.now_location_id=n.id
+          left join fw_mould_storage_location o on h.old_location_id=o.id
+          left join fw_mould_devices m on h.mould_id=m.id
+          left join fw_basic_attachment f on f.data_id = m.data_id
+        where 1=1
+        <if test="code != null  and code != ''">
+            and h.house_no like concat('%/', #{code}, '%') ESCAPE '/'
+        </if>
+        <if test="mouldCode != null  and mouldCode != ''">
+            and m.code like concat('%/', #{mouldCode}, '%') ESCAPE '/'
+        </if>
+        <if test="operate != null">
+            and h.operate=#{operate}
+        </if>
+        <if test="startTime != null  and startTime != ''">
+            and date_format(h.create_time,'%Y-%m-%d') =#{startTime}
+        </if>
+        <if test="endTime != null  and endTime != ''">
+            and date_format(h.create_time,'%Y-%m-%d') &lt;=#{endTime}
+        </if>
+        <if test="status != null">
+            and h.status=#{status}
+        </if>
+        order by h.create_time desc
+    </select>
+    <select id="findCode" resultType="java.lang.String">
+       select ifnull(concat(left(max(house_no),4),lpad(right(max(house_no),6)+1,6,0)),#{code}) code from fw_mould_house
+    </select>
+
+</mapper>
+

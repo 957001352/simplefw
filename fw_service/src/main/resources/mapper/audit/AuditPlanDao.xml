@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.audit.dao.AuditPlanDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.audit.AuditPlan">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="audit_team_id" property="auditTeamId" jdbcType="INTEGER"/>
+        <result column="keep_cycle" property="keepCycle" jdbcType="VARCHAR"/>
+        <result column="cron" property="cron" jdbcType="TIMESTAMP"/>
+        <result column="audit_users" property="auditUsers" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.fw.entity.audit.AuditPlan" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_audit_plan
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null  and name != ''">name,</if>
+            <if test="auditTeamId != null">audit_team_id,</if>
+            <if test="keepCycle != null and keepCycle !=''">keep_cycle,</if>
+            <if test="cron != null and cron !=''">cron,</if>
+            <if test="auditUsers != null and auditUsers !=''">audit_users,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="auditTeamId != null">#{auditTeamId},</if>
+            <if test="keepCycle != null and keepCycle !=''">#{keepCycle},</if>
+            <if test="cron != null and cron !=''">#{cron},</if>
+            <if test="auditUsers != null and auditUsers !=''">#{auditUsers},</if>
+        </trim>
+    </insert>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,name,audit_team_id,keep_cycle,cron,audit_users,create_time,status
+    </sql>
+
+    <update id="update" parameterType="com.fw.entity.audit.AuditPlan">
+        update fw_audit_plan
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''">name = #{name},</if>
+            <if test="auditTeamId != null">audit_team_id = #{auditTeamId},</if>
+            <if test="keepCycle != null and keepCycle !=''">keep_cycle = #{keepCycle},</if>
+            <if test="cron != null and cron !=''">cron = #{cron},</if>
+            <if test="auditUsers != null and auditUsers !=''">audit_users = #{auditUsers},</if>
+            <if test="status != null">status = #{status},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="java.lang.Integer">
+        delete from fw_audit_plan where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="findList" resultType="com.fw.entity.audit.AuditPlan">
+        select
+            t1.id,
+            t1.name,
+            t1.audit_team_id as auditTeamId,
+            t1.keep_cycle as keepCycle,
+            t1.cron,
+            t1.audit_users as auditUsers,
+            t1.create_time as createTime,
+            t1.status,
+            t2.name as auditTeamName
+        from
+            fw_audit_plan t1 left join fw_audit_team t2 on t1.audit_team_id = t2.id
+        where
+            1=1
+        <if test="name != null  and name != ''">
+            and t1.name like concat('%/', #{name}, '%') ESCAPE '/'
+        </if>
+        <if test="auditTeamName !=null and auditTeamName!=''">
+            and t2.name like concat('%/', #{auditTeamName}, '%') ESCAPE '/'
+        </if>
+        order by t1.create_time desc
+    </select>
+
+    <select id="findPlanByIdOrName" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select * from fw_audit_plan where 1=1
+        <if test="name != null and name != ''">and name = #{name}</if>
+        <if test="id != null">and id = #{id}</if>
+    </select>
+
+    <select id="findPlanByIdAndName" resultType="java.lang.Integer">
+        select count(id) from fw_audit_plan where id not in(#{id})  and name = #{name}
+    </select>
+
+    <select id="findListByStatus" resultType="com.fw.entity.audit.AuditPlan">
+        select * from fw_audit_plan where status = 0
+    </select>
+
+</mapper>
+

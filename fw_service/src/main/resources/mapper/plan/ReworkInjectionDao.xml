@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.plan.dao.ReworkInjectionDao">
+    <insert id="insert" parameterType="com.fw.entity.plan.ReworkInjection" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_plan_rework_injection
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="productId != null">product_id,</if>
+            <if test="customerId != null">customer_id,</if>
+            <if test="planCount != null">plan_count,</if>
+            <if test="startTime != null and startTime != ''">start_time,</if>
+            <if test="priority != null">priority, </if>
+            <if test="productCode != null and productCode != ''">product_code,</if>
+            <if test="material != null and material != ''">material,</if>
+            <if test="productTime != null">product_time,</if>
+            <if test="deliverTime != null and deliverTime != ''">deliver_time,</if>
+            <if test="note != null and note != ''">note,</if>
+            <if test="status != null">status,</if>
+            <if test="updateUser != null">update_user,</if>
+            <if test="updateTime != null and updateTime != ''">update_time,</if>
+
+            <if test="createUser != null">create_user,</if>
+            <if test="createTime != null and createTime != ''">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="productId != null">#{productId},</if>
+            <if test="customerId != null">#{customerId},</if>
+            <if test="planCount != null">#{planCount},</if>
+            <if test="startTime != null and startTime != ''">#{startTime},</if>
+            <if test="priority != null">#{priority}, </if>
+            <if test="productCode != null and productCode != ''">#{productCode},</if>
+            <if test="material != null and material != ''">#{material},</if>
+            <if test="productTime != null">#{productTime},</if>
+            <if test="deliverTime != null and deliverTime != ''">#{deliverTime},</if>
+            <if test="note != null and note != ''">#{note},</if>
+            <if test="status != null">#{status},</if>
+            <if test="updateUser != null">#{updateUser},</if>
+            <if test="updateTime != null and updateTime != ''">#{updateTime},</if>
+
+            <if test="createUser != null">#{createUser},</if>
+            <if test="createTime != null and createTime != ''">#{createTime},</if>
+        </trim>
+    </insert>
+    <update id="update">
+        update fw_plan_rework_injection
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productId != null">product_id= #{productId},</if>
+            <if test="customerId != null">customer_id= #{customerId},</if>
+            <if test="planCount != null">plan_count= #{planCount},</if>
+            <if test="startTime != null and startTime != ''">start_time= #{startTime},</if>
+            <if test="priority != null">priority= #{priority}, </if>
+            <if test="productCode != null and productCode != ''">product_code= #{productCode},</if>
+            <if test="material != null and material != ''">material= #{material},</if>
+            <if test="productTime != null">product_time= #{productTime},</if>
+            <if test="deliverTime != null and deliverTime != ''">deliver_time= #{deliverTime},</if>
+            <if test="note != null and note != ''">note= #{note},</if>
+            <if test="updateUser != null">update_user= #{updateUser},</if>
+            <if test="updateTime != null and updateTime != ''">update_time= #{updateTime},</if>
+
+            <if test="createUser != null">create_user= #{createUser},</if>
+            <if test="createTime != null and createTime != ''">create_time= #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        update fw_plan_rework_injection set status = #{status} where id = #{id}
+    </update>
+    <update id="updateListTime">
+        <foreach collection="reworkInjections" separator=";" item="rework">
+            update fw_plan_rework_injection
+            <trim prefix="SET" suffixOverrides=",">
+                <if test="rework.planCount != null">plan_count= #{rework.planCount},</if>
+                <if test="rework.startTime != null and rework.startTime != ''">start_time= #{rework.startTime},</if>
+                <if test="rework.productTime != null">product_time= #{rework.productTime},</if>
+
+                <if test="rework.updateUser != null">update_user= #{rework.updateUser},</if>
+                <if test="rework.updateTime != null and rework.updateTime != ''">update_time= #{rework.updateTime},</if>
+            </trim>
+            where id = #{rework.id}
+        </foreach>
+    </update>
+
+    <select id="selectById" parameterType="integer" resultType="com.fw.entity.plan.ReworkInjection">
+        select * from fw_plan_rework_injection where id = #{id}
+    </select>
+
+
+    <select id="findList" resultType="com.fw.entity.plan.ReworkInjection">
+        select p.*,l.code parts_code,l.name parts_name,l.unit,c.name customer_name,
+             (select sum(stop_time)*60 from fw_plan_rework_stop_list where injection_id=p.id) stop_time,
+             date_add(start_time,INTERVAL product_time MINUTE) end_time
+          from   fw_plan_rework_injection p
+          left join fw_logistics_product l on p.product_id=l.id
+          left join fw_plan_customer c on p.customer_id=c.id
+        where 1=1
+        <if test="productCode != null  and productCode != ''">
+            and p.product_code like concat('%/', #{productCode}, '%') ESCAPE '/'
+        </if>
+        <if test="partsCode != null  and partsCode != ''">
+            and l.code like concat('%/', #{partsCode}, '%') ESCAPE '/'
+        </if>
+        <if test="startTime != null  and startTime != ''">
+            and date_format(p.start_time,'%Y-%m-%d') &gt;=#{startTime}
+        </if>
+        <if test="endTime != null  and endTime != ''">
+            and date_format(p.start_time,'%Y-%m-%d') &lt;=#{endTime}
+        </if>
+        <if test="status == null">
+            and p.status in (0,1,2,3)
+        </if>
+        <if test="status != null">
+            and p.status in (${status})
+        </if>
+        order by p.start_time
+    </select>
+    <insert id="insertStopList" parameterType="com.fw.entity.plan.ReworkStopList">
+        insert into fw_plan_rework_stop_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="injectionId != null">injection_id,</if>
+            <if test="stopTime != null">stop_time,</if>
+            <if test="stopReason != null">stop_reason,</if>
+            <if test="createUser != null">create_user</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="injectionId != null">#{injectionId},</if>
+            <if test="stopTime != null">#{stopTime},</if>
+            <if test="stopReason != null">#{stopReason},</if>
+            <if test="createUser != null">#{createUser}</if>
+        </trim>
+    </insert>
+    <select id="findAllStopTime" resultType="java.lang.Double">
+          select sum(stop_time) from fw_plan_rework_stop_list where injection_id=#{injectionId}
+    </select>
+    <select id="findLastProductCode" resultType="com.fw.entity.plan.ReworkInjection">
+        SELECT fpri.*,(select sum(stop_time)*60 from fw_plan_rework_stop_list where injection_id=fpri.id) stop_time
+        FROM fw_plan_rework_injection fpri
+        WHERE fpri.status in (0,1,2)
+        ORDER BY fpri.start_time DESC LIMIT 0,1
+    </select>
+    <select id="findMoveUp" resultType="com.fw.entity.plan.ReworkInjection">
+        SELECT fpri.*,(select sum(stop_time)*60 from fw_plan_rework_stop_list where injection_id=fpri.id) stop_time
+        FROM fw_plan_rework_injection fpri
+        WHERE fpri.status in (0,2) and fpri.start_time &lt; #{startTime}
+        ORDER BY fpri.start_time DESC LIMIT 0,#{moveCount}
+    </select>
+    <select id="findMoveDown" resultType="com.fw.entity.plan.ReworkInjection">
+        SELECT fpri.*,(select sum(stop_time)*60 from fw_plan_rework_stop_list where injection_id=fpri.id) stop_time
+        FROM fw_plan_rework_injection fpri
+        WHERE fpri.status in (0,2) and fpri.start_time &gt; #{startTime}
+        ORDER BY fpri.start_time ASC LIMIT 0,#{moveCount}
+    </select>
+    <select id="findLater" resultType="com.fw.entity.plan.ReworkInjection">
+        SELECT fpri.*,(select sum(stop_time)*60 from fw_plan_rework_stop_list where injection_id=fpri.id) stop_time
+        FROM fw_plan_rework_injection fpri
+        WHERE fpri.status in (0,2) and fpri.start_time &gt; #{startTime}
+        ORDER BY fpri.start_time ASC
+    </select>
+</mapper>
+

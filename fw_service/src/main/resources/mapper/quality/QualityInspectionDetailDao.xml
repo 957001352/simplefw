@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.quality.dao.QualityInspectionDetailDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.quality.QualityInspectionDetail">
+        <result column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="feature" property="feature" jdbcType="VARCHAR"/>
+        <result column="special" property="special" jdbcType="VARCHAR"/>
+        <result column="process" property="process" jdbcType="VARCHAR"/>
+        <result column="standard" property="standard" jdbcType="VARCHAR"/>
+        <result column="evaluate" property="evaluate" jdbcType="VARCHAR"/>
+        <result column="measure" property="measure" jdbcType="VARCHAR"/>
+        <result column="quota" property="quota" jdbcType="VARCHAR"/>
+        <result column="control" property="control" jdbcType="VARCHAR"/>
+        <result column="inspection_id" property="inspectionId" jdbcType="INTEGER"/>
+        <result column="classify" property="classify" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,feature, special, process, standard, evaluate, measure, quota, control, inspection_id, classify
+    </sql>
+
+    <insert id="batchInsert" parameterType="com.fw.entity.quality.QualityInspectionDetail">
+        insert into fw_quality_inspection_detail
+        (id,feature, special, process, standard, evaluate, measure, quota, control, inspection_id, classify)
+        values
+        <foreach collection="details" item="details" index="i" separator=",">
+            (
+            #{details.id},
+            #{details.feature},
+            #{details.special},
+            #{details.process},
+            #{details.standard},
+            #{details.evaluate},
+            #{details.measure},
+            #{details.quota},
+            #{details.control},
+            #{details.inspectionId},
+            #{details.classify}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="deleteByInspectionId" parameterType="java.lang.Integer">
+        delete from fw_quality_inspection_detail where inspection_id = #{inspectionId}
+    </delete>
+
+</mapper>

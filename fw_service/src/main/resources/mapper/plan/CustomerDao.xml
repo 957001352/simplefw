@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.plan.dao.CustomerDao">
+    <insert id="insert" parameterType="com.fw.entity.plan.Customer" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_plan_customer
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name}</if>
+        </trim>
+    </insert>
+    <update id="update">
+        update fw_plan_customer
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name= #{name}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="delete">
+        update  fw_plan_customer set status=1  where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="selectById" parameterType="integer" resultType="com.fw.entity.plan.Customer">
+        select * from fw_plan_customer where id = #{id}
+    </select>
+
+
+    <select id="findList" resultType="com.fw.entity.plan.Customer">
+        select * from   fw_plan_customer  where status=0
+        <if test="name != null  and name != ''">
+            and name like concat('%/', #{name}, '%') ESCAPE '/'
+        </if>
+        order by id desc
+    </select>
+    <select id="isRepeatName" resultType="Integer">
+        SELECT count(*) FROM fw_plan_customer  WHERE status=0 and name=#{name}
+        <if test="id!= null">
+            AND id!=#{id}
+        </if>
+    </select>
+</mapper>
+

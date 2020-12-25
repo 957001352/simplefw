@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.device.dao.DevicesCheckTeamDao">
+
+
+
+    <insert id="insert" parameterType="com.fw.entity.device.DevicesCheckTeam" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_devices_check_team
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="name != null  and name != ''">name,</if>
+            <if test="devicesClassify != null  and devicesClassify != ''">devices_classify,</if>
+            <if test="checkItemIds != null  and checkItemIds != ''">check_item_ids,</if>
+            <if test="productDevicesIds != null  and productDevicesIds != ''">product_devices_ids</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="devicesClassify != null  and devicesClassify != ''">#{devicesClassify},</if>
+            <if test="checkItemIds != null  and checkItemIds != ''">#{checkItemIds},</if>
+            <if test="productDevicesIds != null  and productDevicesIds != ''">#{productDevicesIds}</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.device.DevicesCheckTeam">
+        update fw_devices_check_team
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''">name = #{name},</if>
+            <if test="devicesClassify != null  and devicesClassify != ''">devices_classify = #{devicesClassify},</if>
+            <if test="checkItemIds != null  and checkItemIds != ''">check_item_ids = #{checkItemIds},</if>
+            <if test="productDevicesIds != null  and productDevicesIds != ''">product_devices_ids = #{productDevicesIds}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="selectById" parameterType="integer" resultType="com.fw.entity.device.DevicesCheckTeam">
+        select * from fw_devices_check_team where id = #{id}
+    </select>
+
+    <update id="delete" parameterType="java.util.List">
+        update  fw_devices_check_team set deleted=1  where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="findList"   resultType="com.fw.entity.device.DevicesCheckTeam">
+        select t.*,group_concat(c.name) check_item_names
+         from fw_devices_check_team t
+         left join fw_devices_check_item c on find_in_set(c.id,t.check_item_ids)
+        where t.deleted=0
+        <if test="name != null  and name != ''">
+            and t.name like concat('%/', #{name}, '%') ESCAPE '/'
+        </if>
+        <if test="devicesClassify != null">
+            and t.devices_classify = #{devicesClassify}
+        </if>
+        <if test="productDevicesIds != null">
+             and
+            <foreach collection="productDevicesIds" open="(" separator="or " close=")" item="item">
+                find_in_set(#{item},t.product_devices_ids)
+            </foreach>
+        </if>
+        <if test="checkItem != null  and checkItem != ''">
+            and c.name like concat('%/', #{checkItem}, '%') ESCAPE '/'
+        </if>
+        group by t.id
+        order by t.create_time desc
+    </select>
+    <select id="isRepeatName" resultType="java.lang.Integer">
+        SELECT count(*) FROM fw_devices_check_team  WHERE deleted=0 and name=#{name}
+        <if test="id!= null">
+            AND id!=#{id}
+        </if>
+    </select>
+    <select id="isRepeatProduct" resultType="java.lang.Integer">
+        SELECT count(*) FROM fw_devices_check_team  WHERE deleted=0
+        <if test="productDevicesIds != null">
+            and
+            <foreach collection="productDevicesIds" open="(" separator="or " close=")" item="item">
+                find_in_set(#{item},product_devices_ids)
+            </foreach>
+        </if>
+        <if test="id!= null">
+            AND id!=#{id}
+        </if>
+    </select>
+    <select id="findCheckItemListByDevicve" resultType="com.fw.entity.device.DevicesCheckDetail">
+        select c.id check_item_id,c.name check_item_name,t.id check_team_id
+          from fw_devices_check_item c
+          left join fw_devices_check_team t on find_in_set(c.id,t.check_item_ids)
+         where  find_in_set(#{devicesId},t.product_devices_ids)
+           and  t.deleted=0 and c.deleted=0
+    </select>
+</mapper>

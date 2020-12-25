@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.jbpm.dao.JbpmDeploymentDao">
+
+
+    <insert id="insert" parameterType="com.fw.entity.jbpm.JbpmDeployment" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_jbpm_deployment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="formId != null  and formId != ''">form_id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="createTime != null  and createTime != ''">create_time,</if>
+            <if test="createUser != null  and createUser != ''">create_user,</if>
+            <if test="messNotice != null">mess_notice,</if>
+            <if test="emailNotice != null">email_notice</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="formId != null  and formId != ''">#{formId},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="createTime != null  and createTime != ''">#{createTime},</if>
+            <if test="createUser != null  and createUser != ''">#{createUser},</if>
+            <if test="messNotice != null">#{messNotice},</if>
+            <if test="emailNotice != null">#{emailNotice}</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.jbpm.JbpmDeployment">
+        update fw_jbpm_deployment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="formId != null  and formId != ''">form_id = #{formId},</if>
+            <if test="name != null  and name != ''">name = #{name},</if>
+            <if test="updateTime != null  and updateTime != ''">update_time = #{updateTime},</if>
+            <if test="updateUser != null  and updateUser != ''">update_user = #{updateUser},</if>
+            <if test="messNotice != null">mess_notice = #{messNotice},</if>
+            <if test="emailNotice != null">email_notice = #{emailNotice}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="java.util.List">
+        delete from fw_jbpm_deployment where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+    <select id="selectById" parameterType="integer" resultType="com.fw.entity.jbpm.JbpmDeployment">
+        select d.*,f.url form_url from fw_jbpm_deployment d
+          left join fw_jbpm_form f on d.form_id=f.id
+          where d.id = #{id}
+    </select>
+
+    <select id="findDeploymentByCode"  resultType="com.fw.entity.jbpm.JbpmDeployment">
+        select t.* from fw_jbpm_deployment t
+          left join fw_jbpm_form f on t.form_id=f.id
+         where f.code = #{formCode}
+    </select>
+
+
+    <select id="findList" resultMap="devicesCheckResult">
+        select c.*,f.name form_name
+        from fw_jbpm_deployment c
+        left join fw_jbpm_form f on c.form_id=f.id
+        where 1=1
+        <if test="code != null  and code != ''">
+            and c.form_id like concat('%/', #{code}, '%') ESCAPE '/'
+        </if>
+        <if test="name != null  and name != ''">
+            and c.name like concat('%/', #{name}, '%') ESCAPE '/'
+        </if>
+        order by c.create_time desc
+    </select>
+
+    <resultMap type="com.fw.entity.jbpm.JbpmDeployment" id="devicesCheckResult">
+        <result property="id" jdbcType="INTEGER"    column="id"    />
+        <collection property="noteList" column="id" select="findJbpmNodeList" />
+    </resultMap>
+
+    <insert id="insertJbpmNode" parameterType="com.fw.entity.jbpm.JbpmDeployprop">
+        insert into fw_jbpm_deployprop
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="deploymentId != null  and deploymentId != ''">deployment_id,</if>
+            <if test="auditUsers != null  and auditUsers != ''">audit_users</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="deploymentId != null  and deploymentId != ''">#{deploymentId},</if>
+            <if test="auditUsers != null  and auditUsers != ''">#{auditUsers}</if>
+        </trim>
+    </insert>
+
+    <update id="updateJbpmNode" parameterType="com.fw.entity.jbpm.JbpmDeployprop">
+        update fw_jbpm_deployprop
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deploymentId != null  and deploymentId != ''">deployment_id = #{deploymentId},</if>
+            <if test="auditUsers != null  and auditUsers != ''">audit_users = #{auditUsers}</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <delete id="deleteJbpmNode" parameterType="java.lang.Integer">
+        delete from fw_jbpm_deployprop where deployment_id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+    <select id="findJbpmNodeList" resultType="com.fw.entity.jbpm.JbpmDeployprop">
+        select t.* from fw_jbpm_deployprop t where deployment_id=#{jbpmId} order by t.id
+    </select>
+    <select id="findJbpmFormList" resultType="com.fw.entity.jbpm.JbpmForm">
+        select t.* from fw_jbpm_form t
+    </select>
+</mapper>
+

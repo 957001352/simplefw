@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.device.dao.DevicesExtensionDao">
+    <insert id="insert" parameterType="com.fw.entity.device.DevicesExtension" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_product_devices_extension
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="productDevicesId != null  and productDevicesId != ''">product_devices_id,</if>
+            <if test="shzcd != null and shzcd != ''">shzcd,</if>
+            <if test="shzwj != null  and shzwj != ''">shzwj,</if>
+            <if test="shchrl != null  and shchrl != ''">shchrl,</if>
+            <if test="shechzhl != null  and shechzhl != ''">shechzhl,</if>
+            <if test="lgzhj != null  and lgzhj != ''">lgzhj,</if>
+            <if test="lgshnl != null  and lgshnl != ''">lgshnl,</if>
+            <if test="shchyl != null  and shchyl != ''">shchyl,</if>
+
+            <if test="dchl != null  and dchl != ''">dchl,</if>
+            <if test="dgshl != null  and dgshl != ''">dgshl,</if>
+            <if test="dgkzhj != null and dgkzhj != ''">dgkzhj,</if>
+            <if test="dzhxch != null  and dzhxch != ''">dzhxch,</if>
+            <if test="mjzdbhhd != null  and mjzdbhhd != ''">mjzdbhhd,</if>
+            <if test="zdkmxch != null  and zdkmxch != ''">zdkmxch,</if>
+            <if test="dzhjjHv != null  and dzhjjHv != ''">dzhjj_hv,</if>
+            <if test="zxmjchc != null  and zxmjchc != ''">zxmjchc,</if>
+            <if test="yyzhz != null  and yyzhz != ''">yyzhz,</if>
+            <if test="qyzhz != null  and qyzhz != ''">qyzhz,</if>
+            <if test="dwhzhj != null  and dwhzhj != ''">dwhzhj,</if>
+            <if test="shzqmbj != null and shzqmbj != ''">shzqmbj,</if>
+            <if test="shzjchyl != null  and shzjchyl != ''">shzjchyl,</if>
+            <if test="shbchc != null  and shbchc != ''">shbchc,</if>
+            <if test="shbzhl != null  and shbzhl != ''">shbzhl,</if>
+            <if test="yyll != null  and yyll != ''">yyll,</if>
+            <if test="djgl != null  and djgl != ''">djgl,</if>
+            <if test="jrgl != null  and jrgl != ''">jrgl,</if>
+            <if test="jxsh != null  and jxsh != ''">jxsh,</if>
+            <if test="intoTime != null  and intoTime != ''">into_time,</if>
+            <if test="status != null  and status != ''">status,</if>
+
+            <if test="shzkj != null  and shzkj != ''">shzkj,</if>
+            <if test="mbchc != null  and mbchc != ''">mbchc,</if>
+
+            <if test="extendAttr != null  and extendAttr != ''">extend_attr,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="productDevicesId != null  and productDevicesId != ''">#{productDevicesId},</if>
+            <if test="shzcd != null and shzcd != ''">#{shzcd},</if>
+            <if test="shzwj != null  and shzwj != ''">#{shzwj},</if>
+            <if test="shchrl != null  and shchrl != ''">#{shchrl},</if>
+            <if test="shechzhl != null  and shechzhl != ''">#{shechzhl},</if>
+            <if test="lgzhj != null  and lgzhj != ''">#{lgzhj},</if>
+            <if test="lgshnl != null  and lgshnl != ''">#{lgshnl},</if>
+            <if test="shchyl != null  and shchyl != ''">#{shchyl},</if>
+
+            <if test="dchl != null  and dchl != ''">#{dchl},</if>
+            <if test="dgshl != null  and dgshl != ''">#{dgshl},</if>
+            <if test="dgkzhj != null and dgkzhj != ''">#{dgkzhj},</if>
+            <if test="dzhxch != null  and dzhxch != ''">#{dzhxch},</if>
+            <if test="mjzdbhhd != null  and mjzdbhhd != ''">#{mjzdbhhd},</if>
+            <if test="zdkmxch != null  and zdkmxch != ''">#{zdkmxch},</if>
+            <if test="dzhjjHv != null  and dzhjjHv != ''">#{dzhjjHv},</if>
+            <if test="zxmjchc != null  and zxmjchc != ''">#{zxmjchc},</if>
+            <if test="yyzhz != null  and yyzhz != ''">#{yyzhz},</if>
+            <if test="qyzhz != null  and qyzhz != ''">#{qyzhz},</if>
+            <if test="dwhzhj != null  and dwhzhj != ''">#{dwhzhj},</if>
+            <if test="shzqmbj != null and shzqmbj != ''">#{shzqmbj},</if>
+            <if test="shzjchyl != null  and shzjchyl != ''">#{shzjchyl},</if>
+            <if test="shbchc != null  and shbchc != ''">#{shbchc},</if>
+            <if test="shbzhl != null  and shbzhl != ''">#{shbzhl},</if>
+            <if test="yyll != null  and yyll != ''">#{yyll},</if>
+            <if test="djgl != null  and djgl != ''">#{djgl},</if>
+            <if test="jrgl != null  and jrgl != ''">#{jrgl},</if>
+            <if test="jxsh != null  and jxsh != ''">#{jxsh},</if>
+            <if test="intoTime != null  and intoTime != ''">#{intoTime},</if>
+            <if test="status != null  and status != ''">#{status},</if>
+
+            <if test="shzkj != null  and shzkj != ''">#{shzkj},</if>
+            <if test="mbchc != null  and mbchc != ''">#{mbchc},</if>
+
+            <if test="extendAttr != null  and extendAttr != ''">#{extendAttr},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.device.DevicesExtension">
+        update fw_product_devices_extension
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productDevicesId != null  and productDevicesId != ''">product_devices_id = #{productDevicesId},</if>
+            <if test="shzcd != null">shzcd = #{shzcd},</if>
+            <if test="shzwj != null">shzwj = #{shzwj},</if>
+            <if test="shchrl != null">shchrl = #{shchrl},</if>
+            <if test="shechzhl != null">shechzhl = #{shechzhl},</if>
+            <if test="lgzhj != null">lgzhj = #{lgzhj},</if>
+            <if test="lgshnl != null">lgshnl = #{lgshnl},</if>
+            <if test="shchyl != null">shchyl = #{shchyl},</if>
+
+            <if test="dchl != null">dchl = #{dchl},</if>
+            <if test="dgshl != null">dgshl = #{dgshl},</if>
+            <if test="dgkzhj != null">dgkzhj = #{dgkzhj},</if>
+            <if test="dzhxch != null">dzhxch = #{dzhxch},</if>
+            <if test="mjzdbhhd != null">mjzdbhhd = #{mjzdbhhd},</if>
+            <if test="zdkmxch != null">zdkmxch = #{zdkmxch},</if>
+            <if test="dzhjjHv != null">dzhjj_hv = #{dzhjjHv},</if>
+            <if test="zxmjchc != null">zxmjchc = #{zxmjchc},</if>
+            <if test="yyzhz != null">yyzhz = #{yyzhz},</if>
+            <if test="qyzhz != null">qyzhz = #{qyzhz},</if>
+            <if test="dwhzhj != null">dwhzhj = #{dwhzhj},</if>
+            <if test="shzqmbj != null">shzqmbj = #{shzqmbj},</if>
+            <if test="shzjchyl != null">shzjchyl = #{shzjchyl},</if>
+            <if test="shbchc != null">shbchc = #{shbchc},</if>
+            <if test="shbzhl != null">shbzhl = #{shbzhl},</if>
+            <if test="yyll != null">yyll = #{yyll},</if>
+            <if test="djgl != null">djgl = #{djgl},</if>
+            <if test="jrgl != null">jrgl = #{jrgl},</if>
+            <if test="jxsh != null">jxsh = #{jxsh},</if>
+            <if test="intoTime != null  and intoTime != ''">into_time = #{intoTime},</if>
+            <if test="status != null">status = #{status},</if>
+
+            <if test="shzkj != null">shzkj = #{shzkj},</if>
+            <if test="mbchc != null">mbchc = #{mbchc},</if>
+
+            <if test="extendAttr != null and extendAttr != ''">extend_attr = #{extendAttr},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="java.util.List">
+        delete from fw_product_devices_extension where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+    <select id="findList" resultType="com.fw.entity.device.DevicesExtension">
+        SELECT fpde.*,CASE
+                        WHEN EXISTS (
+                            SELECT 1
+                            FROM `fw_jbpm_execution` fjpm
+                            WHERE fjpm.data_id = fpds.id AND fjpm.`form_code` = #{formCode} AND fjpm.`end_time` IS NULL
+                            ) THEN '1'
+                            ELSE '0'
+                        END AS audit_status
+        FROM fw_product_devices_extension fpde
+        LEFT JOIN (SELECT max(id) id,devices_extension_id  FROM fw_product_devices_scrap group by devices_extension_id ) fpds  ON fpds.devices_extension_id = fpde.id
+        where 1=1
+        <if test="status != null and status != ''">
+            and fpde.status = #{status}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and fpde.into_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and fpde.into_time &lt;= #{endTime}
+        </if>
+    </select>
+
+</mapper>
+

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.mould.dao.MouldKeepTeamDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.mould.MouldKeepTeam">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="keep_item_ids" property="keepItemIds" jdbcType="VARCHAR"/>
+        <result column="mould_devices_ids" property="mouldDevicesIds" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="deleted" property="deleted" jdbcType="INTEGER"/>
+        <result column="keep_type" property="keepType" jdbcType="INTEGER"/>
+        <result column="cycle" property="cycle" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,create_time,name, keep_item_ids, mould_devices_ids,deleted,keep_type,cycle
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.mould.MouldKeepTeam" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_mould_keep_team
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">
+                id,
+            </if>
+            <if test="name != null  and name != ''">
+                name,
+            </if>
+            <if test="keepItemIds != null  and keepItemIds != ''">
+                keep_item_ids,
+            </if>
+            <if test="mouldDevicesIds != null  and mouldDevicesIds != ''">
+                mould_devices_ids,
+            </if>
+            <if test="cycle != null ">
+                cycle,
+            </if>
+            <if test="keepType != null  and keepType != ''">
+                keep_type
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">
+                #{id},
+            </if>
+            <if test="name != null  and name != ''">
+                #{name},
+            </if>
+            <if test="keepItemIds != null  and keepItemIds != ''">
+                #{keepItemIds},
+            </if>
+            <if test="mouldDevicesIds != null  and mouldDevicesIds != ''">
+                #{mouldDevicesIds},
+            </if>
+            <if test="cycle != null ">
+                #{cycle},
+            </if>
+            <if test="keepType != null  and keepType != ''">
+                #{keepType}
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.mould.MouldKeepTeam">
+        update fw_mould_keep_team
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''">
+                name = #{name},
+            </if>
+            <if test="keepItemIds != null  and keepItemIds != ''">
+                keep_item_ids = #{keepItemIds},
+            </if>
+            <if test="mouldDevicesIds != null  and mouldDevicesIds != ''">
+                mould_devices_ids = #{mouldDevicesIds},
+            </if>
+            <if test="cycle != null ">
+                cycle = #{cycle},
+            </if>
+            <if test="keepType != null  and keepType != ''">
+                keep_type = #{keepType},
+            </if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="selectById" parameterType="integer" resultType="com.fw.entity.mould.MouldKeepTeam">
+        select
+        <include refid="Base_Column_List"/>
+        from fw_mould_keep_team where id = #{id} and deleted = 0
+    </select>
+
+    <delete id="delete" parameterType="java.util.List">
+        update fw_mould_keep_team set deleted = 1
+        where id in
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="findList" parameterType="com.fw.entity.mould.MouldKeepTeam" resultMap="BaseResultMap">
+        SELECT t5.* FROM ( SELECT t2.*, group_concat( t4.CODE ) CODE FROM(SELECT
+        t1.id,
+        t1.name,
+        t1.keep_item_ids,
+        t1.mould_devices_ids,
+        t1.create_time,
+        t1.deleted,
+        t1.keep_type,
+        t1.cycle,
+        group_concat( t3.NAME ) keepItemName
+        FROM fw_mould_keep_team t1
+        LEFT JOIN fw_mould_keep_item t3 ON find_in_set( t3.id, t1.keep_item_ids )
+        WHERE t1.deleted = 0 GROUP BY t1.id ) t2
+        LEFT JOIN fw_mould_devices t4 ON find_in_set( t4.id, t2.mould_devices_ids )
+        GROUP BY t2.id) t5 WHERE 1=1
+        <if test="name != null  and name != ''">
+            and t5.name like concat('%/', #{name}, '%') ESCAPE '/'
+        </if>
+        <if test="mouldCode != null  and mouldCode != ''">
+            and t5.code like concat('%/', #{mouldCode}, '%') ESCAPE '/'
+        </if>
+        order by t5.id desc
+    </select>
+
+    <select id="getAllKeepTeam" parameterType="com.fw.entity.mould.MouldKeepTeam" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from fw_mould_keep_team where deleted = 0 order by create_time desc
+    </select>
+
+    <select id="verifyName" parameterType="java.lang.String" resultType="boolean">
+        select count(*)
+        from fw_mould_keep_team
+        where deleted = 0
+          and name = #{name}
+    </select>
+
+    <select id="verifyKeepType" parameterType="java.lang.Integer" resultType="boolean">
+        select count(*)
+        from fw_mould_keep_team
+        where deleted = 0
+          and keep_type in (#{keepType})
+    </select>
+
+    <select id="getKeepTeamByType" parameterType="java.lang.Integer" resultType="com.fw.entity.mould.MouldKeepTeam">
+        select
+        <include refid="Base_Column_List"/>
+        from fw_mould_keep_team where deleted = 0 and keep_type = #{keepType}
+    </select>
+
+</mapper>

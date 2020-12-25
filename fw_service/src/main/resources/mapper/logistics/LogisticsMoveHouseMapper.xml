@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.logistics.dao.LogisticsMoveHouseDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.logistics.LogisticsMoveHouse">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="move_house_no" property="moveHouseNo" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="execute_time" property="executeTime" jdbcType="TIMESTAMP"/>
+        <result column="execute_user" property="executeUser" jdbcType="INTEGER"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+        <collection property="logisticsMoveHouseDetailsList" column="id" select="selectMoveHouseDetail"/>
+    </resultMap>
+
+    <resultMap id="MoveHouseDetailResultMap" type="com.fw.entity.logistics.LogisticsMoveHouseDetail">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="move_house_id" property="moveHouseId" jdbcType="INTEGER"/>
+        <result column="storage_detail_id" property="storageDetailId" jdbcType="INTEGER"/>
+        <result column="fw_batch" property="fwBatch" jdbcType="VARCHAR"/>
+        <result column="old_loaction" property="oldLoaction" jdbcType="INTEGER"/>
+        <result column="oldLoactionName" property="oldLoactionName" jdbcType="VARCHAR"/>
+        <result column="oldLoactionCode" property="oldLoactionCode" jdbcType="VARCHAR"/>
+        <result column="newLoactionName" property="newLoactionName" jdbcType="VARCHAR"/>
+        <result column="newLoactionCode" property="newLoactionCode" jdbcType="VARCHAR"/>
+        <result column="new_loaction" property="newLoaction" jdbcType="INTEGER"/>
+        <result column="storage_count" property="storageCount" jdbcType="INTEGER"/>
+        <result column="productCode" property="productCode" jdbcType="VARCHAR"/>
+        <result column="productName" property="productName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,move_house_no,create_time, create_user, status,execute_time,execute_user,note
+    </sql>
+
+
+    <!--新增入库单 -->
+    <insert id="insert" parameterType="com.fw.entity.logistics.LogisticsMoveHouse" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_logistics_move_house
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="moveHouseNo != null  and moveHouseNo != ''">move_house_no,</if>
+            <if test="createUser != null  and createUser != ''">create_user,</if>
+            <if test="note != null and note !=''">note</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="moveHouseNo != null  and moveHouseNo != ''">#{moveHouseNo},</if>
+            <if test="createUser != null  and createUser != ''">#{createUser},</if>
+            <if test="note != null and note !=''">#{note}</if>
+        </trim>
+    </insert>
+
+    <!--新增入库明细 -->
+    <insert id="insertDetail" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_logistics_move_house_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            move_house_id,storage_detail_id,fw_batch,old_loaction,new_loaction,storage_count
+        </trim>
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{item.moveHouseId},#{item.storageDetailId},#{item.fwBatch},#{item.oldLoaction},#{item.newLoaction},#{item.storageCount}
+            </trim>
+        </foreach>
+
+    </insert>
+
+    <update id="updateMoveHouseStatus">
+        update fw_logistics_move_house
+            <trim prefix="SET" suffixOverrides=",">
+                <if test="status != null">status = #{status},</if>
+                execute_Time = NOW(),
+                <if test="executeUser != null">execute_user = #{executeUser}</if>
+            </trim>
+        where id = #{id}
+    </update>
+
+
+    <select id="findList" resultMap="BaseResultMap">
+        select
+        * from
+        fw_logistics_move_house
+        where 1=1
+        <if test="moveHouseNo != null and moveHouseNo!=''">
+            and move_house_no like concat('%/', #{moveHouseNo}, '%') ESCAPE '/'
+        </if>
+        <if test="status != null " >
+            and status = #{status}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectMoveHouseDetail" resultMap="MoveHouseDetailResultMap">
+        SELECT
+            t1.*,
+            t3.name as productName,
+            t3.code as productCode,
+            t3.specs as productSpecs,
+            t4.name as oldLoactionName,
+            t4.code as oldLoactionCode,
+            t5.name as newLoactionName,
+            t5.code as newLoactionCode
+        FROM
+	        fw_logistics_move_house_detail t1
+			LEFT JOIN fw_logistics_storage_detail t2 on t1.storage_detail_id = t2.id
+	    LEFT JOIN fw_logistics_product t3 ON t2.product_id = t3.id
+	    LEFT JOIN fw_logistics_storage_location t4 on t1.old_loaction = t4.id
+	    LEFT JOIN fw_logistics_storage_location t5 on t1.new_loaction = t5.id
+	    where move_house_id = #{id}
+       </select>
+
+
+
+    <delete id="delete">
+        delete from fw_logistics_move_house where id in
+        <foreach collection="ids" separator="," open="(" close=")" item="id">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteDetail">
+        delete from fw_logistics_move_house_detail where move_house_id = #{moveHouseId}
+    </delete>
+
+    <select id="findMoveHouseById" parameterType="java.lang.Integer" resultType="com.fw.entity.logistics.LogisticsMoveHouse">
+        select
+         <include refid="Base_Column_List"></include>
+         from fw_logistics_move_house where id in
+            <foreach collection="ids" separator="," open="(" close=")" item="id">
+                #{id}
+            </foreach>
+    </select>
+
+
+    <select id="findCode" resultType="java.lang.String">
+        select ifnull(concat(left(max(move_house_no),4),lpad(right(max(move_house_no),6)+1,6,0)),#{code})code from fw_logistics_move_house
+    </select>
+</mapper>

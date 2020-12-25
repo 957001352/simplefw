@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.logistics.dao.LogisticsStoreHouseDetailDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.logistics.LogisticsStoreHouseDetail">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="store_house_id" property="storeHouseId" jdbcType="INTEGER"/>
+        <result column="product_id" property="productId" jdbcType="INTEGER"/>
+        <result column="storage_count" property="storageCount" jdbcType="INTEGER"/>
+        <result column="material_count" property="materialCount" jdbcType="VARCHAR"/>
+        <result column="fw_batch" property="fwBatch" jdbcType="VARCHAR"/>
+        <result column="provider_batch" property="providerBatch" jdbcType="VARCHAR"/>
+        <result column="storage_location_id" property="storageLocationId" jdbcType="INTEGER"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+        <result column="product_code" property="productCode" jdbcType="VARCHAR"/>
+        <result column="product_devices_id" property="productDevicesId" jdbcType="VARCHAR"/>
+        <result column="order_detail_id" property="orderDetailId" jdbcType="VARCHAR"/>
+        <collection column="product_id" property="logisticsProduct" select="com.fw.service.logistics.dao.LogisticsProductDao.getLogisticsProduct"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,store_house_id, product_id, storage_count,material_count,fw_batch,provider_batch,storage_location_id,note,product_code,product_devices_id,order_detail_id
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.logistics.LogisticsStoreHouseDetail">
+        insert into fw_logistics_store_house_detail
+        (store_house_id, product_id, storage_count,material_count,fw_batch,provider_batch,storage_location_id,note,product_code,product_devices_id,order_detail_id)
+        values
+        <foreach collection="logisticsStoreHouseDetails" item="logisticsStoreHouseDetail" index="i" separator=",">
+            (
+            #{logisticsStoreHouseDetail.storeHouseId},
+            #{logisticsStoreHouseDetail.productId},
+            #{logisticsStoreHouseDetail.storageCount},
+            #{logisticsStoreHouseDetail.materialCount},
+            #{logisticsStoreHouseDetail.fwBatch},
+            #{logisticsStoreHouseDetail.providerBatch},
+            #{logisticsStoreHouseDetail.storageLocationId},
+            #{logisticsStoreHouseDetail.note},
+            #{logisticsStoreHouseDetail.productCode},
+            #{logisticsStoreHouseDetail.productDevicesId},
+            #{logisticsStoreHouseDetail.orderDetailId}
+            )
+        </foreach>
+    </insert>
+    <update id="storeHouseIn">
+        update fw_logistics_store_house_detail
+        set storage_location_id = #{storageLocationId}
+        where store_house_id = #{storeHouseId}
+    </update>
+    <update id="batchBound" parameterType="java.util.Arrays">
+        <foreach collection="logisticsStoreHouseDetails" item="logisticsStoreHouseDetail" separator=";">
+            update fw_logistics_store_house_detail
+            <trim prefix="SET" suffixOverrides=",">
+                <if test="logisticsStoreHouseDetail.storageCount != null and logisticsStoreHouseDetail.storageCount != ''">
+                    storage_count = #{logisticsStoreHouseDetail.storageCount},
+                </if>
+                <if test="logisticsStoreHouseDetail.providerBatch != null and logisticsStoreHouseDetail.providerBatch != ''">
+                    provider_batch = #{logisticsStoreHouseDetail.providerBatch},
+                </if>
+                <if test="logisticsStoreHouseDetail.storageLocationId != null">
+                    storage_location_id = #{logisticsStoreHouseDetail.storageLocationId},
+                </if>
+            </trim>
+            where id = #{logisticsStoreHouseDetail.id}
+        </foreach>
+    </update>
+    <select id="findByOrderNo" resultMap="BaseResultMap">
+        SELECT flshd.*,flsl.code storage_code
+        FROM fw_logistics_store_house_detail flshd
+        left join fw_logistics_storage_location flsl on flshd.storage_location_id = flsl.id
+        WHERE flshd.store_house_id IN (${storeHouseId})
+    </select>
+
+    <select id="findByStoreHouseId" resultMap="BaseResultMap">
+        SELECT flshd.*,flsl.code storage_code
+        FROM fw_logistics_store_house_detail flshd
+        left join fw_logistics_storage_location flsl on flshd.storage_location_id = flsl.id
+        WHERE store_house_id IN (
+            #{storeHouseId}
+        )
+    </select>
+
+    <delete id="delete">
+        delete from fw_logistics_store_house_detail where store_house_id = #{storeHouseId}
+    </delete>
+</mapper>

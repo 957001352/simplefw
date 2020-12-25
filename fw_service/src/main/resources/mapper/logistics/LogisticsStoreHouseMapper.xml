@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.logistics.dao.LogisticsStoreHouseDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.logistics.LogisticsStoreHouse">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="house_no" property="houseNo" jdbcType="VARCHAR"/>
+        <result column="house_type" property="houseType" jdbcType="VARCHAR"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="provider_name" property="providerName" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="execute_time" property="executeTime" jdbcType="TIMESTAMP"/>
+        <result column="execute_user" property="executeUser" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="store_date" property="storeDate" jdbcType="TIMESTAMP"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+        <result column="parts_type" property="partsType" jdbcType="INTEGER"/>
+        <collection property="logisticsStoreHouseDetailList" column="id" select="com.fw.service.logistics.dao.LogisticsStoreHouseDetailDao.findByStoreHouseId"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,house_no, house_type, order_no,provider_name,create_time,execute_time,execute_user,status,storeDate,note,parts_type
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.logistics.LogisticsStoreHouse">
+        insert into fw_logistics_store_house
+        (house_no, house_type, order_no, provider_name,create_time,execute_time,execute_user,status,store_date,note,parts_type)
+        values
+        <foreach collection="logisticsStoreHouses" item="logisticsStoreHouse" index="i" separator=",">
+            (
+            #{logisticsStoreHouse.houseNo},
+            #{logisticsStoreHouse.houseType},
+            #{logisticsStoreHouse.orderNo},
+            #{logisticsStoreHouse.providerName},
+            #{logisticsStoreHouse.createTime},
+            #{logisticsStoreHouse.executeTime},
+            #{logisticsStoreHouse.executeUser},
+            #{logisticsStoreHouse.status},
+            #{logisticsStoreHouse.storeDate},
+            #{logisticsStoreHouse.note},
+            #{logisticsStoreHouse.partsType}
+            )
+        </foreach>
+    </insert>
+    <insert id="insertOne" parameterType="com.fw.entity.logistics.LogisticsStoreHouse" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_logistics_store_house
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="houseNo != null  and houseNo != ''">house_no,</if>
+            <if test="houseType != null">house_type,</if>
+            <if test="orderNo != null  and orderNo != ''">order_no,</if>
+            <if test="providerName != null  and providerName != ''">provider_name,</if>
+            <if test="createTime != null  and createTime != ''">create_time,</if>
+            <if test="executeTime != null and executeTime != ''">execute_time,</if>
+            <if test="executeUser != null and executeUser != ''">execute_user,</if>
+            <if test="status != null">status,</if>
+            <if test="storeDate != null  and storeDate != ''">store_date,</if>
+            <if test="note != null  and note != ''">note,</if>
+            <if test="partsType != null">parts_type,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="houseNo != null  and houseNo != ''">#{houseNo},</if>
+            <if test="houseType != null">#{houseType},</if>
+            <if test="orderNo != null  and orderNo != ''">#{orderNo},</if>
+            <if test="providerName != null  and providerName != ''">#{providerName},</if>
+            <if test="createTime != null  and createTime != ''">#{createTime},</if>
+            <if test="executeTime != null and executeTime != ''">#{executeTime},</if>
+            <if test="executeUser != null and executeUser !=''">#{executeUser},</if>
+            <if test="status != null">#{status},</if>
+            <if test="storeDate != null  and storeDate != ''">#{storeDate},</if>
+            <if test="note != null  and note != ''">#{note},</if>
+            <if test="partsType != null">#{partsType},</if>
+        </trim>
+    </insert>
+    <update id="update">
+        update fw_logistics_store_house
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="houseNo != null and houseNo != ''">house_no = #{houseNo},</if>
+            <if test="houseType != null">house_type = #{houseType},</if>
+            <if test="orderNo != null and orderNo != ''">order_no = #{orderNo},</if>
+            <if test="providerName != null and providerName != ''">provider_name = #{providerName},</if>
+            <if test="createTime != null and createTime != ''">create_time = #{createTime},</if>
+            <if test="executeTime != null and executeTime != ''">execute_time = #{executeTime},</if>
+            <if test="executeUser != null and executeUser != ''">execute_user = #{executeUser},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="storeDate != null and storeDate != ''">store_date = #{storeDate},</if>
+            <if test="note != null and note != ''">note = #{note},</if>
+            <if test="partsType != null">parts_type = #{partsType},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <delete id="delete">
+        delete from fw_logistics_store_house where id = #{id}
+    </delete>
+    <select id="findList" resultType="com.fw.entity.logistics.LogisticsStoreHouse">
+        select * from fw_logistics_store_house
+        where 1=1
+        <if test="houseTypes != null">
+            and house_type in
+            <foreach collection="houseTypes" item="ht" separator="," open="(" close=")">
+                 #{ht}
+            </foreach>
+        </if>
+        <if test="orderNo != null and orderNo != ''">
+            and order_no like concat('%',#{orderNo},'%')
+        </if>
+        <if test="houseNo != null and houseNo != ''">
+            and house_no like concat('%',#{houseNo},'%')
+        </if>
+        <if test="status != null">
+            and status = #{status}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and store_date &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and store_date &lt;= #{endTime}
+        </if>
+        <if test="partsType != null">
+            and parts_type in (${partsType})
+        </if>
+    </select>
+    <select id="findByStoreHouseId" resultMap="BaseResultMap">
+        select * from fw_logistics_store_house where id = #{storeHouseId}
+    </select>
+
+    <select id="findCode" resultType="java.lang.String">
+        select ifnull(concat(left(max(house_no),4),lpad(right(max(house_no),6)+1,6,0)),#{code})code from fw_logistics_store_house
+    </select>
+</mapper>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.craft.dao.CardParamsDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.craft.CardParams">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="card_id" property="cardId" jdbcType="INTEGER"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="part_code" property="partCode" jdbcType="VARCHAR"/>
+        <result column="part_name" property="partName" jdbcType="VARCHAR"/>
+        <result column="document_no" property="documentNo" jdbcType="VARCHAR"/>
+        <result column="product_id" property="productId" jdbcType="INTEGER"/>
+        <result column="craft_data" property="craftData" jdbcType="VARCHAR"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="update_user" property="updateUser" jdbcType="INTEGER"/>
+        <result column="update_type" property="updateType" jdbcType="INTEGER"/>
+        <result column="approve_time" property="approveTime" jdbcType="TIMESTAMP"/>
+        <result column="approve_user" property="approveUser" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="mould_id" property="mouldId" jdbcType="INTEGER"/>
+
+        <result column="picture" property="picture" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.fw.entity.craft.CardParams" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_craft_card_params
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="cardId != null">card_id,</if>
+            <if test="code != null  and code != ''">code,</if>
+            <if test="partCode != null  and partCode != ''">part_code,</if>
+            <if test="partName != null  and partName != ''">part_name,</if>
+            <if test="documentNo != null  and documentNo != ''">document_no,</if>
+            <if test="productId != null">product_id,</if>
+            <if test="craftData != null  and craftData != ''">craft_data,</if>
+            <if test="createUser != null">create_user,</if>
+            <if test="createTime != null  and createTime != ''">create_time,</if>
+            <if test="updateTime != null  and updateTime != ''">update_time,</if>
+            <if test="updateUser != null">update_user,</if>
+            <if test="updateType != null">update_type,</if>
+            <if test="approveTime != null  and approveTime != ''">approve_time,</if>
+            <if test="approveUser != null">approve_user,</if>
+            <if test="status != null">status,</if>
+            <if test="mouldId != null and mouldId != ''">mould_id,</if>
+
+            <if test="picture != null and picture != ''">picture,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="cardId != null">#{cardId},</if>
+            <if test="code != null  and code != ''">#{code},</if>
+            <if test="partCode != null  and partCode != ''">#{partCode},</if>
+            <if test="partName != null  and partName != ''">#{partName},</if>
+            <if test="documentNo != null  and documentNo != ''">#{documentNo},</if>
+            <if test="productId != null">#{productId},</if>
+            <if test="craftData != null  and craftData != ''">#{craftData},</if>
+            <if test="createUser != null">#{createUser},</if>
+            <if test="createTime != null  and createTime != ''">#{createTime},</if>
+            <if test="updateTime != null  and updateTime != ''">#{updateTime},</if>
+            <if test="updateUser != null">#{updateUser},</if>
+            <if test="updateType != null">#{updateType},</if>
+            <if test="approveTime != null  and approveTime != ''">#{approveTime},</if>
+            <if test="approveUser != null">#{approveUser},</if>
+            <if test="status != null">#{status},</if>
+            <if test="mouldId != null and mouldId != ''">#{mouldId},</if>
+
+            <if test="picture != null and picture != ''">#{picture},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.craft.CraftModel">
+        update fw_craft_card_params
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="cardId != null">card_id = #{cardId},</if>
+            <if test="code != null  and code != ''">code = #{code},</if>
+            <if test="partCode != null  and partCode != ''">part_code = #{partCode},</if>
+            <if test="partName != null  and partName != ''">part_name = #{partName},</if>
+            <if test="documentNo != null  and documentNo != ''">document_no = #{documentNo},</if>
+            <if test="productId != null">product_id = #{productId},</if>
+            <if test="craftData != null  and craftData != ''">craft_data = #{craftData},</if>
+            <if test="createUser != null">create_user = #{createUser},</if>
+            <if test="createTime != null and createTime != ''">create_time = #{createTime},</if>
+            <if test="updateTime != null and updateTime != ''">update_time = #{updateTime},</if>
+            <if test="updateUser != null">update_user = #{updateUser},</if>
+            <if test="updateType != null">update_type = #{updateType},</if>
+            <if test="approveTime != null and approveTime != ''">approve_time = #{approveTime},</if>
+            <if test="approveUser != null">approve_user = #{approveUser},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="mouldId != null and mouldId != ''">mould_id = #{mouldId},</if>
+
+            <if test="picture != null and picture != ''">picture = #{picture},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <delete id="delete">
+        delete from fw_craft_card_params where id in
+        <foreach collection="ids" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+
+    <select id="findList" resultType="com.fw.entity.craft.CardParams">
+        select fccp.id,fccp.code,fccp.part_code,fccp.part_name,fccp.update_type,fccp.create_time,CASE
+                        WHEN EXISTS (
+                                SELECT 1
+                                FROM `fw_jbpm_execution` fjpm
+                                WHERE fjpm.data_id = fccl.id AND fjpm.`form_code` = #{formCode} AND fjpm.`end_time` IS NULL
+                                ) THEN '1'
+                            ELSE '0'
+                        END AS audit_status
+        from fw_craft_card_params fccp
+        left join (SELECT max(id) id,params_id  FROM fw_craft_card_log group by params_id ) fccl on fccl.params_id = fccp.id
+        where 1=1
+        <if test="partCode != null and partCode != ''">
+            and fccp.part_code like CONCAT('%',#{partCode},'%')
+        </if>
+        <if test="partName != null and partName != ''">
+            and fccp.part_name like CONCAT('%',#{partName},'%')
+        </if>
+        <if test="productId != null and productId != ''">
+            and fccp.product_id = #{productId}
+        </if>
+        order by fccp.create_time desc
+    </select>
+    <select id="findById" resultType="com.fw.entity.craft.CardParams">
+        select * from fw_craft_card_params where id = #{paramsId}
+    </select>
+    <select id="isExist" resultType="java.lang.Integer">
+        select COUNT(1) from fw_craft_card_params
+        where product_id = #{productId} and part_code = #{partCode}
+        <if test="id != null">
+            id != #{id}
+        </if>
+    </select>
+    <select id="findDeviceByPartCode" resultType="com.fw.entity.craft.CardParams">
+        select * from fw_craft_card_params where part_code = #{partCode}
+    </select>
+    <select id="findByDeviceProduct" resultType="com.fw.entity.craft.CardParams">
+        select * from fw_craft_card_params where product_id = #{productId} and part_code = #{partCode}
+    </select>
+
+</mapper>
+

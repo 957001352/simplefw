@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.produce.dao.ProduceFeedingDetailDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.produce.ProduceFeedingDetail">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="feeding_id" property="feedingId" jdbcType="INTEGER"/>
+        <result column="storage_detail_id" property="storageDetailId" jdbcType="INTEGER"/>
+        <result column="storage_count" property="storageCount" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, feeding_id, storage_detail_id, storage_count
+    </sql>
+
+    <insert id="batchInsert" parameterType="com.fw.entity.produce.ProduceFeedingDetail">
+        insert into fw_produce_feeding_detail
+        (feeding_id, storage_detail_id, storage_count)
+        values
+        <foreach collection="produceFeedingDetail" item="produceFeedingDetail" index="i" separator=",">
+            (
+            #{produceFeedingDetail.feedingId},
+            #{produceFeedingDetail.storageDetailId},
+            #{produceFeedingDetail.storageCount}
+            )
+        </foreach>
+    </insert>
+
+    <select id="findProduceFeedingDetails" parameterType="com.fw.entity.produce.ProduceFeedingDetail" resultMap="BaseResultMap">
+        SELECT
+          t1.id,
+          t1.feeding_id,
+          t1.storage_detail_id,
+          t1.storage_count,
+          t3.CODE,
+          t3.name,
+          t3.unit
+        FROM
+          fw_produce_feeding_detail t1
+          LEFT JOIN fw_logistics_storage_detail t2 ON t2.id = t1.storage_detail_id
+          LEFT JOIN fw_logistics_product t3 ON t3.id = t2.product_id
+        WHERE
+            t1.feeding_id = #{id}
+        ORDER BY
+            id DESC
+    </select>
+
+</mapper>

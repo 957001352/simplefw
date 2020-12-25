@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.device.dao.DevicesKeepTeamDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.device.DevicesKeepTeam">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="devices_classify" property="devicesClassify" jdbcType="VARCHAR"/>
+        <result column="keep_item_ids" property="keepItemIds" jdbcType="VARCHAR"/>
+        <result column="product_devices_ids" property="productDevicesIds" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="deleted" property="deleted" jdbcType="TIMESTAMP"/>
+        <result column="cycle" property="cycle" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,create_time,name, devices_classify, keep_item_ids, product_devices_ids,deleted,cycle
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.device.DevicesKeepTeam" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_devices_keep_team
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="name != null  and name != ''">name,</if>
+            <if test="devicesClassify != null  and devicesClassify != ''">devices_classify,</if>
+            <if test="keepItemIds != null  and keepItemIds != ''">keep_item_ids,</if>
+            <if test="productDevicesIds != null  and productDevicesIds != ''">product_devices_ids,</if>
+            <if test="cycle != null ">cycle,</if>
+            <if test="deleted != null">deleted</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="devicesClassify != null  and devicesClassify != ''">#{devicesClassify},</if>
+            <if test="keepItemIds != null  and keepItemIds != ''">#{keepItemIds},</if>
+            <if test="productDevicesIds != null  and productDevicesIds != ''">#{productDevicesIds},</if>
+            <if test="cycle != null">#{cycle},</if>
+            <if test="deleted != null">#{deleted}</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.device.DevicesKeepTeam">
+        update fw_devices_keep_team
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''">name = #{name},</if>
+            <if test="devicesClassify != null  and devicesClassify != ''">devices_classify = #{devicesClassify},</if>
+            <if test="keepItemIds != null  and keepItemIds != ''">keep_item_ids = #{keepItemIds},</if>
+            <if test="productDevicesIds != null  and productDevicesIds != ''">product_devices_ids = #{productDevicesIds},</if>
+            <if test="cycle != null ">cycle = #{cycle},</if>
+            <if test="deleted != null">deleted = #{deleted}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="selectById" parameterType="integer" resultType="com.fw.entity.device.DevicesKeepTeam">
+        select
+        <include refid="Base_Column_List"/>
+        from fw_devices_keep_team where id = #{id}  and deleted = 0
+    </select>
+
+    <delete id="delete" parameterType="java.util.List">
+        update fw_devices_keep_team set deleted = 1
+        where id in
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="findList" parameterType="com.fw.entity.device.DevicesKeepTeam" resultMap="BaseResultMap">
+        select t.*,group_concat(c.name) keep_item_name
+        from fw_devices_keep_team t
+        left join fw_devices_keep_item c on find_in_set(c.id,t.keep_item_ids)
+        where 1=1 and t.deleted = 0
+        <if test="name != null  and name != ''">
+            and t.name like concat('%/', #{name}, '%') ESCAPE '/'
+        </if>
+        <if test="devicesClassify != null">
+            and t.devices_classify = #{devicesClassify}
+        </if>
+        <if test="productDevicesIds != null">
+            and
+            <foreach collection="productDevicesIds" open="(" separator="or " close=")" item="item">
+                find_in_set(#{item},t.product_devices_ids)
+            </foreach>
+        </if>
+        group by t.id
+        order by t.create_time desc
+    </select>
+
+    <select id="getAllKeepTeam" parameterType="com.fw.entity.device.DevicesKeepTeam" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from fw_devices_keep_team where deleted = 0 order by create_time desc
+    </select>
+
+    <select id="verifyName" parameterType="java.lang.String" resultType="boolean">
+        select count(*)  from fw_devices_keep_team where deleted = 0 and name = #{name}
+    </select>
+
+</mapper>

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.logistics.dao.LogisticsDeliveryPlanDao">
+    <insert id="insert" parameterType="com.fw.entity.logistics.LogisticsDeliveryPlan">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            insert into fw_logistics_delivery_plan
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="item.customer != null  and item.customer != ''">customer,</if>
+                <if test="item.productId != null">product_id,</if>
+                <if test="item.planCount != null">plan_count,</if>
+                <if test="item.partsCount != null">parts_count,</if>
+                <if test="item.storeTime != null and item.storeTime != ''">store_time,</if>
+                <if test="item.arrivalTime != null and item.arrivalTime != ''">arrival_time,</if>
+                <if test="item.joeCount != null">joe_count,</if>
+                <if test="item.outHouseId != null">out_house_id,</if>
+                <if test="item.planType != null">plan_type,</if>
+                <if test="item.note != null">note</if>
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="item.customer != null  and item.customer != ''">#{item.customer},</if>
+                <if test="item.productId != null">#{item.productId},</if>
+                <if test="item.planCount != null">#{item.planCount},</if>
+                <if test="item.partsCount != null">#{item.partsCount},</if>
+                <if test="item.storeTime != null and item.storeTime != ''">#{item.storeTime},</if>
+                <if test="item.arrivalTime != null and item.arrivalTime != ''">#{item.arrivalTime},</if>
+                <if test="item.joeCount != null">#{item.joeCount},</if>
+                <if test="item.outHouseId != null">#{item.outHouseId},</if>
+                <if test="item.planType != null">#{item.planType},</if>
+                <if test="item.note != null">#{item.note}</if>
+            </trim>
+        </foreach>
+    </insert>
+    <update id="update" parameterType="com.fw.entity.logistics.LogisticsDeliveryPlan">
+        update fw_logistics_delivery_plan
+            <trim prefix="SET" suffixOverrides=",">
+                <if test="productId != null">product_id = #{productId},</if>
+                <if test="planCount != null">plan_count = #{planCount},</if>
+                <if test="partsCount != null">parts_count = #{partsCount},</if>
+                <if test="customer != null  and customer != ''">customer = #{customer},</if>
+                <if test="storeTime != null  and storeTime != ''">store_time = #{storeTime},</if>
+                <if test="arrivalTime != null  and arrivalTime != ''">arrival_time = #{arrivalTime},</if>
+                <if test="joeCount != null">joe_count= #{joeCount},</if>
+                <if test="outHouseId != null">out_house_id=#{outHouseId},</if>
+                <if test="status != null">status = #{status},</if>
+                <if test="planType != null">plan_type=#{planType},</if>
+                <if test="note != null">note=#{note}</if>
+            </trim>
+            where id = #{id}
+    </update>
+    <update id="updateStatus" parameterType="java.lang.Integer">
+        update fw_logistics_delivery_plan set status = #{status} where id = #{id}
+    </update>
+    <update id="updateStatusByOutHouseId" parameterType="java.lang.Integer">
+        update fw_logistics_delivery_plan set status = #{status} where out_house_id = #{outHouseId}
+    </update>
+    <update id="updateList">
+        <foreach collection="list" item="item" separator=";">
+            update fw_logistics_delivery_plan
+            <trim prefix="SET" suffixOverrides=",">
+                <if test="item.productId != null">product_id = #{item.productId},</if>
+                <if test="item.planCount != null">plan_count = #{item.planCount},</if>
+                <if test="item.partsCount != null">parts_count = #{item.partsCount},</if>
+                <if test="item.customer != null  and item.customer != ''">customer = #{item.customer},</if>
+                <if test="item.storeTime != null  and item.storeTime != ''">store_time = #{item.storeTime},</if>
+                <if test="item.arrivalTime != null  and item.arrivalTime != ''">arrival_time = #{item.arrivalTime},</if>
+                <if test="item.joeCount != null">joe_count= #{item.joeCount},</if>
+                <if test="item.outHouseId != null">out_house_id=#{item.outHouseId},</if>
+                <if test="item.status != null">status = #{item.status},</if>
+                <if test="item.planType != null">plan_type=#{item.planType},</if>
+                <if test="item.note != null">note=#{item.note}</if>
+            </trim>
+            where id = #{item.id}
+        </foreach>
+    </update>
+    <delete id="delete" parameterType="java.util.List">
+        delete from fw_logistics_delivery_plan where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+    <select id="selectById" resultType="com.fw.entity.logistics.LogisticsDeliveryPlan">
+        select * from fw_logistics_delivery_plan where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+    <select id="selectPlanById" resultType="com.fw.entity.logistics.LogisticsDeliveryPlan">
+        select * from fw_logistics_delivery_plan where id=#{id}
+    </select>
+    <select id="findList" resultType="com.fw.entity.logistics.LogisticsDeliveryPlan">
+        select h.id,h.customer,h.plan_count,h.store_time,h.arrival_time,h.joe_count,h.status,h.plan_type,h.note,
+               h.deliver_time,h.parts_count,h.out_house_id,h.product_id,p.code product_code,p.name product_name,
+               (select sum(storage_count) from fw_logistics_storage_detail d where d.product_id=h.product_id) storage_count
+          from fw_logistics_delivery_plan h
+          left join fw_logistics_product p on  h.product_id=p.id
+        where 1=1
+        <if test="customer != null  and customer != ''">
+            and h.customer like concat('%/', #{customer}, '%') ESCAPE '/'
+        </if>
+        <if test="productCode != null  and productCode != ''">
+            and p.code like concat('%/', #{productCode}, '%') ESCAPE '/'
+        </if>
+        <if test="deliverTime != null  and deliverTime != ''">
+            and date_format(h.deliver_time,'%Y-%m-%d') =#{deliverTime}
+        </if>
+        <if test="outHouseId != null">
+            and h.out_house_id=#{outHouseId}
+        </if>
+        <if test="status != null">
+            and h.status=#{status}
+        </if>
+        <if test="queryType != null">
+            <choose>
+            <when test="queryType == 1">
+                and date_format(h.deliver_time,'%Y-%m-%d')  &lt;=date_format(now(),'%Y-%m-%d')
+            </when>
+            <otherwise>
+                and date_format(h.deliver_time,'%Y-%m-%d') =date_format(now(),'%Y-%m-%d')
+            </otherwise>
+            </choose>
+        </if>
+
+
+        order by h.deliver_time desc
+    </select>
+    <select id="findListByOutHouseId" resultType="java.lang.Integer">
+        select count(*) from fw_logistics_delivery_plan h where h.out_house_id=#{outHouseId}
+    </select>
+    <select id="selectOutHouseIdByCustomer"  resultType="java.lang.Integer">
+        select out_house_id from fw_logistics_delivery_plan
+         where status=0 and date_format(deliver_time,'%Y-%m-%d')=date_format(now(),'%Y-%m-%d')
+        <if test="customer != null  and customer != ''">
+            and customer=#{customer}
+        </if>
+        order by id limit 1
+    </select>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.logistics.LogisticsDeliveryPlan">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="out_house_id" property="outHouseId" jdbcType="INTEGER"/>
+        <result column="customer" property="customer" jdbcType="VARCHAR"/>
+        <result column="product_id" property="productId" jdbcType="INTEGER"/>
+        <result column="parts_count" property="partsCount" jdbcType="INTEGER"/>
+        <result column="plan_count" property="planCount" jdbcType="INTEGER"/>
+        <result column="store_time" property="storeTime" jdbcType="TIMESTAMP" />
+        <result column="arrival_time" property="arrivalTime" jdbcType="TIMESTAMP"/>
+        <result column="deliver_time" property="deliverTime" jdbcType="TIMESTAMP"/>
+        <result column="joe_count" property="joeCount" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="plan_type" property="planType" jdbcType="INTEGER"/>
+        <result column="note" property="note" jdbcType="VARCHAR" />
+        <collection property="logisticsOutHouseDetails" column="{outHouseId = out_house_id, productId = product_id}" select="com.fw.service.logistics.dao.LogisticsOutHouseDetailDao.findByOutHouseIdProduct"/>
+    </resultMap>
+    <select id="findByOutHouseId" resultMap="BaseResultMap">
+        select h.id,h.customer,h.plan_count,h.store_time,h.arrival_time,h.joe_count,h.status,h.plan_type,h.note,
+               h.deliver_time,h.parts_count,h.out_house_id,h.product_id,p.code product_code,p.name product_name,p.unit,
+               (select sum(storage_count) from fw_logistics_storage_detail d where d.product_id=h.product_id) storage_count
+          from fw_logistics_delivery_plan h
+          left join fw_logistics_product p on  h.product_id=p.id
+        where h.out_house_id=#{outHouseId}
+    </select>
+</mapper>
+

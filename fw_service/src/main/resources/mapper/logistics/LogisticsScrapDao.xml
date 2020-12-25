@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.logistics.dao.LogisticsScrapDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.logistics.LogisticsScrap">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="product_id" property="productId" jdbcType="INTEGER"/>
+        <result column="product_devices_id" property="productDevicesId" jdbcType="INTEGER"/>
+        <result column="product_order" property="productOrder" jdbcType="VARCHAR"/>
+        <result column="scrap_coun" property="scrapCoun" jdbcType="INTEGER"/>
+        <result column="reason" property="reason" jdbcType="VARCHAR"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        create_time,
+        product_id, product_devices_id, product_order, scrap_coun, reason, create_user
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.logistics.LogisticsScrap" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_logistics_scrap
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productId !=null">product_id,</if>
+            <if test="productDevicesId !=null">product_devices_id,</if>
+            <if test="productOrder !=null and productOrder !=''">product_order,</if>
+            <if test="scrapCoun !=null">scrap_coun,</if>
+            <if test="reason !=null and reason !=''">reason,</if>
+            <if test="createUser !=null">create_user,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="productId !=null">#{productId},</if>
+            <if test="productDevicesId !=null">#{productDevicesId},</if>
+            <if test="productOrder !=null and productOrder !=''">#{productOrder},</if>
+            <if test="scrapCoun !=null">#{scrapCoun},</if>
+            <if test="reason !=null and reason !=''">#{reason},</if>
+            <if test="createUser !=null">#{createUser},</if>
+        </trim>
+    </insert>
+
+    <delete id="delete" parameterType="java.util.List">
+        delete from fw_logistics_scrap
+        where id in
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <update id="update" parameterType="com.fw.entity.logistics.LogisticsScrap">
+        update fw_logistics_scrap
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productId !=null">product_id = #{productId},</if>
+            <if test="productDevicesId !=null">product_devices_id = #{productDevicesId},</if>
+            <if test="productOrder !=null and productOrder !=''">product_order = #{productOrder},</if>
+            <if test="scrapCoun !=null">scrap_coun = #{scrapCoun},</if>
+            <if test="reason !=null and reason !=''">reason = #{reason},</if>
+            <if test="createUser !=null">create_user = #{createUser},</if>
+        </trim>
+    </update>
+
+    <select id="findList" resultType="com.fw.entity.logistics.LogisticsScrap">
+        SELECT
+	        t1.*,
+            t2.code as productCode,
+            t2.name	as productName
+        FROM
+	        fw_logistics_scrap t1
+	    LEFT JOIN fw_logistics_product t2 ON t1.product_id = t2.id
+	    where 1=1
+	    <if test="productCode != null and productCode !=''"> and t2.code like concat('%/',#{productCode},'%') ESCAPE '/'</if>
+        <if test="productName != null and productName !=''"> and t2.name like concat('%/',#{productName},'%') ESCAPE '/'</if>
+        <if test="productOrder != null and productOrder !=''"> and t1.product_order like concat('%/',#{productOrder},'%') ESCAPE '/'</if>
+        ORDER BY t1.create_time DESC
+    </select>
+
+    <select id="findById" resultType="java.lang.Integer">
+        select count(id) from fw_logistics_scrap where id =#{id}
+    </select>
+
+</mapper>

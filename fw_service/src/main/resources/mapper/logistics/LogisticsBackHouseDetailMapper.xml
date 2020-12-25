@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.logistics.dao.LogisticsBackHouseDetailDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.logistics.LogisticsBackHouseDetail">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="back_house_id" property="backHouseId" jdbcType="INTEGER"/>
+        <result column="product_id" property="productId" jdbcType="INTEGER"/>
+        <result column="storage_count" property="storageCount" jdbcType="INTEGER"/>
+        <result column="apply_count" property="applyCount" jdbcType="INTEGER"/>
+        <result column="fw_batch" property="fwBatch" jdbcType="VARCHAR"/>
+        <result column="storage_location_id" property="storageLocationId" jdbcType="INTEGER"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+        <result column="provider_batch" property="providerBatch" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+            id, back_house_id, product_id, storage_count, apply_count, fw_batch, storage_location_id, note,provider_batch
+    </sql>
+
+    <select id="getBackHouseDetail" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT
+            t1.id,
+            t1.back_house_id,
+            t1.product_id,
+            t1.storage_count,
+            t1.apply_count,
+            t1.fw_batch,
+            t1.storage_location_id,
+            t1.note,
+            t1.provider_batch,
+            t2.product_code,
+            t3.name as productName,
+            t3.code,
+            t3.unit,
+            t3.specs
+        FROM
+            fw_logistics_back_house_detail t1
+            LEFT JOIN fw_logistics_back_house t2 ON t1.back_house_id = t2.id
+            LEFT JOIN fw_logistics_product t3 ON t1.product_id = t3.id
+        WHERE
+            t2.id = #{id}
+    </select>
+
+    <update id="cancellingStocks" parameterType="com.fw.entity.logistics.LogisticsBackHouseDetail">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update fw_logistics_back_house_detail
+            <set>
+                storage_count = #{item.storageCount}
+            </set>
+            where id = #{item.id}
+        </foreach>
+    </update>
+
+    <insert id="batchInsert" parameterType="com.fw.entity.logistics.LogisticsBackHouseDetail">
+        insert into fw_logistics_back_house_detail
+        (back_house_id, product_id, storage_count, apply_count,fw_batch,storage_location_id,note,provider_batch)
+        values
+        <foreach collection="logisticsBackHouseDetail" item="logisticsBackHouseDetail" index="i" separator=",">
+            (
+            #{logisticsBackHouseDetail.backHouseId},
+            #{logisticsBackHouseDetail.productId},
+            #{logisticsBackHouseDetail.storageCount},
+            #{logisticsBackHouseDetail.applyCount},
+            #{logisticsBackHouseDetail.fwBatch},
+            #{logisticsBackHouseDetail.storageLocationId},
+            #{logisticsBackHouseDetail.note},
+            #{logisticsBackHouseDetail.providerBatch}
+            )
+        </foreach>
+    </insert>
+
+    <update id="batchUpdate" parameterType="com.fw.entity.logistics.LogisticsBackHouseDetail">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update fw_logistics_back_house_detail
+            <set>
+                back_house_id = #{item.backHouseId},
+                product_id = #{item.productId},
+                storage_count = #{item.storageCount},
+                apply_count = #{item.applyCount},
+                fw_batch = #{item.fwBatch},
+                storage_location_id = #{item.storageLocationId},
+                note = #{item.note},
+                provider_batch = #{providerBatch}
+            </set>
+            where id = #{item.id}
+        </foreach>
+    </update>
+
+    <delete id="delteByHouseId" parameterType="java.lang.Integer">
+        delete from fw_logistics_back_house_detail where back_house_id = #{houseId}
+    </delete>
+
+</mapper>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.quality.dao.QualityExcepListDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.quality.QualityExcepList">
+        <result column="id" property="id" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="excep_no" property="excepNo" jdbcType="VARCHAR"/>
+        <result column="product_id" property="productId" jdbcType="VARCHAR"/>
+        <result column="all_count" property="allCount" jdbcType="VARCHAR" />
+        <result column="check_count" property="checkCount" jdbcType="VARCHAR"/>
+        <result column="bad_count" property="badCount" jdbcType="VARCHAR"/>
+        <result column="batch" property="batch" jdbcType="VARCHAR"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="provider" property="provider" jdbcType="VARCHAR"/>
+        <result column="check_user" property="checkUser" jdbcType="VARCHAR" />
+        <result column="excep_area" property="excepArea" jdbcType="INTEGER"/>
+        <result column="bad_desc" property="badDesc" jdbcType="VARCHAR"/>
+        <result column="deal_plan" property="dealPlan" jdbcType="VARCHAR"/>
+        <result column="deal_time" property="dealTime" jdbcType="TIMESTAMP"/>
+        <result column="prevent_step" property="preventStep" jdbcType="VARCHAR"/>
+        <result column="prevent_date" property="preventDate" jdbcType="TIMESTAMP"/>
+        <result column="confirm_result" property="confirmResult" jdbcType="TIMESTAMP"/>
+        <result column="confirm_date" property="confirmDate" jdbcType="TIMESTAMP"/>
+        <result column="classify" property="classify" jdbcType="INTEGER"/>
+        <result column="data_id" property="dataId" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        create_time,
+        excep_no, product_id, all_count, check_count, bad_count, batch, order_no, provider, check_user, excep_area, bad_desc, deal_plan, deal_time, prevent_step, prevent_date, confirm_result, confirm_date, classify, data_id
+    </sql>
+
+</mapper>

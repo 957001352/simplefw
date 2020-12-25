@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.quality.dao.QualityInspectResultDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.quality.QualityInspectResult">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="part_code" property="partCode" jdbcType="VARCHAR"/>
+        <result column="samping" property="samping" jdbcType="VARCHAR"/>
+        <result column="material" property="material" jdbcType="VARCHAR"/>
+        <result column="mould_no" property="mouldNo" jdbcType="VARCHAR"/>
+        <result column="part_name" property="partName" jdbcType="VARCHAR"/>
+        <result column="frequence" property="frequence" jdbcType="VARCHAR"/>
+        <result column="material_no" property="materialNo" jdbcType="VARCHAR"/>
+        <result column="of_no" property="ofNo" jdbcType="VARCHAR"/>
+        <result column="end_time" property="endTime" jdbcType="TIMESTAMP"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+        <result column="user" property="user" jdbcType="INTEGER"/>
+        <result column="check_classify" property="checkClassify"/>
+        <result column="real_result" property="realResult" jdbcType="VARCHAR"/>
+        <result column="view_result" property="viewResult" jdbcType="VARCHAR"/>
+        <result column="classify" property="classify" jdbcType="INTEGER"/>
+        <result column="measure_user" property="measureUser" jdbcType="VARCHAR"/>
+        <result column="data_id" property="dataId" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        create_time,
+        part_code, samping, material, mould_no, part_name, frequence, material_no, of_no, end_time, note, user, check_classify, real_result, view_result, classify, data_id,measure_user
+    </sql>
+
+    <insert id="save" parameterType="com.fw.entity.quality.QualityInspectResult" keyProperty="id"
+            useGeneratedKeys="true">
+        insert into fw_quality_inspect_result
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="partCode != null  and partCode != ''">part_code,</if>
+            <if test="samping != null and samping !=''">samping,</if>
+            <if test="material != null  and material != ''">material,</if>
+            <if test="mouldNo != null and mouldNo!=''">mould_no,</if>
+            <if test="partName != null and partName !=''">part_name,</if>
+            <if test="frequence != null  and frequence != ''">frequence,</if>
+            <if test="materialNo != null  and materialNo != ''">material_no,</if>
+            <if test="ofNo != null and ofNo!=''">of_no,</if>
+            <if test="endTime != null and endTime !=''">end_time,</if>
+            <if test="note != null and note != ''">note,</if>
+            <if test="user != null">user,</if>
+            <if test="checkClassify != null and checkClassify != ''">check_classify,</if>
+            <if test="realResult != null and realResult != ''">real_result,</if>
+            <if test="viewResult != null and viewResult != ''">view_result,</if>
+            <if test="classify != null">classify,</if>
+            <if test="measureUser != null and measureUser!=''">measure_user,</if>
+            <if test="dataId != null">data_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="partCode != null  and partCode != ''">#{partCode},</if>
+            <if test="samping != null and samping !=''">#{samping},</if>
+            <if test="material != null  and material != ''">#{material},</if>
+            <if test="mouldNo != null and mouldNo!=''">#{mouldNo},</if>
+            <if test="partName != null and partName !=''">#{partName},</if>
+            <if test="frequence != null  and frequence != ''">#{frequence},</if>
+            <if test="materialNo != null  and materialNo != ''">#{materialNo},</if>
+            <if test="ofNo != null and ofNo!=''">#{ofNo},</if>
+            <if test="endTime != null and endTime !=''">#{endTime},</if>
+            <if test="note != null and note != ''">#{note},</if>
+            <if test="user != null">#{user},</if>
+            <if test="checkClassify != null and checkClassify != ''">#{checkClassify},</if>
+            <if test="realResult != null and realResult != ''">#{realResult},</if>
+            <if test="viewResult != null and viewResult != ''">#{viewResult},</if>
+            <if test="classify != null">#{classify},</if>
+            <if test="measureUser != null and measureUser!=''">#{measureUser},</if>
+            <if test="dataId != null">#{dataId},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.quality.QualityInspectResult">
+        update fw_quality_inspect_result
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="partCode != null  and partCode != ''">part_code = #{partCode},</if>
+            <if test="samping != null and samping !=''">samping = #{samping},</if>
+            <if test="material != null  and material != ''">material = #{material},</if>
+            <if test="mouldNo != null and mouldNo!=''">mould_no = #{mouldNo},</if>
+            <if test="partName != null and partName !=''">part_name = #{partName},</if>
+            <if test="frequence != null  and frequence != ''">frequence = #{frequence},</if>
+            <if test="materialNo != null  and materialNo != ''">material_no = #{materialNo},</if>
+            <if test="ofNo != null and ofNo!=''">of_no = #{ofNo},</if>
+            <if test="endTime != null and endTime !=''">end_time = #{endTime},</if>
+            <if test="note != null and note != ''">note = #{note},</if>
+            <if test="checkClassify != null and checkClassify != ''">check_classify = #{checkClassify},</if>
+            <if test="realResult != null and realResult != ''">real_result = #{realResult},</if>
+            <if test="viewResult != null and viewResult != ''">view_result = #{viewResult},</if>
+            <if test="measureUser != null and measureUser!=''">measure_user = #{measureUser}</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+    <!--根据检验对象ID和规范分类查询质检结果信息-->
+    <select id="findResultByDataIdAndClassify" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"></include>
+        from fw_quality_inspect_result
+        where data_id = #{dataId} and classify = #{classify}
+    </select>
+
+
+    <!--根据检验对象ID查询收货物料明细-->
+    <select id="findTakeDetailIds" resultType="String">
+        SELECT
+	        t3.id as takeOrderDetailIds
+        FROM
+	        fw_quality_material_check t1
+        LEFT JOIN fw_logistics_take_order t2 ON t1.take_order_id = t2.id
+        LEFT JOIN fw_logistics_take_order_detail t3 on t2.id = t3.take_order_id
+        where t1.id = #{id}
+    </select>
+
+
+</mapper>

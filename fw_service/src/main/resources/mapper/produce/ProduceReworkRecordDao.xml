@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.produce.dao.ProduceReworkRecordDao">
+
+
+    <insert id="insert" parameterType="com.fw.entity.produce.ProduceReworkRecord" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_produce_rework_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="planReworkId != null">plan_rework_id,</if>
+            <if test="createUser != null">create_user,</if>
+            <if test="qualified != null">qualified</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="planReworkId != null">#{planReworkId},</if>
+            <if test="createUser != null">#{createUser},</if>
+            <if test="qualified != null">#{qualified}</if>
+        </trim>
+    </insert>
+
+    <select id="findList" resultType="com.fw.entity.produce.ProduceReworkRecord">
+        select  r.*,l.product_code product_order,p.code product_code,p.name product_name
+        from fw_produce_rework_record r
+        left join fw_plan_rework_injection l on r.plan_rework_id=l.id
+        left join fw_logistics_product p on l.product_id=p.id
+        WHERE 1=1
+        <if test="planReworkId != null">
+            and r.plan_rework_id = #{planReworkId}
+        </if>
+    </select>
+
+    <update id="batchUpdate" parameterType="com.fw.entity.produce.ProduceReworkRecord">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update fw_produce_rework_record
+            <set>
+                status = 1
+            </set>
+            where id = #{item.id}
+        </foreach>
+    </update>
+
+</mapper>

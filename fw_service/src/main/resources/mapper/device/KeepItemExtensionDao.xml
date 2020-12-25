@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.device.dao.KeepItemExtensionDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.device.KeepItemExtension">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="keep_item_id" property="keepItemId" jdbcType="INTEGER"/>
+        <result column="columns" property="columns" jdbcType="VARCHAR"/>
+        <result column="rows" property="rows" jdbcType="INTEGER"/>
+        <result column="deleted" property="deleted" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,keep_item_id, columns, rows,deleted
+    </sql>
+
+    <insert id="batchInset" parameterType="com.fw.entity.device.KeepItemExtension">
+        insert into fw_keep_item_extension
+        (keep_item_id,columns,rows)
+        values
+        <foreach collection="keepItemExtensions" item="keepItemExtension" index="i" separator=",">
+            (
+            #{keepItemExtension.keepItemId},
+            #{keepItemExtension.columns},
+            #{keepItemExtension.rows}
+            )
+        </foreach>
+    </insert>
+
+    <update id="batchUpdate" parameterType="com.fw.entity.device.KeepItemExtension">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update fw_keep_item_extension
+            <set>
+                columns = #{item.columns},rows = #{item.rows}
+            </set>
+            where id = #{item.id}
+        </foreach>
+    </update>
+
+    <delete id="delete" parameterType="java.util.List">
+        update fw_keep_item_extension set deleted = 1
+        where keep_item_id in
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="selectByKeepItemId" parameterType="integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from fw_keep_item_extension where keep_item_id = #{id} and deleted = 0
+    </select>
+</mapper>

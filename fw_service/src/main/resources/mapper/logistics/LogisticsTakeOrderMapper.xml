@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.logistics.dao.LogisticsTakeOrderDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.logistics.LogisticsTakeOrder">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="task_no" property="taskNo" jdbcType="VARCHAR"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="kind" property="kind" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="take_date" property="takeDate" jdbcType="TIMESTAMP"/>
+        <result column="execute_time" property="executeTime" jdbcType="TIMESTAMP"/>
+        <result column="execute_user" property="executeUser" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <collection property="TakeOrderDetailList" column="id" select="selectTakeOrderDetail"/>
+    </resultMap>
+
+    <resultMap id="takeOrderDetailResultMap" type="com.fw.entity.logistics.LogisticsTakeOrderDetail">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="take_order_id" property="takeOrderId" jdbcType="INTEGER"/>
+        <result column="product_id" property="productId" jdbcType="INTEGER"/>
+        <result column="productSpecs" property="productSpecs" jdbcType="VARCHAR"/>
+        <result column="productUnit" property="productUnit" jdbcType="VARCHAR"/>
+        <result column="productName" property="productName" jdbcType="VARCHAR"/>
+        <result column="productCode" property="productCode" jdbcType="VARCHAR"/>
+        <result column="buy_count" property="buyCount" jdbcType="INTEGER"/>
+        <result column="receive_count" property="receiveCount" jdbcType="INTEGER"/>
+        <result column="batch_no" property="batchNo" jdbcType="VARCHAR"/>
+        <result column="provider_name" property="providerName" jdbcType="VARCHAR"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,task_no,order_no,kind,status,take_date,execute_time,execute_user,create_time
+    </sql>
+
+
+    <!-- 更新收货单信息-->
+    <update id="updateTakeOrder" parameterType="com.fw.entity.logistics.LogisticsTakeOrder">
+        update fw_logistics_take_order
+            <trim prefix="SET" suffixOverrides=",">
+                <if test="status != null">status = #{status},</if>
+                <if test="executeUser != null">execute_user = #{executeUser},</if>
+                execute_time = NOW()
+            </trim>
+        where id = #{id}
+    </update>
+
+    <!-- 更新明细实收数量-->
+    <update id="updateTakeOrderDetail" parameterType="com.fw.entity.logistics.LogisticsTakeOrderDetail">
+        update fw_logistics_take_order_detail
+            <trim prefix="SET" suffixOverrides=",">
+                <if test="receiveCount != null and receiveCount !='' ">receive_count = #{receiveCount},</if>
+                <if test="batchNo != null and batchNo !='' ">batch_no = #{batchNo}</if>
+            </trim>
+        where id = #{id}
+    </update>
+
+
+    <select id="findList" resultMap="BaseResultMap">
+            select
+            id,
+            task_no,
+            order_no,
+            kind,
+            status,
+            DATE_FORMAT(take_date,'%Y-%m-%d') as take_date,
+            execute_time,
+            execute_user,
+            create_time
+            from
+                fw_logistics_take_order
+            where 1=1
+            <if test="taskNo != null and taskNo !=''">
+                and task_no like concat('%/', #{taskNo}, '%') ESCAPE '/'
+            </if>
+            <if test="status !=null">
+                and status = #{status}
+            </if>
+            <if test="kind !=null">
+                and kind = #{kind}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                <![CDATA[ and create_time >= #{startTime}]]>
+            </if>
+            <if test="stopTime != null and stopTime != ''">
+                <![CDATA[ and create_time <= #{stopTime}]]>
+            </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectTakeOrderDetail" resultMap="takeOrderDetailResultMap">
+        SELECT
+            t1.*,
+            t2.specs productSpecs,
+            t2.unit productUnit,
+            t2.name productName,
+            t2.code productCode
+        FROM
+        fw_logistics_take_order_detail t1
+        LEFT JOIN fw_logistics_product t2	ON t1.product_id = t2.id
+        where take_order_id = #{id}
+    </select>
+
+    <select id="findById" resultMap="BaseResultMap">
+        select * from fw_logistics_take_order where id = #{id}
+    </select>
+
+    <!-- 根据收货订单号和物料号查询收货明细-->
+    <select id="findDetailByTakeOrderIdAndProductID" resultType="com.fw.entity.logistics.LogisticsTakeOrderDetail">
+        select * from fw_logistics_take_order_detail where take_order_id = #{takeOrderId} and product_id = #{productId}
+    </select>
+
+    <!--生成批次号，规则为日期加3位流水号，例如：20201212001-->
+    <select id="createFwBatchNo" resultType="java.lang.String">
+        SELECT
+            ifnull(
+            IF
+                (
+                    LEFT ( max( batch_no ), 8 ) = #{date},
+                    CONCAT(
+                        LEFT ( max( batch_no ), 8 ),
+                        lpad( RIGHT ( max( batch_no ), 3 ) + 1, 3, 0 )),
+                        CONCAT( DATE_FORMAT( #{date}, '%Y%m%d' ), '001' )),
+                CONCAT( #{date}, '001' ))  as fwBatch
+        FROM
+            fw_logistics_take_order_detail
+    </select>
+
+
+    <select id="findDetailByid" resultType="com.fw.entity.logistics.LogisticsTakeOrderDetail">
+        select * from fw_logistics_take_order_detail where id = #{id}
+    </select>
+
+</mapper>

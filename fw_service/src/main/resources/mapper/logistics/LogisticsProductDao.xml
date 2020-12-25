@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.logistics.dao.LogisticsProductDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.logistics.LogisticsProduct">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="specs" property="specs" jdbcType="VARCHAR"/>
+        <result column="category" property="category" jdbcType="VARCHAR"/>
+        <result column="max_store" property="maxStore" jdbcType="INTEGER"/>
+        <result column="min_store" property="minStore" jdbcType="INTEGER"/>
+        <result column="warn_time" property="warnTime" jdbcType="INTEGER"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+        <result column="unit" property="unit" jdbcType="VARCHAR"/>
+        <result column="safety_store" property="safetyStore" jdbcType="DECIMAL"/>
+        <result column="store_count" property="storeCount" jdbcType="DECIMAL"/>
+        <result column="property" property="property" jdbcType="VARCHAR"/>
+        <result column="is_safety" property="isSafety" jdbcType="VARCHAR"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,name, code, specs, category, max_store, min_store, warn_time, note,unit,safety_store,store_count,property,is_safety,update_time
+    </sql>
+
+    <insert id="batchInsert" parameterType="com.fw.entity.logistics.LogisticsProduct">
+        insert into fw_logistics_product
+        (name, code, specs, category)
+        values
+        <foreach collection="logisticsProduct" item="logisticsProduct" index="i" separator=",">
+            (
+            #{logisticsProduct.name},
+            #{logisticsProduct.code},
+            #{logisticsProduct.specs},
+            #{logisticsProduct.category}
+            )
+        </foreach>
+    </insert>
+
+    <update id="batchUpdateStore" parameterType="com.fw.entity.logistics.LogisticsProduct">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update fw_logistics_product
+            <set>
+                warn_time = #{item.maxStore},min_store = #{item.minStore}
+            </set>
+            where id = #{item.id}
+        </foreach>
+    </update>
+
+    <update id="batchUpdateWarn" parameterType="com.fw.entity.logistics.LogisticsProduct">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update fw_logistics_product
+            <set>
+                max_store = #{item.warnTime}
+            </set>
+            where id = #{item.id}
+        </foreach>
+    </update>
+
+    <select id="getLogisticsProduct" parameterType="integer" resultType="com.fw.entity.logistics.LogisticsProduct">
+        select
+        <include refid="Base_Column_List"/>
+        from fw_logistics_product where id = #{id}
+    </select>
+
+    <update id="update" parameterType="com.fw.entity.logistics.LogisticsProduct">
+        update fw_logistics_product
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''">name = #{name},</if>
+            <if test="code != null and code !=''">code = #{code},</if>
+            <if test="specs != null and specs !=''">specs = #{specs},</if>
+            <if test="category != null and category !='' ">category = #{category},</if>
+            <if test="maxStore != null ">max_store = #{maxStore},</if>
+            <if test="minStore != null ">min_store = #{minStore},</if>
+            <if test="warnTime != null ">warn_time = #{warnTime},</if>
+            <if test="note != null and note !='' ">note = #{note},</if>
+            <if test="unit != null and unit !='' ">unit = #{unit}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="findList" parameterType="com.fw.entity.logistics.LogisticsProduct" resultMap="BaseResultMap">
+        SELECT
+        t1.id,
+        t1.NAME,
+        t1.CODE,
+        t1.specs,
+        t1.category,
+        t1.max_store,
+        t1.min_store,
+        t1.warn_time,
+        t1.note,
+        t1.unit,
+        t1.safety_store,
+        t1.property,
+        t1.is_safety,
+        t1.update_time,
+        ( SELECT sum( d.storage_count ) FROM fw_logistics_storage_detail d WHERE d.product_id = t1.id ) AS store_count
+        FROM
+        fw_logistics_product t1
+        WHERE 1 = 1
+        <if test="name != null  and name != ''">
+            and t1.name  like concat('%/', #{name}, '%') ESCAPE '/'
+        </if>
+        <if test="code != null  and code != ''">
+            and t1.code like concat('%/', #{code}, '%') ESCAPE '/'
+        </if>
+        order by t1.id desc
+
+    </select>
+
+    <select id="findStoreWarn" parameterType="com.fw.entity.logistics.LogisticsProduct" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        FROM fw_logistics_product where 1=1
+        AND store_count &lt; safety_store
+        <if test="name != null  and name != ''">
+            and name like concat('%/', #{name}, '%') ESCAPE '/'
+        </if>
+        <if test="code != null  and code != ''">
+            and code like concat('%/', #{code}, '%') ESCAPE '/'
+        </if>
+        order by id desc
+    </select>
+
+    <select id="findExceedWarn" parameterType="com.fw.entity.logistics.LogisticsProduct" resultMap="BaseResultMap">
+        SELECT
+        t1.*,
+        t2.storage_date,
+        datediff( NOW( ),t2.storage_date ) AS DAY ,
+        t2.fw_batch as fwBatch,
+        t3.`code` as storageCode
+        FROM
+        fw_logistics_product t1
+        LEFT JOIN fw_logistics_storage_detail t2 ON t1.id = t2.product_id
+        LEFT JOIN fw_logistics_storage_location t3 ON t2.storage_id = t3.id
+        WHERE 1 = 1
+        AND IF(t1.is_safety = '是',  datediff( now( ) ,t2.storage_date ) > t1.warn_time,  '' )
+        <if test="name != null  and name != ''">
+            and t1.name like concat('%/', #{name}, '%') ESCAPE '/'
+        </if>
+        <if test="code != null  and code != ''">
+            and t1.code like concat('%/', #{code}, '%') ESCAPE '/'
+        </if>
+        order by t1.id desc
+    </select>
+
+    <select id="getProductDetail" parameterType="java.lang.String" resultType="com.fw.entity.logistics.LogisticsProduct">
+       select
+	    t1.id,
+	    t1.name,
+	    t1.code,
+	    t1.specs,
+	    t1.category,
+	    t1.max_store,
+	    t1.min_store,
+	    t1.warn_time,
+	    t1.note,
+	    t1.unit,
+	    t2.storage_count,
+        t2.fw_batch,
+        t2.product_date,
+        t2.id as storageDetailId
+        from fw_logistics_product t1
+	    LEFT JOIN  fw_logistics_storage_detail t2 on t1.id = t2.product_id
+	    where  t1.CODE LIKE concat( '%/', #{code}, '%' ) ESCAPE '/' limit 1
+    </select>
+
+    <select id="findDetailList" parameterType="com.fw.entity.logistics.LogisticsProduct" resultMap="BaseResultMap">
+        SELECT
+        t1.*,
+        t2.id as storageDetailId,
+        t2.storage_count as storageCount,
+        t2.fw_batch as fwBatch,
+        t2.provider_name as providerName,
+        t2.provider_batch as providerBatch,
+        t2.storage_date as storageDate,
+        t3.`code` as storageCode,
+        t3.id as storageId
+        FROM
+        fw_logistics_product t1
+        LEFT JOIN fw_logistics_storage_detail t2 ON t1.id = t2.product_id
+        LEFT JOIN fw_logistics_storage_location t3 ON t2.storage_id = t3.id
+        WHERE
+        1 =1
+        <if test="code != null  and code != ''">
+            and t1.code like concat('%/', #{code}, '%') ESCAPE '/'
+        </if>
+        <if test="name != null  and name != ''">
+            and t1.name like concat('%/', #{name}, '%') ESCAPE '/'
+        </if>
+        <if test="storageCode != null  and storageCode != ''">
+            and t3.code like concat('%/', #{storageCode}, '%') ESCAPE '/'
+        </if>
+        ORDER BY t1.id DESC
+    </select>
+    <select id="findByStorageDetailId" resultType="com.fw.entity.logistics.LogisticsProduct">
+        SELECT flp.*,flsl.`code` storage_code
+        FROM `fw_logistics_product` flp
+        LEFT JOIN  `fw_logistics_storage_detail` flsd ON flsd.`product_id` = flp.`id`
+        LEFT JOIN  `fw_logistics_storage_location` flsl ON flsl.`id` = flsd.`storage_id`
+        WHERE flsd.id = #{storageDetailId}
+    </select>
+
+    <select id="getAllCode" resultMap="BaseResultMap">
+        SELECT id,code,name FROM `fw_logistics_product`
+    </select>
+
+    <select id="getNameByCode" parameterType="java.lang.String" resultType="com.fw.entity.logistics.LogisticsProduct">
+        SELECT <include refid="Base_Column_List"/>  FROM fw_logistics_product where code = #{code}
+    </select>
+    <select id="findListByCode"  resultType="com.fw.entity.logistics.LogisticsProduct">
+        SELECT <include refid="Base_Column_List"/>  FROM fw_logistics_product where code in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

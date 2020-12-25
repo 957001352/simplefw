@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.produce.dao.ProduceBadReportDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.produce.ProduceBadReport">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="plan_molding_id" property="planMoldingId" jdbcType="INTEGER"/>
+        <result column="mold" property="mold" jdbcType="VARCHAR"/>
+        <result column="material" property="material" jdbcType="VARCHAR"/>
+        <result column="jagged" property="jagged" jdbcType="VARCHAR"/>
+        <result column="copper" property="copper" jdbcType="VARCHAR"/>
+        <result column="leakage" property="leakage" jdbcType="VARCHAR"/>
+        <result column="cover" property="cover" jdbcType="VARCHAR"/>
+        <result column="crush" property="crush" jdbcType="VARCHAR"/>
+        <result column="craze" property="craze" jdbcType="VARCHAR"/>
+        <result column="burning" property="burning" jdbcType="VARCHAR"/>
+        <result column="oil" property="oil" jdbcType="VARCHAR"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,plan_molding_id, mold, material, jagged, copper, leakage, cover, crush, craze,
+        burning, oil, note, create_user,create_time
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.produce.ProduceBadReport" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_produce_bad_report
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="planMoldingId != null">plan_molding_id,</if>
+            <if test="mold != null and mold !='' ">mold,</if>
+            <if test="material != null and material !='' ">material,</if>
+            <if test="jagged != null and jagged !='' ">jagged,</if>
+            <if test="copper != null and copper !='' ">copper,</if>
+            <if test="leakage != null and leakage !='' ">leakage,</if>
+            <if test="cover != null and cover !='' ">cover,</if>
+            <if test="crush != null and crush !='' ">crush,</if>
+            <if test="craze != null and craze !='' ">craze,</if>
+            <if test="burning != null and burning !='' ">burning,</if>
+            <if test="oil != null and oil !='' ">oil,</if>
+            <if test="note != null and note !='' ">note,</if>
+            <if test="createUser != null and createUser !='' ">create_user</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="planMoldingId != null">#{planMoldingId},</if>
+            <if test="mold != null and mold !='' ">#{mold},</if>
+            <if test="material != null and material !='' ">#{material},</if>
+            <if test="jagged != null and jagged !='' ">#{jagged},</if>
+            <if test="copper != null and copper !='' ">#{copper},</if>
+            <if test="leakage != null and leakage !='' ">#{leakage},</if>
+            <if test="cover != null and cover !='' ">#{cover},</if>
+            <if test="crush != null and crush !='' ">#{crush},</if>
+            <if test="craze != null and craze !='' ">#{craze},</if>
+            <if test="burning != null and burning !='' ">#{burning},</if>
+            <if test="oil != null and oil !='' ">#{oil},</if>
+            <if test="note != null and note !='' ">#{note},</if>
+            <if test="createUser != null and createUser !='' ">#{createUser}</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.produce.ProduceBadReport">
+        update fw_produce_bad_report
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="planMoldingId != null">plan_molding_id = #{planMoldingId},</if>
+            <if test="mold != null and mold !='' ">mold = #{mold},</if>
+            <if test="material != null and material !='' ">material = #{material},</if>
+            <if test="jagged != null and jagged !='' ">jagged = #{jagged},</if>
+            <if test="copper != null and copper !='' ">copper = #{copper},</if>
+            <if test="leakage != null and leakage !='' ">leakage = #{leakage},</if>
+            <if test="cover != null and cover !='' ">cover = #{cover},</if>
+            <if test="crush != null and crush !='' ">crush = #{crush},</if>
+            <if test="craze != null and craze !='' ">craze = #{craze},</if>
+            <if test="burning != null and burning !='' ">burning = #{burning},</if>
+            <if test="oil != null and oil !='' ">oil = #{oil},</if>
+            <if test="note != null and note !='' ">note = #{note},</if>
+            <if test="createUser != null and createUser !='' ">createUser = #{createUser}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="java.util.List">
+        delete from fw_produce_bad_report where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="selectById" parameterType="java.lang.Integer" resultType="com.fw.entity.produce.ProduceBadReport">
+        select
+        <include refid="Base_Column_List"/>
+        from fw_produce_bad_report
+        where id = #{id}
+    </select>
+
+    <select id="findList" parameterType="com.fw.entity.produce.ProduceBadReport" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from fw_produce_bad_report
+        where 1=1
+        <if test="moldingId != null ">
+            and  plan_molding_id = #{moldingId}
+        </if>
+        order by id  desc
+    </select>
+
+</mapper>

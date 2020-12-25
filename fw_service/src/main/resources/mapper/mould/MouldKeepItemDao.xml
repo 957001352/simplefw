@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.mould.dao.MouldKeepItemDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.mould.MouldKeepItem">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="deleted" property="deleted" jdbcType="INTEGER"/>
+        <result column="cycle" property="cycle" jdbcType="INTEGER"/>
+        <result column="instructor" property="instructor" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,create_time,name, content,deleted,cycle,instructor
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.mould.MouldKeepItem" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_mould_keep_item
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="name != null  and name != ''">name,</if>
+            <if test="content != null  and content != ''">content,</if>
+            <if test="cycle != null ">cycle,</if>
+            <if test="instructor != null  and instructor != ''">instructor</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="content != null  and content != ''">#{content},</if>
+            <if test="cycle != null ">#{cycle},</if>
+            <if test="instructor != null  and instructor != ''">#{instructor}</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.mould.MouldKeepItem">
+        update fw_mould_keep_item
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''">name = #{name},</if>
+            <if test="content != null  and content != ''">content = #{content},</if>
+            <if test="cycle != null ">cycle = #{cycle},</if>
+            <if test="instructor != null  and instructor != ''">instructor = #{instructor}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="selectById" parameterType="integer" resultType="com.fw.entity.mould.MouldKeepItem">
+        select
+            t1.id,t1.create_time,t1.name, t1.content,t1.deleted,t1.cycle,t1.instructor,
+            t2.NAME AS fileName,t2.path AS webPath,t2.suffix
+        from fw_mould_keep_item t1 left join  fw_basic_attachment t2 ON t2.data_id = t1.instructor  where t1.id = #{id} and t1.deleted = 0
+    </select>
+
+    <delete id="delete" parameterType="java.util.List">
+        update fw_mould_keep_item set deleted = 1
+        where id in
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="findList" parameterType="com.fw.entity.mould.MouldKeepItem" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from fw_mould_keep_item where 1=1 and deleted = 0
+        <if test="name != null  and name != ''">
+            and name like concat('%/', #{name}, '%') ESCAPE '/'
+        </if>
+        order by create_time desc
+    </select>
+
+    <select id="findAll" parameterType="com.fw.entity.mould.MouldKeepItem" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from fw_mould_keep_item  where deleted = 0 order by create_time desc
+    </select>
+
+    <select id="findItemByIds"  parameterType="string" resultType="java.lang.String">
+        select name from fw_mould_keep_item where deleted = 0 and id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="findKeepItemByIds"  parameterType="string" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from fw_mould_keep_item where deleted = 0 and id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="verifyName" parameterType="java.lang.String" resultType="boolean">
+        select count(*)  from fw_mould_keep_item where deleted = 0 and name = #{name}
+    </select>
+
+    <select id="getKeepItemByCycle" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from fw_mould_keep_item where  deleted = 0 and cycle = #{cycle} order by id desc
+    </select>
+
+</mapper>
+

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.produce.dao.BarcodeQueryDao">
+
+    <sql id="selectInjectionMolding">
+            select i.id,i.product_code productOrder,p.code productCode,p.name productName,d.code mouldCode,d.name mouldName,
+                   d.cavity,c.name customer,i.deliver_time deliverTime,ifnull(i.actual_start,i.start_time) startTime,q.param_value tmCycleTime,
+                   date_add(i.actual_start,INTERVAL i.product_time MINUTE) endTime,i.plan_count planCount,b.qualified,
+                   b.unqualified,m.beat planBeat,k.code carkCode,d.life_time lifeTime,d.init_count useCount,m.photo,r.id monitorId,
+                   i.product_devices_id productDevicesId,i.create_user createUser,i.actual_start createTime,r.status,i.product_id productId,
+                   concat(round(b.qualified/i.plan_count*100),'%') proPercent,concat(round((b.qualified-b.unqualified)/b.qualified*100),'%') passPercent,
+                   concat(round(d.init_count/d.life_time*100),'%') mouldPercent,concat(round(m.beat/q.param_value*100),'%') beatPercent
+             from fw_plan_injection_molding i
+             left join fw_logistics_product p on p.id=i.product_id
+             left join fw_plan_customer c on c.id=i.customer_id
+             left join fw_mould_devices d on d.id=i.mould_id
+             left join (select plan_molding_id,sum(qualified) qualified,sum(unqualified)unqualified
+                         from fw_produce_molding_record group by plan_molding_id) b on b.plan_molding_id=i.id
+             left join fw_craft_card_params  k on (k.part_code=p.code) and k.product_id=i.product_devices_id
+             left join fw_collect_device q on (q.deviceId=i.product_device_code) and q.param_key='tmCycleTime'
+             left join fw_produce_molding_monitor r on (r.plan_molding_id=i.id) <!-- and r.status in(0,1,2)-->
+             left join fw_craft_model m on m.product_code=p.code
+             left join fw_craft_molde_process mp on (mp.craft_model_id=m.id) and mp.devices_id=i.product_devices_id
+             left join fw_craft_card_params cp on cp.id=mp.card_id
+    </sql>
+
+    <select id="findProductProcessList" resultType="java.util.LinkedHashMap">
+        <include refid="selectInjectionMolding"/> where i.status=1
+    </select>
+    <select id="findMoldingInjectionList" resultType="java.util.LinkedHashMap">
+        <include refid="selectInjectionMolding"/>
+         where 1=1
+        <if test="productOrder != null   and productOrder != ''">
+            and i.product_code = #{productOrder}
+        </if>
+        <if test="partsCode != null   and partsCode != ''">
+            and p.code = #{partsCode}
+        </if>
+        <if test="partsName != null   and partsName != ''">
+            and p.name = #{partsName}
+        </if>
+        order by i.product_code
+    </select>
+    <select id="findNowProductOrder" resultType="java.util.LinkedHashMap">
+        <include refid="selectInjectionMolding"/> where i.status in(0,1,2)
+        <if test="productDevicesId != null">
+            and i.product_devices_id = #{productDevicesId}
+        </if>
+        order by i.start_time limit 1
+    </select>
+
+    <select id="findProductStatusList" resultType="java.util.LinkedHashMap">
+        select (select   round(0.03*avg(param_value)/(6*stddev(param_value)),1)   from fw_collect_device q
+                 where q.param_key='tmCycleTime' and q.deviceId=#{productDevicesCode} order by create_time desc limit 50) tmCycleTime,
+               (select   round(0.03*avg(param_value)/(6*stddev(param_value)),1)   from fw_collect_device q
+                 where q.param_key='tmChargeTime' and q.deviceId=#{productDevicesCode} order by create_time desc limit 50) tmChargeTime,
+               (select   round(0.03*avg(param_value)/(6*stddev(param_value)),1)   from fw_collect_device q
+                where q.param_key='tmInjEndPosi' and q.deviceId=#{productDevicesCode} order by create_time desc limit 50) tmInjEndPosi,
+               (select   round(0.03*avg(param_value)/(6*stddev(param_value)),1)   from fw_collect_device q
+                where q.param_key='tmInjMaxPress' and q.deviceId=#{productDevicesCode} order by create_time desc limit 50) tmInjMaxPress,
+               (select   round(1/(6*avg(param_value)),1)   from fw_collect_device q
+                where q.param_key='tmChargeTime' and q.deviceId=#{productDevicesCode} order by create_time desc limit 50) chargeAvgTime
+    </select>
+
+
+    <select id="findBadProductList" resultType="java.util.LinkedHashMap">
+        select  sum(mold) mold,
+                sum(material) material,
+                sum(jagged) jagged,
+                sum(copper) copper,
+                sum(leakage) leakage,
+                sum(cover) cover,
+                sum(crush) crush,
+                sum(craze) craze,
+                sum(burning) burning,
+                sum(oil) oil,
+                sum(note) note
+          from fw_produce_bad_report where plan_molding_id=#{planMoldingId}
+    </select>
+
+    <select id="findFeedingDetailList" resultType="com.fw.entity.produce.ProduceFeedingDetail">
+        SELECT t1.id,  t1.storage_count, t3.code,t3.name, t3.unit
+          FROM fw_produce_feeding_detail t1
+          LEFT JOIN fw_logistics_storage_detail t2 ON t2.id = t1.storage_detail_id
+          LEFT JOIN fw_logistics_product t3 ON t3.id = t2.product_id
+		  LEFT JOIN fw_produce_feeding t4 ON t4.id=t1.feeding_id
+         WHERE t4.product_order=#{productOrder}
+         ORDER BY t1.id
+    </select>
+    <select id="findMoldingMonitorList" resultType="com.fw.entity.produce.ProduceMoldingMonitor">
+        select m.*,i.plan_count, b.qualified,b.unqualified
+          from fw_produce_molding_monitor m
+          left join fw_plan_injection_molding i on i.id=m.plan_molding_id
+          left join (select plan_molding_id,sum(qualified) qualified,sum(unqualified)unqualified
+          from fw_produce_molding_record group by plan_molding_id) b on b.plan_molding_id=m.plan_molding_id
+        where 1=1
+        <if test="planMoldingId != null">
+            and m.plan_molding_id = #{planMoldingId}
+        </if>
+        <if test="productOrder != null">
+            and m.product_order = #{productOrder}
+        </if>
+        <if test="status != null">
+            and
+            <foreach collection="status" open="(" separator="or " close=")" item="item">
+                m.status=#{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="findReworkInjectionList" resultType="com.fw.entity.produce.ProduceReworkMonitor">
+        select r.*,i.create_user,i.create_time,i.plan_count,o.fw_batch,
+        (select sum(qualified) from fw_produce_rework_record k where k.plan_rework_id=i.id)  qualified
+        from fw_produce_rework_monitor r
+        left join fw_plan_rework_injection i on i.id=r.plan_molding_id
+        left join fw_logistics_picking_order o on o.product_code=r.product_code
+        where 1=1
+        <if test="productOrder != null   and productOrder != ''">
+            and r.product_order = #{productOrder}
+        </if>
+        <if test="partsCode != null   and partsCode != ''">
+            and r.product_code = #{partsCode}
+        </if>
+        <if test="partsName != null   and partsName != ''">
+            and r.product_name = #{partsName}
+        </if>
+        order by r.product_order
+    </select>
+
+
+</mapper>

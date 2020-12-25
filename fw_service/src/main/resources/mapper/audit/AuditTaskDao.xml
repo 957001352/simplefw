@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.audit.dao.AuditTaskDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.audit.AuditTask">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="task_no" property="taskNo" jdbcType="VARCHAR"/>
+        <result column="execute_time" property="executeTime" jdbcType="TIMESTAMP"/>
+        <result column="execute_user" property="executeUser" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="audit_plan_id" property="auditPlanId" jdbcType="INTEGER"/>
+        <result column="audit_team_id" property="auditTeamId" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.fw.entity.audit.AuditTask" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_audit_task
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="taskNo != null  and taskNo != ''">task_no,</if>
+            <if test="auditPlanId != null">audit_plan_id,</if>
+            <if test="auditTeamId != null">audit_team_id,</if>
+            <if test="executeUser != null">execute_user,</if>
+            <if test="note != null and note !=''">note,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="taskNo != null  and taskNo != ''">#{taskNo},</if>
+            <if test="auditPlanId != null">#{auditPlanId},</if>
+            <if test="auditTeamId != null">#{auditTeamId},</if>
+            <if test="executeUser != null">#{executeUser},</if>
+            <if test="note != null and note !=''">#{note},</if>
+        </trim>
+    </insert>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,task_no,execute_time,execute_user,status,audit_plan_id,audit_team_id,create_time,note
+    </sql>
+
+    <update id="update" parameterType="com.fw.entity.audit.AuditTask">
+        update fw_audit_task
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="executeTime != null  and executeTime != ''">execute_time = #{executeTime},</if>
+            <if test="status != null">status = #{status},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="java.lang.Integer">
+        delete from fw_audit_task where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="findList" resultType="java.util.LinkedHashMap">
+        SELECT
+            t1.id,
+            t1.task_no taskNo,
+            t2.name teamName,
+            t2.item_ids as itemIds,
+            t1.status taskStatus,
+            DATE_FORMAT(t1.execute_time,'%Y-%m-%d %H:%i:%s') as exeTime,
+            DATE_FORMAT(t1.create_time,'%Y-%m-%d %H:%i:%s') as createTime,
+            t1.execute_user exeUser,
+            GROUP_CONCAT(t3.name) as itemNames
+        FROM
+        fw_audit_task t1
+        LEFT JOIN fw_audit_team t2 ON t1.audit_team_id = t2.id
+        left join fw_audit_item t3 on FIND_IN_SET(t3.id,t2.item_ids)
+        where 1=1
+            <if test="taskNo != null and taskNo!=''">and task_no like concat('%/', #{taskNo}, '%') ESCAPE '/'</if>
+            <if test="status != null">and status = #{status}</if>
+            <if test="executeTime != null and executeTime!=''">and date_format( t1.execute_time,'%Y-%m-%d') = #{executeTime}</if>
+        GROUP BY t1.id
+        ORDER BY t1.task_no
+    </select>
+
+    <!--查看已完成任务详情 -->
+    <select id="findTaskDetails" resultType="java.util.LinkedHashMap">
+        SELECT
+             t1.id,
+             t1.task_no taskNo,
+             t4.id itemId,
+             t4.name itemName,
+             t3.audit_item_result result,
+             t3.reason,
+             t3.picture
+        from
+            fw_audit_task t1
+        JOIN fw_audit_item_detail t3 ON t1.id = t3.audit_task_id
+        JOIN fw_audit_item t4 ON t3.audit_item_id = t4.id
+        where t1.status =1 and t1.id = #{id}
+	    order by t1.create_time
+    </select>
+
+    <!--查看未完成任务详情 -->
+    <select id="findUnfinishedTaskDetails" resultType="java.util.LinkedHashMap">
+        SELECT
+            t1.id as taskId,
+            t3.id as itemId,
+            t3.name as itemName
+        FROM
+            fw_audit_task t1
+        JOIN fw_audit_team t2 ON t1.audit_team_id = t2.id
+        LEFT JOIN fw_audit_item t3 ON FIND_IN_SET(t3.id,t2.item_ids)
+        WHERE t1.status = 0 and t1.id = #{id}
+        ORDER BY t1.create_time
+    </select>
+
+
+
+    <!--存入审核项目明细 -->
+    <insert id="insertItemDetails">
+        insert into fw_audit_item_detail
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                audit_task_id, audit_item_id,audit_item_result,reason,picture
+            </trim>
+        values
+            <foreach collection="list" item="item" index="index" separator=",">
+                <trim prefix="(" suffix=")" suffixOverrides=",">
+                    #{item.auditTaskId},#{item.auditItemId},#{item.auditItemResult},#{item.reason},#{item.picture}
+                </trim>
+            </foreach>
+    </insert>
+
+    <select id="findCode" resultType="java.lang.String">
+        select ifnull(concat(left(max(task_no),4),lpad(right(max(task_no),6)+1,6,0)),#{code})code from fw_audit_task
+    </select>
+
+</mapper>
+

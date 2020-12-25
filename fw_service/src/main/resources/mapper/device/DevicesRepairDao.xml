@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.device.dao.DevicesRepairDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.device.DevicesRepair">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="product_devices_id" property="productDevicesId" jdbcType="VARCHAR"/>
+        <result column="question" property="question" jdbcType="VARCHAR"/>
+        <result column="question_desc" property="questionDesc" jdbcType="VARCHAR"/>
+        <result column="priority" property="priority" jdbcType="VARCHAR"/>
+        <result column="before_file" property="beforeFile" jdbcType="VARCHAR"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="repair_team_ids" property="repairTeamIds" jdbcType="VARCHAR"/>
+        <result column="add_plan" property="addPlan" jdbcType="VARCHAR"/>
+        <result column="plan_file" property="planFile" jdbcType="VARCHAR"/>
+        <result column="plan_hour" property="planHour" jdbcType="DOUBLE"/>
+        <result column="is_review" property="isReview" jdbcType="INTEGER"/>
+        <result column="project_create_user" property="projectCreateUser" jdbcType="INTEGER"/>
+        <result column="project_create_time" property="projectCreateTime" jdbcType="TIMESTAMP"/>
+        <result column="after_file" property="afterFile" jdbcType="VARCHAR"/>
+        <result column="source" property="source" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="result" property="result" jdbcType="VARCHAR"/>
+        <result column="repair_user" property="repairUser" jdbcType="INTEGER"/>
+        <result column="repair_time" property="repairTime" jdbcType="TIMESTAMP"/>
+        <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+        <result column="finish_time" property="finishTime" jdbcType="TIMESTAMP"/>
+        <result column="repair_project_status" property="repairProjectStatus" jdbcType="INTEGER"/>
+        <result column="repair_task__exe_status" property="repairTaskExeStatus" jdbcType="INTEGER"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+        <result column="devicesRepairItemName" property="devicesRepairItemName" jdbcType="VARCHAR"/>
+        <result column="questionName" property="questionName" jdbcType="VARCHAR"/>
+        <result column="task_received" property="taskReceived" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,code,product_devices_id,devices_classify, question,question_desc,priority,priority,before_file,create_user,create_time,repair_team_ids,
+        add_plan,is_review,project_create_user,project_create_time,after_file,source,status,result,repair_user,
+        repair_time,start_time,finish_time,repair_project_status,repair_task__exe_status,note
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.device.DevicesRepair" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_devices_repair
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="code != null  and code != ''">code,</if>
+            <if test="productDevicesId != null  and productDevicesId != ''">product_devices_id,</if>
+            <if test="devicesClassify != null  and devicesClassify != ''">devices_classify,</if>
+            <if test="question != null  and question != ''">question,</if>
+            <if test="questionDesc != null  and questionDesc != ''">question_desc,</if>
+            <if test="priority != null  and priority != ''">priority,</if>
+            <if test="beforeFile != null  and beforeFile != ''">before_file,</if>
+            <if test="createUser != null">create_user,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="code != null  and code != ''">#{code},</if>
+            <if test="productDevicesId != null  and productDevicesId != ''">#{productDevicesId},</if>
+            <if test="devicesClassify != null  and devicesClassify != ''">#{devicesClassify},</if>
+            <if test="question != null  and question != ''">#{question},</if>
+            <if test="questionDesc != null  and questionDesc != ''">#{questionDesc},</if>
+            <if test="priority != null  and priority != ''">#{priority},</if>
+            <if test="beforeFile != null  and beforeFile != ''">#{beforeFile},</if>
+            <if test="createUser != null">#{createUser},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.device.DevicesRepair">
+        update fw_devices_repair
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="code != null  and code != ''">code = #{code},</if>
+            <if test="productDevicesId != null  and productDevicesId != ''">product_devices_id = #{productDevicesId},</if>
+            <if test="devicesClassify != null  and devicesClassify != ''">devices_classify = #{devicesClassify},</if>
+            <if test="question != null  and question != ''">question = #{question},</if>
+            <if test="questionDesc != null  and questionDesc != ''">question_desc = #{questionDesc},</if>
+            <if test="priority != null  and priority != ''">priority = #{priority},</if>
+            <if test="createUser != null">create_user = #{createUser},</if>
+            <if test="createTime != null  and createTime != ''">create_time = #{createTime},</if>
+            <if test="repairTeamIds != null  and repairTeamIds != ''">repair_team_ids = #{repairTeamIds},</if>
+            <if test="addPlan != null  and addPlan != ''">add_plan = #{addPlan},</if>
+            <if test="planFile != null  and planFile != ''">plan_file = #{planFile},</if>
+            <if test="planHour != null">plan_hour = #{planHour},</if>
+            <if test="isReview != null">is_review = #{isReview},</if>
+            <if test="projectCreateUser != null">project_create_user = #{projectCreateUser},</if>
+            <if test="projectCreateTime != null  and projectCreateTime != ''">project_create_time = #{projectCreateTime},</if>
+            <if test="afterFile != null  and afterFile != ''">after_file = #{afterFile},</if>
+            <if test="source != null">source = #{source},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="result != null  and result != ''">result = #{result},</if>
+            <if test="repairUser != null">repair_user = #{repairUser},</if>
+            <if test="repairTime != null  and repairTime != ''">repair_time = #{repairTime},</if>
+            <if test="startTime != null  and startTime != ''">start_time = #{startTime},</if>
+            <if test="finishTime != null  and finishTime != ''">finish_time = #{finishTime},</if>
+            <if test="repairProjectStatus != null and repairProjectStatus == 1">repair_project_status = #{repairProjectStatus},</if>
+            <if test="repairTaskExeStatus != null and repairTaskExeStatus == 1">repair_task__exe_status = #{repairTaskExeStatus},</if>
+            <if test="taskReceived != null and taskReceived == 1">task_received = #{taskReceived},</if>
+            <if test="note != null  and note != ''">note = #{note},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+
+    <select id="findList" resultMap="BaseResultMap">
+        select c.id,c.code,c.product_devices_id,c.devices_classify,c.question,c.question_desc,c.priority,c.before_file,c.create_user,c.create_time
+        ,c.repair_team_ids,c.add_plan,c.is_review,c.project_create_user,c.project_create_time,c.after_file,c.source,c.status,c.result,c.repair_user
+        ,c.plan_hour,c.repair_time,c.start_time,c.finish_time,c.repair_project_status,c.repair_task__exe_status,c.note,c.task_received
+        ,replace(c.plan_file,#{rootPath},'\\attach\\') as plan_file
+        ,group_concat(DISTINCT t.name) devicesRepairItemName
+        ,group_concat( DISTINCT p.NAME ) questionName
+        from fw_devices_repair c
+        left join fw_devices_repair_item t on find_in_set(t.id,c.repair_team_ids)
+        LEFT JOIN fw_devices_problem p on find_in_set ( p.id,c.question)
+        where 1=1
+        <if test="id != null">
+            and c.id = #{id}
+        </if>
+        <if test="priority != null and priority !=''">
+            and c.priority = #{priority}
+        </if>
+        <if test="repairStatus != null">
+            and c.repair_project_status = #{repairStatus}
+        </if>
+        <if test="repairExeStatus != null">
+            and c.repair_task__exe_status = #{repairExeStatus}
+        </if>
+        <if test="code != null  and code != ''">
+            and code like concat('%/', #{code}, '%') ESCAPE '/'
+        </if>
+        <if test="devicesClassify != null">
+            and c.devices_classify = #{devicesClassify}
+        </if>
+        <if test="productDevicesIds != null">
+            and
+            <foreach collection="productDevicesIds" open="(" separator="or " close=")" item="item">
+                c.product_devices_id=#{item}
+            </foreach>
+        </if>
+        group by c.id
+        order by c.create_time desc
+    </select>
+
+    <select id="findRepairItemById" resultType="com.fw.entity.device.DevicesRepairSpare">
+        select id,devices_repair_id, repair_plan, use_count,devices_spare_id
+        from fw_devices_repair_spare where devices_repair_id = #{devicesRepairId}
+    </select>
+
+    <delete id="delete" parameterType="java.util.List">
+        delete from fw_devices_repair where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="findDevicesPairInfoById"  resultMap="BaseResultMap" >
+        select
+        repair_project_status,repair_task__exe_status
+        from fw_devices_repair
+         where id = #{id}
+    </select>
+    <select id="findByNearNow" resultType="com.fw.entity.device.DevicesRepair">
+        SELECT fmr.* FROM
+        (SELECT *,DATE_ADD(create_time,INTERVAL plan_hour HOUR) predict_time FROM `fw_devices_repair`) fmr
+        WHERE fmr.product_devices_id = #{productDeviceId} and fmr.repair_project_status = 1 AND fmr.status = 0 AND fmr.predict_time &lt;= #{nowTime}
+        ORDER BY fmr.predict_time DESC LIMIT 0,1
+    </select>
+
+    <select id="findCode" resultType="java.lang.String">
+        select ifnull(concat(left(max(code),4),lpad(right(max(code),6)+1,6,0)),#{code})code from fw_devices_repair
+    </select>
+</mapper>
+

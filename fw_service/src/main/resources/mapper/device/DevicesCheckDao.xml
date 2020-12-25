@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.device.dao.DevicesCheckDao">
+
+
+    <insert id="insert" parameterType="com.fw.entity.device.DevicesCheck" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_devices_check
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="code != null  and code != ''">code,</if>
+            <if test="productCode != null and productCode != ''">product_code,</if>
+            <if test="productDevicesId != null  and productDevicesId != ''">product_devices_id,</if>
+            <if test="checkTeamIds != null  and checkTeamIds != ''">check_team_ids,</if>
+            <if test="checkFile != null  and checkFile != ''">check_file,</if>
+            <if test="executeTime != null  and executeTime != ''">execute_time,</if>
+            <if test="executeUser != null  and executeUser != ''">execute_user,</if>
+            <if test="status != null">status,</if>
+            <if test="note != null  and note != ''">note</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="code != null  and code != ''">#{code},</if>
+            <if test="productCode != null and productCode != ''">#{productCode},</if>
+            <if test="productDevicesId != null  and productDevicesId != ''">#{productDevicesId},</if>
+            <if test="checkTeamIds != null  and checkTeamIds != ''">#{checkTeamIds},</if>
+            <if test="checkFile != null  and checkFile != ''">#{checkFile},</if>
+            <if test="executeTime != null  and executeTime != ''">#{executeTime},</if>
+            <if test="executeUser != null  and executeUser != ''">#{executeUser},</if>
+            <if test="status != null">#{status},</if>
+            <if test="note != null  and note != ''">#{note}</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.device.DevicesCheck">
+        update fw_devices_check
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="code != null  and code != ''">code = #{code},</if>
+            <if test="productCode != null  and productCode != ''">product_code = #{productCode},</if>
+            <if test="productDevicesId != null  and productDevicesId != ''">product_devices_id = #{productDevicesId},</if>
+            <if test="checkFile != null  and checkFile != ''">check_file = #{checkFile},</if>
+            <if test="executeTime != null  and executeTime != ''">execute_time = #{executeTime},</if>
+            <if test="executeUser != null  and executeUser != ''">execute_user = #{executeUser},</if>
+            <if test="note != null  and note != ''">note = #{note},</if>
+            <if test="status != null  and status != ''">status = #{status}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="java.util.List">
+        delete from fw_devices_check where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+    <select id="selectById" parameterType="integer" resultType="com.fw.entity.device.DevicesCheck">
+        select * from fw_devices_check where id = #{id}
+    </select>
+    <select id="findList" resultMap="devicesCheckResult">
+        select c.*,group_concat(t.name) check_team_names
+        from fw_devices_check c
+        left join fw_devices_check_team t on find_in_set(t.id,c.check_team_ids)
+        where 1=1
+        <if test="code != null  and code != ''">
+            and code like concat('%/', #{code}, '%') ESCAPE '/'
+        </if>
+        <if test="devicesClassify != null">
+            and t.devices_classify = #{devicesClassify}
+        </if>
+        <if test="productDevicesIds != null">
+            and
+            <foreach collection="productDevicesIds" open="(" separator="or " close=")" item="item">
+                c.product_devices_id=#{item}
+            </foreach>
+        </if>
+        <if test="status != null">
+            and c.status=#{status}
+        </if>
+        group by c.id
+        order by c.create_time desc
+    </select>
+
+    <select id="findIsExistCheckTask" resultType="java.lang.Integer">
+            select count(id) from fw_devices_check
+             where execute_user=#{executeUser}
+               and product_devices_id=#{productDevicesId}
+           <if test="shift != null">
+                <choose>
+                    <when test="shift == 1">
+                        and (date_format(create_time,'%H')&gt;=20 or date_format(create_time,'%H') &lt;8)
+                    </when>
+                    <otherwise>
+                        and (date_format(create_time,'%H')&gt;=8 and date_format(create_time,'%H') &lt;20)
+                    </otherwise>
+                </choose>
+           </if>
+    </select>
+    <select id="findCheckTask" resultMap="devicesCheckResult">
+        select * from fw_devices_check
+        where status=0
+          and execute_user=#{executeUser}
+          and product_devices_id=#{productDevicesId}
+        <if test="shift != null">
+            <choose>
+                <when test="shift == 1">
+                    and (date_format(create_time,'%H')&gt;=20 or date_format(create_time,'%H') &lt;8)
+                </when>
+                <otherwise>
+                    and (date_format(create_time,'%H')&gt;=8 and date_format(create_time,'%H') &lt;20)
+                </otherwise>
+            </choose>
+        </if>
+    </select>
+    <resultMap type="com.fw.entity.device.DevicesCheck" id="devicesCheckResult">
+        <result property="id" jdbcType="INTEGER"    column="id"    />
+        <collection property="checkDetailList" column="id" select="findCheckDetailList" />
+    </resultMap>
+
+    <insert id="insertCheckDetail" parameterType="com.fw.entity.device.DevicesCheckDetail">
+        insert into fw_devices_check_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="checkRecordId != null  and checkRecordId != ''">check_record_id,</if>
+            <if test="checkItemId != null  and checkItemId != ''">check_item_id,</if>
+            <if test="checkItemResult != null">check_item_result</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="checkRecordId != null  and checkRecordId != ''">#{checkRecordId},</if>
+            <if test="checkItemId != null  and checkItemId != ''">#{checkItemId},</if>
+            <if test="checkItemResult != null">#{checkItemResult}</if>
+        </trim>
+    </insert>
+
+    <update id="updateCheckDetail" parameterType="com.fw.entity.device.DevicesCheckDetail">
+        update fw_devices_check_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="reason != null  and reason != ''">reason = #{reason},</if>
+            <if test="checkItemResult != null">check_item_result = #{checkItemResult}</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <delete id="deleteCheckDetail" parameterType="java.lang.Integer">
+        delete from fw_devices_check_detail where check_record_id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+    <select id="findCheckDetailList" resultType="com.fw.entity.device.DevicesCheckDetail">
+        select t.*,i.name check_item_name
+          from fw_devices_check_detail t
+          left join fw_devices_check_item i on t.check_item_id=i.id
+         where check_record_id=#{checkId}
+        order by t.id
+    </select>
+    <select id="findCode" resultType="java.lang.String">
+       select ifnull(concat(left(max(code),4),lpad(right(max(code),6)+1,6,0)),#{code})code from fw_devices_check
+    </select>
+</mapper>
+

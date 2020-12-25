@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.quality.dao.QualityMaterialCheckDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.quality.QualityMaterialCheck">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="check_no" property="checkNo" jdbcType="VARCHAR" />
+        <result column="source_no" property="sourceNo" jdbcType="VARCHAR" />
+        <result column="take_order_id" property="takeOrderId" jdbcType="INTEGER"/>
+        <result column="buy_date" property="buyDate" jdbcType="TIMESTAMP"/>
+        <result column="take_date" property="takeDate" jdbcType="TIMESTAMP"/>
+        <result column="check_date" property="checkDate" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+        <result column="execute_user" property="executeUser" jdbcType="INTEGER"/>
+        <result column="execute_time" property="executeTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        check_no, source_no, take_order_id, buy_date, take_date, check_date, status, execute_user, execute_time,create_user
+    </sql>
+
+    <insert id="save" parameterType="com.fw.entity.quality.QualityMaterialCheck" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_quality_material_check
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="checkNo != null and checkNo !=''">check_no,</if>
+            <if test="sourceNo != null and sourceNo !=''">source_no,</if>
+            <if test="takeOrderId != null">take_order_id,</if>
+            <if test="buyDate != null and buyDate !=''">buy_date,</if>
+            <if test="takeDate != null and takeDate !=''">take_date,</if>
+            <if test="executeUser != null">execute_user,</if>
+            <if test="createUser !=null">create_user</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="checkNo != null and checkNo !=''">#{checkNo},</if>
+            <if test="sourceNo != null and sourceNo !=''">#{sourceNo},</if>
+            <if test="takeOrderId != null">#{takeOrderId},</if>
+            <if test="buyDate != null and buyDate !=''">#{buyDate},</if>
+            <if test="takeDate != null and takeDate !=''">#{takeDate},</if>
+            <if test="executeUser != null">#{executeUser},</if>
+            <if test="createUser !=null">#{createUser}</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.quality.QualityMaterialCheck">
+            update fw_quality_material_check
+                <trim prefix="SET" suffixOverrides=",">
+                    execute_time = NOW(),
+                    <if test="status != null ">status = #{status},</if>
+                    <if test="createUser != null">create_user = #{createUser}</if>
+                </trim>
+            where id = #{id}
+    </update>
+
+    <select id="findList" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List"></include>
+        from fw_quality_material_check
+        where 1=1
+            <if test="checkNo != null and checkNo !=''" >
+                and check_no like concat('%/', #{checkNo}, '%') ESCAPE '/'
+            </if>
+            <if test="startTime != null and startTime != ''">
+                <![CDATA[ and check_date >= #{startTime}]]>
+            </if>
+            <if test="stopTime != null and stopTime != ''">
+                <![CDATA[ and check_date <= #{stopTime}]]>
+            </if>
+            <if test="exeStartTime != null and exeStartTime != ''">
+                <![CDATA[ and execute_time >= #{exeStartTime}]]>
+            </if>
+            <if test="exeStopTime != null and exeStopTime != ''">
+                <![CDATA[ and execute_time <= #{exeStopTime}]]>
+            </if>
+             <if test="status != null">
+                 and status = #{status}
+             </if>
+    </select>
+    
+    <select id="getCheckoutMaterialInfoById" resultType="java.util.LinkedHashMap">
+         SELECT
+            t2.product_id,
+            t2.receive_count,
+            t3.name,
+            t3.code,
+            t3.unit,
+            t2.batch_no as fw_batch,
+            t2.provider_name,
+            -- t4.provider_batch,
+            DATE_FORMAT(t1.check_date,'%Y-%m-%d %H:%i:%s') as check_date
+        FROM
+        fw_quality_material_check t1
+        LEFT JOIN fw_logistics_take_order_detail t2 on t1.take_order_id = t2.take_order_id
+        LEFT JOIN fw_logistics_product t3 on t2.product_id = t3.id
+        where t1.id = #{id}
+    </select>
+
+    <select id="findCode" resultType="java.lang.String">
+        select ifnull(concat(left(max(check_no),4),lpad(right(max(check_no),6)+1,6,0)),#{code})code from fw_quality_material_check
+    </select>
+
+    <!--根据id获取信息-->
+    <select id="findCheckoutById" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"></include>
+        from fw_quality_material_check
+        where id = #{id}
+    </select>
+
+</mapper>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fw.service.produce.dao.ProduceMachineDownDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.produce.ProduceMachineDown">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="end_time" property="endTime" jdbcType="TIMESTAMP"/>
+        <result column="plan_molding_id" property="planMoldingId" jdbcType="INTEGER"/>
+        <result column="product_devices_id" property="productDevicesId" jdbcType="INTEGER"/>
+        <result column="real_product_devices_code" property="realProductDevicesCode" jdbcType="VARCHAR"/>
+        <result column="product_devices_code" property="productDevicesCode" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="reason" property="reason" jdbcType="VARCHAR"/>
+        <result column="create_user" property="createUser" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        create_time,
+        plan_molding_id, product_devices_id, status, reason, create_user
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.produce.ProduceMachineDown" keyProperty="id" useGeneratedKeys="true">
+        insert into fw_produce_machine_down
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="planMoldingId !=null ">plan_molding_id,</if>
+            <if test="productDevicesId !=null ">product_devices_id,</if>
+            <if test="productDevicesCode !=null and productDevicesCode!=''">product_devices_code,</if>
+            <if test="realProductDevicesCode !=null and realProductDevicesCode!=''">real_product_devices_code,</if>
+            <if test="status !=null ">status,</if>
+            <if test="reason !=null and reason !=''">reason,</if>
+            <if test="createUser !=null ">create_user,</if>
+            <if test="endTime!=null and endTime!=''">end_time</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="planMoldingId !=null ">#{planMoldingId},</if>
+            <if test="productDevicesId !=null ">#{productDevicesId},</if>
+            <if test="productDevicesCode !=null and productDevicesCode!=''">#{productDevicesCode},</if>
+            <if test="realProductDevicesCode !=null and realProductDevicesCode!=''">#{realProductDevicesCode},</if>
+            <if test="status !=null ">#{status},</if>
+            <if test="reason !=null and reason !=''">#{reason},</if>
+            <if test="createUser !=null ">#{createUser},</if>
+            <if test="endTime!=null and endTime!=''">#{endTime}</if>
+        </trim>
+    </insert>
+
+    <select id="findList" resultType="com.fw.entity.produce.ProduceMachineDown">
+    SELECT
+        t1.* ,
+        t2.product_code as of_no
+    FROM
+        fw_produce_machine_down t1
+        LEFT JOIN fw_plan_injection_molding t2 ON t1.plan_molding_id = t2.id
+    where 1=1
+    <if test="ofNo != null and ofNo != ''">
+        and t2.product_code = #{ofNo}
+    </if>
+    </select>
+
+    <!--更具设备编码更新生产停机结束时间-->
+    <update id="update">
+        update fw_produce_machine_down set end_time = NOW() where product_devices_code =#{productDevicesCode}
+    </update>
+
+</mapper>

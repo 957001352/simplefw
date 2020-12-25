@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.device.dao.DevicesRepairItemDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.device.DevicesRepairItem">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="devices_classify" property="devicesClassify" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,create_time,name, devices_classify
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.device.DevicesRepairItem" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_devices_repair_item
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null  and name != ''">name,</if>
+            <if test="devicesClassify != null  and devicesClassify != ''">devices_classify</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="devicesClassify != null  and devicesClassify != ''">#{devicesClassify}</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.device.DevicesRepairItem">
+        update fw_devices_repair_item
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''">name = #{name},</if>
+            <if test="devicesClassify != null  and devicesClassify != ''">devices_classify = #{devicesClassify}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="findList"  resultMap="BaseResultMap" >
+        select
+            <include refid="Base_Column_List"></include>
+        from fw_devices_repair_item
+        where 1=1 and deleted = 0
+        <if test="name != null  and name != ''">and name like concat('%/', #{name}, '%') ESCAPE '/'</if>
+        <if test="devicesClassify != null  and devicesClassify != ''">and devices_classify = #{devicesClassify}</if>
+        ORDER BY create_time DESC
+    </select>
+
+    <delete id="delete" parameterType="java.util.List">
+        update fw_devices_repair_item set deleted = 1 where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+
+    <select id="findListById"  resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List"></include>
+        from fw_devices_repair_item
+        where id in and deleted = 0
+            <foreach collection="list" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+    </select>
+
+    <select id="findItemById" parameterType="java.lang.String" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List"></include>
+        from fw_devices_repair_item
+        where 1=1 and deleted = 0
+         <if test="id != null">and id = #{id}</if>
+         <if test="name !=null and name!=''">and name = #{name}</if>
+    </select>
+
+    <!--查询除自己之外的名称是否存在 -->
+    <select id="findItemByIdAndName" parameterType="java.lang.String" resultType="java.lang.Integer" >
+        select
+        count(id)
+        from fw_devices_repair_item
+        where 1=1 and deleted = 0
+        <if test="id != null">and id not in(#{id}) </if>
+        <if test="name !=null and name!=''">and name = #{name}</if>
+    </select>
+
+</mapper>
+

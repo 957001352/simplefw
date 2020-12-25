@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.mould.dao.MouldRepairItemDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.mould.MouldRepairItem">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,create_time,name
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.mould.MouldRepairItem" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_mould_repair_item
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null  and name != ''">name,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null  and name != ''">#{name},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.mould.MouldRepairItem">
+        update fw_mould_repair_item
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''">name = #{name},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="findList"  resultMap="BaseResultMap" >
+        select
+            <include refid="Base_Column_List"></include>
+        from fw_mould_repair_item
+        where 1=1
+        <if test="name != null  and name != ''">and name like concat('%/', #{name}, '%') ESCAPE '/'</if>
+        ORDER BY create_time DESC
+    </select>
+
+    <delete id="delete" parameterType="java.util.List">
+        delete from fw_mould_repair_item where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="findItemById" resultMap="BaseResultMap" >
+        select
+            id,create_time,name
+        from fw_mould_repair_item
+        where id = #{id}
+    </select>
+
+    <select id="findItemByName" resultType="java.lang.Integer">
+        select
+            count(id)
+        from fw_mould_repair_item
+        where name = #{name}
+    </select>
+
+    <select id="findItemByIdAndName" resultType="java.lang.Integer">
+        select
+            count(id)
+        from fw_mould_repair_item
+        where id not in(#{id}) and name = #{name}
+    </select>
+
+</mapper>
+

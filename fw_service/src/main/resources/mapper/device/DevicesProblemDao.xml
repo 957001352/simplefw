@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.device.dao.DevicesProblemDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fw.entity.device.DevicesProblem">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,name,content,status,type
+    </sql>
+
+    <insert id="insert" parameterType="com.fw.entity.device.DevicesProblem" useGeneratedKeys="true" keyProperty="id">
+        insert into fw_devices_problem
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null  and name != ''">name,</if>
+            <if test="content != null  and content != ''">content,</if>
+            <if test="status != null">status,</if>
+            <if test="type != null">type,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="content != null  and content != ''">#{content},</if>
+            <if test="status != null">#{status},</if>
+            <if test="type != null">#{type}</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.fw.entity.device.DevicesProblem">
+        update fw_devices_problem
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''">name = #{name}</if>
+            <if test="content != null  and content != ''">content = #{content},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="type != null">type = #{type},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="findList"  resultMap="BaseResultMap" >
+        select
+            <include refid="Base_Column_List"></include>
+        from fw_devices_problem
+        where 1=1
+        <if test="name != null  and name != ''">and name = #{name}</if>
+        <if test="type != null">and type = #{type}</if>
+        <if test="status != null">and status = #{status}</if>
+        <if test="content != null  and content != ''">and content = #{content}</if>
+    </select>
+
+    <delete id="delete" parameterType="java.util.List">
+        delete from fw_devices_problem where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+
+    <select id="findListById"  resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List"></include>
+        from fw_devices_problem
+        where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="findProblemById"  resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List"></include>
+        from fw_devices_problem
+        where id = #{id}
+    </select>
+
+</mapper>
+

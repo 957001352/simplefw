@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fw.service.logistics.dao.LogisticsStorageHouseDao">
+
+    <!--  仓库管理-->
+    <insert id="insertStorage" parameterType="com.fw.entity.logistics.LogisticsStorageHouse" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into fw_logistics_storage_house
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="name != null  and name != ''">name,</if>
+            <if test="status != null">status,</if>
+            <if test="allName != null and allName !=''">all_name,</if>
+            <if test="code != null and code !=''">code</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="status != null">#{status},</if>
+            <if test="allName != null and allName !='' ">#{allName},</if>
+            <if test="code != null and code != ''">#{code}</if>
+        </trim>
+    </insert>
+
+    <update id="updateStorage" parameterType="com.fw.entity.logistics.LogisticsStorageHouse">
+        update fw_logistics_storage_house
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''">name = #{name},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="allName != null and allName !='' ">all_name = #{allName},</if>
+            <if test="code != null and code != ''">code = #{code}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteStorage" parameterType="java.util.List">
+        delete from fw_logistics_storage_house where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="selectStorageById" parameterType="integer" resultType="com.fw.entity.logistics.LogisticsStorageHouse">
+        select * from fw_logistics_storage_house where id = #{id}
+    </select>
+
+    <select id="findStorageList" resultType="com.fw.entity.logistics.LogisticsStorageHouse">
+        select * from fw_logistics_storage_house where 1=1
+        <if test="name != null  and name != ''">
+            and name like concat('%/', #{name}, '%') ESCAPE '/'
+        </if>
+        order by id
+    </select>
+
+    <select id="isRepeatStorageName" resultType="java.lang.Integer">
+        SELECT count(*) FROM fw_logistics_storage_house WHERE name=#{name}
+        <if test="id!= null">
+            AND id!=#{id}
+        </if>
+    </select>
+
+    <select id="findStorageIsEableDelete" resultType="java.lang.Integer">
+        select count(*) from fw_logistics_storage_location
+        <if test="list!= null">
+            where storage_house_id in
+            <foreach collection="list" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <!--  库位管理-->
+    <insert id="insertLocation" parameterType="com.fw.entity.logistics.LogisticsStorageLocation" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into fw_logistics_storage_location
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">id,</if>
+            <if test="name != null  and name != ''">name,</if>
+            <if test="storageHouseId != null">storage_house_id,</if>
+            <if test="status != null">status,</if>
+            <if test="allName != null and allName !=''">all_name,</if>
+            <if test="code != null and code !=''">code</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''">#{id},</if>
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="storageHouseId != null">#{storageHouseId},</if>
+            <if test="status != null">#{status},</if>
+            <if test="allName != null and allName !='' ">#{allName},</if>
+            <if test="code != null and code != ''">#{code}</if>
+        </trim>
+    </insert>
+
+    <update id="updateLocation" parameterType="com.fw.entity.logistics.LogisticsStorageLocation">
+        update fw_logistics_storage_location
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''">name = #{name},</if>
+            <if test="storageHouseId != null">storage_house_id = #{storageHouseId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="allName != null and allName !='' ">all_name = #{allName},</if>
+            <if test="code != null and code != ''">code = #{code}</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteLocation" parameterType="java.util.List">
+        delete from fw_logistics_storage_location where id in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="selectLocationById" parameterType="integer"
+            resultType="com.fw.entity.logistics.LogisticsStorageLocation">
+        select * from fw_logistics_storage_location where id = #{id}
+    </select>
+
+    <select id="findLocationList" resultType="com.fw.entity.logistics.LogisticsStorageLocation">
+        select
+            t4.name,
+            t3.name,
+            t2.fw_batch,
+            t2.provider_name,
+            t2.storage_count,
+            t2.product_date,
+            t1.*
+        from
+            fw_logistics_product t1
+        left join fw_logistics_storage_detail t2 on t2.product_id = t1.id
+        left join fw_logistics_storage_location t3 on t3.id = t2.storage_id
+        left join fw_logistics_storage_house t4 on t4.id = t3.storage_house_id
+        <if test="name != null  and name != ''">
+            and t3.name like concat('%/', #{name}, '%') ESCAPE '/'
+        </if>
+        <if test="productCode != null  and productCode != ''">
+            and t1.code like concat('%/', #{code}, '%') ESCAPE '/'
+        </if>
+        order by t2.product_date desc
+    </select>
+
+    <select id="isRepeatLocationName" resultType="java.lang.Integer">
+        SELECT count(*) FROM fw_logistics_storage_location WHERE name=#{name}
+        <if test="id!= null">
+            AND id!=#{id}
+        </if>
+    </select>
+
+    <select id="findStorageLocationList" resultType="com.fw.entity.logistics.LogisticsStorageLocation">
+        select * from fw_logistics_storage_location where status = 0   order by id desc
+    </select>
+
+    <select id="findLocationListByHouseId" resultType="com.fw.entity.logistics.LogisticsStorageLocation">
+        select * from fw_logistics_storage_location where status = 0
+        <if test="houseId != null">
+            and storage_house_id=#{houseId}
+        </if>
+        <if test="name != null  and name != ''">
+            and name like concat('%/', #{name}, '%') ESCAPE '/'
+        </if>
+         order by id desc
+    </select>
+
+
+</mapper>
+
