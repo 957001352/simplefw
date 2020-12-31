@@ -69,6 +69,12 @@ public class ProduceReworkRecord implements Serializable {
     @ApiModelProperty(value = "状态",hidden = true)
     private Integer status;
 
+    /**
+     * 入库状态
+     */
+    @ApiModelProperty(value = "入库状态")
+    private Integer bankStatus;
+
 
 
 

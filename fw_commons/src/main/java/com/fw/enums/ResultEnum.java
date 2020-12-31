@@ -82,7 +82,8 @@ public enum  ResultEnum {
     BAN_USR(1000,"用户被禁用"),
     NO_LOGIN(7001,"登录超时,请重新登录"),
     NO_PERMISS(7002,"无访问权限"),
-    URL_ERROR(7003,"请求异常");
+    URL_ERROR(7003,"请求异常"),
+    DOG_ERROR(7004,"平台认证失败");
 
 
 

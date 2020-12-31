@@ -5,6 +5,8 @@ import com.fw.entity.audit.AuditItem;
 import com.fw.entity.audit.AuditTeam;
 import com.fw.service.audit.service.AuditItemService;
 import com.fw.service.audit.service.AuditTeamService;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,16 +24,19 @@ public class AuditTeamController {
     private AuditTeamService auditTeamService;
 
     @PostMapping(value = "/save")
+    @RequiresPermissions(value = "auditTeam:save")
     public Result save(@RequestBody AuditTeam auditTeam) {
         return auditTeamService.save(auditTeam);
     }
 
     @GetMapping(value = "/delete")
+    @RequiresPermissions(value = "auditTeam:delete")
     public Result delete(@RequestParam(value = "ids") String ids) {
         return auditTeamService.delete(ids);
     }
 
     @GetMapping(value = "/findList")
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "name", required = false) String name,
                            @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
                            @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize

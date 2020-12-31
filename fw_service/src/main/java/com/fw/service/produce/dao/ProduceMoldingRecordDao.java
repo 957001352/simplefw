@@ -23,4 +23,9 @@ public interface ProduceMoldingRecordDao  {
 
 
     List<ProduceMoldingRecord> findList(@Param(value = "ofNo") String ofNo);
+
+    /**
+     * 修改报工单的入库状态
+     */
+    Integer updateBankStatus(@Param("ids")String ids,@Param("bankStatus")Integer bankStatus);
  }

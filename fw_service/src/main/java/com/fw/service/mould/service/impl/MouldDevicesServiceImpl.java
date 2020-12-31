@@ -90,6 +90,9 @@ public class MouldDevicesServiceImpl implements MouldDevicesService {
         if(CheckUtils.isNull(mouldUseRecord.getId())){
             re = mouldUseRecordDao.insert(mouldUseRecord);
         }else{
+            if(mouldUseRecord.getStatus()==1){
+                mouldUseRecord.setCreateUser(headerUtil.loginUser().getId());
+            }
             re =mouldUseRecordDao.update(mouldUseRecord);
             if(re > 0){
                 MouldUseRecord mouldUse = mouldUseRecordDao.findOne(mouldUseRecord.getId());

@@ -4,6 +4,8 @@ import com.fw.domain.Result;
 import com.fw.entity.mould.MouldKeepTask;
 import com.fw.service.mould.service.MouldKeepTaskService;
 import com.fw.utils.ResultUtils;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +34,7 @@ public class MouldKeepTaskController {
      * @return
      */
     @GetMapping("/findList")
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "keepOrder", required = false) String keepOrder,
                            @RequestParam(value = "mouldCode", required = false) String mouldCode,
                            @RequestParam(value = "taskStatus", required = false) String taskStatus,
@@ -49,6 +52,7 @@ public class MouldKeepTaskController {
      * @return result
      */
     @GetMapping(value = "/postPoned")
+    @RequiresPermissions("mouldKeepTask:postPoned")
     public Result postPoned(@RequestParam(value = "ids") String ids,
                             @RequestParam(value = "carryDay", required = false) String carryDay,
                             @RequestParam(value = "type") String type,
@@ -68,6 +72,7 @@ public class MouldKeepTaskController {
      * @return
      */
     @GetMapping("/findHistoryList")
+    @RequiresAuthentication
     public Result findHistoryList(@RequestParam(value = "keepOrder", required = false) String keepOrder,
                                   @RequestParam(value = "mouldCode", required = false) String mouldCode,
                                   @RequestParam(value = "executeUserName", required = false) String executeUserName,
@@ -85,6 +90,7 @@ public class MouldKeepTaskController {
      * @return
      */
     @GetMapping("/getUnfinishedTask")
+    @RequiresAuthentication
     public Result getUnfinishedTask(@RequestParam(value = "id") Integer id) {
         return mouldKeepTaskService.getUnfinishedTask(id);
     }
@@ -96,6 +102,7 @@ public class MouldKeepTaskController {
      * @return
      */
     @GetMapping("/getMouldTask")
+    @RequiresAuthentication
     public Result getDevicesTask(@RequestParam(value = "id") Integer id) {
         return mouldKeepTaskService.getMouldTask(id);
     }
@@ -107,6 +114,7 @@ public class MouldKeepTaskController {
      * @return result
      */
     @PostMapping(value = "/explainTask")
+    @RequiresAuthentication
     public Result explainTask(@RequestBody MouldKeepTask MouldKeepTask, BindingResult bindingResult) {
         Result result = ResultUtils.loadResult(bindingResult);
         if (result == null) {
@@ -122,6 +130,7 @@ public class MouldKeepTaskController {
      * @return
      */
     @GetMapping("/getMouldKeepTask")
+    @RequiresAuthentication
     public Result getMouldKeepTask(@RequestParam(value = "id") Integer id) {
         return mouldKeepTaskService.getMouldKeepTask(id);
     }

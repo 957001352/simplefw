@@ -186,6 +186,9 @@ public class CraftCardServiceImpl implements CraftCardService {
         String craftData = cardParams.getCraftData();
         //获取设备采集的数据
         List<CollectDevice> collectDevices = collectDeviceDao.findByProductCode(devicesItemVo.getCode());
+        if(collectDevices.size() == 0){ //没有采集到数据直接返回工艺卡参数
+            return ResultUtils.success(cardParams);
+        }
         //将设备采集的数据转化为属性为key,值为value的map
         Map<String,String> map = collectDevices.stream().collect(Collectors.toMap(CollectDevice::getParamKey, CollectDevice::getParamValue));
         //获取设备和零件绑定的工艺卡模板id

@@ -32,7 +32,9 @@ public class QualityFirstendCheckController {
 
     @ApiOperation("获取列表")
     @GetMapping(value = "/findList")
-    Result findList(@RequestParam(value = "productCode", required = false) String productCode,
+    Result findList(
+                    @RequestParam(value = "id", required = false) Integer id,
+                    @RequestParam(value = "productCode", required = false) String productCode,
                     @RequestParam(value = "productDevicesCode", required = false) String productDevicesCode,
                     @RequestParam(value = "checkType", required = false) Integer checkType,
                     @RequestParam(value = "startTime", required = false) String startTime,
@@ -40,7 +42,7 @@ public class QualityFirstendCheckController {
                     @RequestParam(value = "status",required = false)Integer status,
                     @RequestParam(value = "pageNum", required = true, defaultValue = "1") Integer pageNum,
                     @RequestParam(value = "pageSize", required = true,defaultValue = "10") Integer pageSize) {
-        return qualityFirstendCheckService.findList(productCode,productDevicesCode,checkType,startTime,stopTime,status,pageNum,pageSize);
+        return qualityFirstendCheckService.findList(id,productCode,productDevicesCode,checkType,startTime,stopTime,status,pageNum,pageSize);
 
     }
 

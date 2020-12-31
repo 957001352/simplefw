@@ -56,6 +56,24 @@ public class LogisticsProductServiceImpl implements LogisticsProductService {
     }
 
     @Override
+    public Result getUpProductDetail(Integer id) {
+        if(CheckUtils.isNull(id)){
+            return ResultUtils.error(ResultEnum.PARAM_ERR);
+        }
+        LogisticsStorageDetail logisticsStorageDetail = logisticsStorageDetailDao.getUpProductDetail(id);
+        return ResultUtils.success(logisticsStorageDetail);
+    }
+
+    @Override
+    public Result getDownProductDetail(Integer id, Integer storageLocationId) {
+        if(CheckUtils.isNull(id)){
+            return ResultUtils.error(ResultEnum.PARAM_ERR);
+        }
+        LogisticsStorageDetail logisticsStorageDetail = logisticsStorageDetailDao.getDownProductDetail(id,storageLocationId);
+        return ResultUtils.success(logisticsStorageDetail);
+    }
+
+    @Override
     public Result storeWarn(String name, String code, Integer pageNum, Integer pageSize) {
         if (!CheckUtils.checkId(pageNum) || !CheckUtils.checkId(pageSize)) {
             return ResultUtils.error(ResultEnum.PARAM_ERR);

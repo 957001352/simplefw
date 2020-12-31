@@ -53,6 +53,9 @@
         on t1.id = t3.data_id
         left join fw_jbpm_execution t5 on t5.id = t3.id
         where 1=1
+        <if test="id !=null ">
+            and t1.id = #{id}
+        </if>
         <if test="productCode !=null and productCode !=''">
             and t1.product_code like concat('%/', #{productCode}, '%') ESCAPE '/'
         </if>
@@ -126,6 +129,16 @@
         from  fw_quality_firstend_check
         where id = #{id}
     </select>
+
+    <select id="findCheckByProductOrder"  resultType="com.fw.entity.quality.QualityFirstendCheck">
+        select
+        *
+        from  fw_quality_firstend_check
+        where product_code = #{productCode} and check_type = 1
+        order by create_time desc
+        limit 1
+    </select>
+
 
     <select id="findCode" resultType="java.lang.String">
         select ifnull(concat(left(max(check_no),4),lpad(right(max(check_no),6)+1,6,0)),#{code})check_no from fw_quality_firstend_check

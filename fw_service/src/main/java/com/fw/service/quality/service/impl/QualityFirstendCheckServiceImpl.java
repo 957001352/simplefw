@@ -5,12 +5,15 @@ import com.fw.domain.Result;
 import com.fw.entity.e2c.DevicesItemVo;
 import com.fw.entity.e2c.User;
 import com.fw.entity.mould.MouldRepairItem;
+import com.fw.entity.plan.InjectionMolding;
 import com.fw.entity.produce.ProduceMoldingMonitor;
 import com.fw.entity.quality.QualityFirstendCheck;
 import com.fw.entity.quality.QualityInspectResult;
 import com.fw.entity.quality.QualityInspection;
 import com.fw.enums.ResultEnum;
 import com.fw.service.basic.dao.AttachmentDao;
+import com.fw.service.enums.CodeEnum;
+import com.fw.service.plan.dao.InjectionMoldingDao;
 import com.fw.service.produce.dao.ProduceMoldingMonitorDao;
 import com.fw.service.quality.dao.QualityFirstendCheckDao;
 import com.fw.service.quality.dao.QualityInspectResultDao;
@@ -29,6 +32,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -48,6 +53,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional
+@EnableScheduling
 public class QualityFirstendCheckServiceImpl implements QualityFirstendCheckService {
 
     @Autowired
@@ -69,14 +75,17 @@ public class QualityFirstendCheckServiceImpl implements QualityFirstendCheckServ
     @Autowired
     private ProduceMoldingMonitorDao produceMoldingMonitorDao;
 
+    @Autowired
+    private InjectionMoldingDao injectionMoldingDao;
+
 
     @Override
-    public Result findList(String productCode, String productDevicesCode, Integer checkType, String startTime, String stopTime, Integer status, Integer pageNum, Integer pageSize) {
+    public Result findList(Integer id, String productCode, String productDevicesCode, Integer checkType, String startTime, String stopTime, Integer status, Integer pageNum, Integer pageSize) {
         if (!CheckUtils.checkId(pageNum) || !CheckUtils.checkId(pageSize)) {
             return ResultUtils.error(ResultEnum.PARAM_ERR);
         }
         PageHelper.startPage(pageNum, pageSize);
-        List<QualityFirstendCheck> qualityFirstendChecklist = qualityFirstendCheckDao.findList(productCode, checkType, startTime, stopTime, status);
+        List<QualityFirstendCheck> qualityFirstendChecklist = qualityFirstendCheckDao.findList(id, productCode, checkType, startTime, stopTime, status);
 
         //查询E2C生产设备
         List<DevicesItemVo> productList = e2CServicesUtil.getProductDevices(headerUtil.cloudToken());
@@ -194,16 +203,16 @@ public class QualityFirstendCheckServiceImpl implements QualityFirstendCheckServ
                 String currentTime = DateUtils.getCurrentTime("yyyy-MM-dd HH:mm:ss");
                 QualityFirstendCheck firstendCheck = qualityFirstendCheckDao.findFirstendCheckByid(qualityInspectResult.getDataId());
                 ProduceMoldingMonitor monitor = produceMoldingMonitorDao.getMoldingMonitor(firstendCheck.getProductCode());
-                if(checkClassify.contains("0-1")){ //首件
+                if (checkClassify.contains("0-1")) { //首件
                     //修改注塑过程监控,首检
-                    if(monitor != null){
+                    if (monitor != null) {
                         monitor.setFirstCheckTime(currentTime);
                         monitor.setFirstCheckUser(name);
                         produceMoldingMonitorDao.update(monitor);
                     }
                 }
-                if(checkClassify.contains("1-1")){ //末件
-                    if(monitor != null){
+                if (checkClassify.contains("1-1")) { //末件
+                    if (monitor != null) {
                         monitor.setLastCheckTime(currentTime);
                         monitor.setLastCheckUser(name);
                         produceMoldingMonitorDao.update(monitor);
@@ -211,7 +220,7 @@ public class QualityFirstendCheckServiceImpl implements QualityFirstendCheckServ
                 }
             }
         }
-        return  flag > 0 ? ResultUtils.success() : ResultUtils.failure();
+        return flag > 0 ? ResultUtils.success() : ResultUtils.failure();
     }
 
 
@@ -293,5 +302,42 @@ public class QualityFirstendCheckServiceImpl implements QualityFirstendCheckServ
         return qualityFirstendCheckDao.update(qualityFirstendCheck) > 0 ? ResultUtils.success() : ResultUtils.failure();
     }
 
+
+    @Scheduled(cron = "0 */5 * * * ?") //每5分钟扫描计划，生成巡检任务
+    public void savePollingTask() {
+        //查询生产中的计划
+        List<InjectionMolding> startedPlan = injectionMoldingDao.findStartedPlan();
+        if (!CollectionUtils.isEmpty(startedPlan)) {
+            for (InjectionMolding injectionMolding : startedPlan) {
+                String planStartTime = "";//计划开始时间
+                //查询巡检任务的最后一条的创建时间 ---->最后一条的创建时间 = 下次创建任务时间的依据
+                QualityFirstendCheck QualityFirstendCheck = qualityFirstendCheckDao.findCheckByProductOrder(injectionMolding.getProductCode());
+                if (QualityFirstendCheck != null) {
+                    planStartTime = QualityFirstendCheck.getCreateTime();
+                } else {
+                    planStartTime = injectionMolding.getActualStart();
+                }
+                //查询检验规范的巡检时间
+                QualityInspection qualityInspection = qualityInspectionDao.selectByProductId(injectionMolding.getProductId());
+                if (qualityInspection != null && qualityInspection.getInspection() != null && qualityInspection.getInspection() > 0) {
+                    //插入巡检任务(当前时间-计划生产时间  >= 检验规范的巡检时间(小时))
+                    System.out.println("分钟差------------>"+ GenerateDateUtil.getMinutesSub(DateUtils.getCurrentTime("yyyy-MM-dd HH:mm:ss"), planStartTime));
+                    if (Math.abs(GenerateDateUtil.getMinutesSub(DateUtils.getCurrentTime("yyyy-MM-dd HH:mm:ss"), planStartTime)) >= qualityInspection.getInspection() * 60) {
+                        QualityFirstendCheck qualityFirstendCheck = new QualityFirstendCheck();
+                        qualityFirstendCheck.setCheckNo(qualityFirstendCheckDao.findCode(CodeEnum.QUALITY_02.getCode()));
+                        qualityFirstendCheck.setProductCode(injectionMolding.getProductCode());
+                        qualityFirstendCheck.setProductId(injectionMolding.getProductId());
+                        qualityFirstendCheck.setProductDevicesId(injectionMolding.getProductDevicesId());
+                        qualityFirstendCheck.setCheckType(1); //CheckType：0 首件 1巡检 2末件
+                        //qualityFirstendCheck.setCreateUser(authUserUtil.userId());
+                        qualityFirstendCheckDao.save(qualityFirstendCheck);
+                    }
+
+                }
+            }
+        }
+
+
+    }
 
 }

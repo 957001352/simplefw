@@ -51,7 +51,7 @@ public class MouldKeepTeamServiceImpl implements MouldKeepTeamService {
                 }
             }
             if(mouldKeepTeam.getKeepType().equals(2) || mouldKeepTeam.getKeepType().equals(3) || mouldKeepTeam.getKeepType().equals(4)){
-                boolean result = mouldKeepTeamDao.verifyKeepType(mouldKeepTeam.getKeepType());
+                boolean result = mouldKeepTeamDao.verifyKeepType(mouldKeepTeam.getId(),mouldKeepTeam.getKeepType());
                 if (result) {
                     return ResultUtils.error("保养类型已存在");
                 }
@@ -62,7 +62,7 @@ public class MouldKeepTeamServiceImpl implements MouldKeepTeamService {
             if (keepTeam == null) {
                 return ResultUtils.error("修改失败,请刷新页面");
             }
-            //修改时表单名称与传过来名称不通的时候进行校验
+            //修改时表单名称与传过来名称不同的时候进行校验
             if (!mouldKeepTeam.getName().equals(keepTeam.getName())) {
                 //校验是否有重复的表单名称
                 boolean res = mouldKeepTeamDao.verifyName(mouldKeepTeam.getName());
@@ -71,7 +71,7 @@ public class MouldKeepTeamServiceImpl implements MouldKeepTeamService {
                 }
             }
             if(mouldKeepTeam.getKeepType().equals(2) || mouldKeepTeam.getKeepType().equals(3) || mouldKeepTeam.getKeepType().equals(4)){
-                boolean result = mouldKeepTeamDao.verifyKeepType(mouldKeepTeam.getKeepType());
+                boolean result = mouldKeepTeamDao.verifyKeepType(mouldKeepTeam.getId(),mouldKeepTeam.getKeepType());
                 if (result) {
                     return ResultUtils.error("保养类型已存在");
                 }

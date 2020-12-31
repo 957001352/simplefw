@@ -27,7 +27,7 @@ public class JbpmDeploymentController {
      * @return
      */
     @PostMapping(value = "/save")
-    //@RequiresPermissions("jbpmDeployment:save")
+    @RequiresPermissions("jbpmDeployment:save")
     public Result save(@RequestBody JbpmDeployment jbpmDeployment) {
         return jbpmDeploymentService.save(jbpmDeployment);
     }
@@ -40,7 +40,7 @@ public class JbpmDeploymentController {
      * @return result
      */
     @GetMapping(value = "/delete")
-    //@RequiresPermissions("jbpmDeployment:delete")
+    @RequiresPermissions("jbpmDeployment:delete")
     public Result delete(@RequestParam(value = "ids") String ids) {
         return jbpmDeploymentService.delete(ids);
     }

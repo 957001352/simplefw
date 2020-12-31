@@ -4,6 +4,8 @@ import com.fw.domain.Result;
 import com.fw.entity.produce.ProduceBadReport;
 import com.fw.entity.produce.ProduceFeeding;
 import com.fw.service.produce.service.ProduceFeedingService;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +29,7 @@ public class ProduceFeedingController {
      * @return
      */
     @PostMapping("/save")
+    @RequiresAuthentication
     public Result save(@RequestBody ProduceFeeding produceFeeding) {
         return produceFeedingService.save(produceFeeding);
     }
@@ -40,6 +43,7 @@ public class ProduceFeedingController {
      * @return
      */
     @GetMapping(value = "/findList")
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "productOrder", required = false) String productOrder,
                            @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
                            @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize) {
@@ -53,6 +57,7 @@ public class ProduceFeedingController {
      * @return
      */
     @GetMapping(value = "/getStorageCount")
+    @RequiresAuthentication
     public Result getStorageCount(@RequestParam(value = "storageDetailId") Integer storageDetailId) {
         return produceFeedingService.getStorageCount(storageDetailId);
     }

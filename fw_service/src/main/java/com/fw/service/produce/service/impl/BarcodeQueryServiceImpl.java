@@ -4,8 +4,7 @@ import com.fw.domain.Result;
 import com.fw.entity.collect.DeviceState;
 import com.fw.entity.e2c.DevicesItemVo;
 import com.fw.entity.e2c.User;
-import com.fw.entity.produce.ProduceDuty;
-import com.fw.entity.produce.ProduceReworkMonitor;
+import com.fw.entity.produce.*;
 import com.fw.enums.ResultEnum;
 import com.fw.service.RedisService;
 import com.fw.service.collect.dao.DeviceStateDao;
@@ -150,16 +149,38 @@ public class BarcodeQueryServiceImpl implements BarcodeQueryService {
 
     @Override
     public Result findFeedingDetailList(String productOrder) {
-        return ResultUtils.success(barcodeQueryDao.findFeedingDetailList(productOrder));
+        List<User> userList = e2CServicesUtil.getUserList(headerUtil.cloudToken());
+        List<ProduceFeedingDetail> list=barcodeQueryDao.findFeedingDetailList(productOrder);
+        if (!CollectionUtils.isEmpty(list)&&!CollectionUtils.isEmpty(userList)) {
+            list.forEach(item -> {
+                userList.forEach(vo -> {
+                    if (item.getCreateUser()!=null && item.getCreateUser().equals(vo.getId())) {
+                        item.setCreateUserName(vo.getName());
+                    }
+                });
+            });
+        }
+        return ResultUtils.success(list);
     }
 
     @Override
     public Result findMoldingMonitorList(Integer planMoldingId,String productOrder,String status) {
+        List<User> userList = e2CServicesUtil.getUserList(headerUtil.cloudToken());
         List statusList=null;
         if(!CheckUtils.isNull(status)){
             Arrays.asList(status.split(","));
         }
-        return ResultUtils.success(barcodeQueryDao.findMoldingMonitorList(planMoldingId,productOrder, statusList));
+        List<ProduceMoldingMonitor> list=barcodeQueryDao.findMoldingMonitorList(planMoldingId,productOrder, statusList);
+        if (!CollectionUtils.isEmpty(list)&&!CollectionUtils.isEmpty(userList)) {
+            list.forEach(item -> {
+                userList.forEach(vo -> {
+                    if (item.getCreateUser()!=null && item.getCreateUser().equals(vo.getId())) {
+                        item.setCreateUserName(vo.getName());
+                    }
+                });
+            });
+        }
+        return ResultUtils.success(list);
     }
 
     @Override

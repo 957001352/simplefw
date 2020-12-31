@@ -10,8 +10,10 @@ import com.fw.service.enums.CodeEnum;
 import com.fw.service.jbpm.dao.JbpmDeploymentDao;
 import com.fw.service.jbpm.dao.JbpmExecutionDao;
 import com.fw.utils.CheckUtils;
+import com.fw.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -58,6 +60,7 @@ public class JbpmUtil {
                 jbpmExecution.setJbpmNo(jbpmExecutionDao.findCode(CodeEnum.JBPM_SP.getCode()));
                 flag = jbpmExecutionDao.insertExecution(jbpmExecution);
             } else {
+                jbpmExecution.setCreateTime(DateUtils.getCurrentTime("yyyy-MM-dd HH:mm:ss"));
                 jbpmExecution.setAuditResult(0);
                 flag = jbpmExecutionDao.updateExecution(jbpmExecution);
             }

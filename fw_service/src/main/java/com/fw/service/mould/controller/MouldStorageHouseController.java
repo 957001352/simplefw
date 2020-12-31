@@ -30,7 +30,7 @@ public class MouldStorageHouseController {
      * @return
      */
     @PostMapping(value = "/saveStorage")
-    //@RequiresPermissions("mouldStorageHouse:saveStorage")
+    @RequiresPermissions("mouldStorageHouse:saveStorage")
     public Result saveStorage(@RequestBody MouldStorageHouse mouldStorageHouse) {
         return mouldStorageHouseService.saveStorage(mouldStorageHouse);
     }
@@ -43,7 +43,7 @@ public class MouldStorageHouseController {
      * @return result
      */
     @GetMapping(value = "/deleteStorage")
-    //@RequiresPermissions("mouldStorageHouse:deleteStorage")
+    @RequiresPermissions("mouldStorageHouse:deleteStorage")
     public Result deleteStorage(@RequestParam(value = "ids") String ids) {
         return mouldStorageHouseService.deleteStorage(ids);
     }
@@ -69,7 +69,7 @@ public class MouldStorageHouseController {
      * @return
      */
     @PostMapping(value = "/saveLocation")
-    //@RequiresPermissions("mouldStorageHouse:saveLocation")
+    @RequiresPermissions("mouldStorageHouse:saveLocation")
     public Result saveLocation(@RequestBody MouldStorageLocation mouldStorageLocation) {
         return mouldStorageHouseService.saveLocation(mouldStorageLocation);
     }
@@ -82,7 +82,7 @@ public class MouldStorageHouseController {
      * @return result
      */
     @GetMapping(value = "/deleteLocation")
-    //@RequiresPermissions("mouldStorageHouse:deleteLocation")
+    @RequiresPermissions("mouldStorageHouse:deleteLocation")
     public Result deleteLocation(@RequestParam(value = "ids") String ids) {
         return mouldStorageHouseService.deleteLocation(ids);
     }
@@ -115,7 +115,7 @@ public class MouldStorageHouseController {
      * @return result
      */
     @PostMapping(value = "/boundMould")
-    //@RequiresPermissions("mouldStorageHouse:boundMould")
+    @RequiresPermissions("mouldStorageHouse:boundMould")
     public Result boundMould(@RequestBody MouldDevices mouldDevices) {
         return mouldStorageHouseService.boundMould(mouldDevices);
     }
@@ -126,7 +126,7 @@ public class MouldStorageHouseController {
      * @return result
      */
     @PostMapping(value = "/unbundMoule")
-    //@RequiresPermissions("mouldStorageHouse:unbundMoule")
+    @RequiresPermissions("mouldStorageHouse:unbundMoule")
     public Result unbundMoule(@RequestBody MouldDevices mouldDevices) {
         return mouldStorageHouseService.unbundMoule(mouldDevices);
     }

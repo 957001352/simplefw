@@ -243,6 +243,12 @@ public class MouldKeepTask implements Serializable {
     @ApiModelProperty(value = "生产指令id", hidden = true)
     private Integer injectionMoldingId;
 
+    /**
+     * 用于显示自动下发产前保养的名称
+     */
+    @ApiModelProperty(value = "用于显示自动下发产前保养的名称", hidden = true)
+    private String teamName;
+
 
     public MouldKeepTask(String status, Integer keepPlanId, String keepOrder,String keepTime,String mouldId) {
         this.status = status;

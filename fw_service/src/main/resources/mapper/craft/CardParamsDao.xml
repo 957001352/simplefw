@@ -108,7 +108,7 @@
                                 WHERE fjpm.data_id = fccl.id AND fjpm.`form_code` = #{formCode} AND fjpm.`end_time` IS NULL
                                 ) THEN '1'
                             ELSE '0'
-                        END AS audit_status
+                        END AS audit_status,fccp.picture
         from fw_craft_card_params fccp
         left join (SELECT max(id) id,params_id  FROM fw_craft_card_log group by params_id ) fccl on fccl.params_id = fccp.id
         where 1=1

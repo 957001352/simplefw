@@ -115,12 +115,8 @@ public class ProduceReworkMonitorServiceImpl implements ProduceReworkMonitorServ
             for (QualityStoreCheck item : qualityStoreChecks) {
                 //检验订单号
                 item.setCheckNo(qualityStoreCheckDao.findCode(CodeEnum.QUALITY_05.getCode()));
-                //物料编码查询出物料对象
-                LogisticsProduct logisticsProduct = logisticsProductDao.getNameByCode(item.getMouldNo());
-                if (logisticsProduct != null) {
-                    //物料对象
-                    item.setProductId(logisticsProduct.getId());
-                }
+                //物料id
+                item.setProductId(produceReworkMonitor.getProductId());
                 item.setCreateUser(user.getId());
                 flag = qualityStoreCheckDao.save(item);
             }

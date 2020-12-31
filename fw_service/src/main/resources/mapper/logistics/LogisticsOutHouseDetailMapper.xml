@@ -36,7 +36,7 @@
             #{logisticsOutHouseDetail.storageLocationId},
             #{logisticsOutHouseDetail.note},
             #{logisticsOutHouseDetail.productOrder},
-            #{logisticsOutHouseDetail.feedCount},
+            #{logisticsOutHouseDetail.feedCount}
             )
         </foreach>
     </insert>

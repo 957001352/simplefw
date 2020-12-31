@@ -22,7 +22,9 @@ public interface QualityFirstendCheckService {
 
 
     @GetMapping(value = "/findList")
-    Result findList(@RequestParam(value = "productCode", required = false) String productCode,
+    Result findList(
+                    @RequestParam(value = "id", required = false) Integer id,
+                    @RequestParam(value = "productCode", required = false) String productCode,
                     @RequestParam(value = "productDevicesCode", required = false) String productDevicesCode,
                     @RequestParam(value = "checkType", required = false) Integer checkType,
                     @RequestParam(value = "startTime", required = false) String startTime,

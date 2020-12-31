@@ -5,6 +5,8 @@ import com.fw.entity.audit.AuditItem;
 import com.fw.entity.audit.AuditPlan;
 import com.fw.service.audit.service.AuditItemService;
 import com.fw.service.audit.service.AuditPlanService;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,16 +24,19 @@ public class AuditPlanController {
     private AuditPlanService auditPlanService;
 
     @PostMapping(value = "/save")
+    @RequiresPermissions(value = "auditPlan:save")
     public Result save(@RequestBody AuditPlan auditPlan) {
         return auditPlanService.save(auditPlan);
     }
 
     @GetMapping(value = "/delete")
+    @RequiresPermissions(value = "auditPlan:update")
     public Result delete(@RequestParam(value = "ids") String ids) {
         return auditPlanService.delete(ids);
     }
 
     @GetMapping(value = "/findList")
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "name", required = false) String name,
                            @RequestParam(value = "auditTeamName", required = false)String auditTeamName,
                            @RequestParam(value = "userName", required = false)String userName,

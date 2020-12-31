@@ -4,6 +4,8 @@ package com.fw.service.quality.controller;
 import com.fw.domain.Result;
 import com.fw.entity.quality.QualityInspection;
 import com.fw.service.quality.service.QualityInspectionService;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +29,7 @@ public class QualityInspectionController {
      * @return
      */
     @PostMapping("/save")
+    @RequiresPermissions("qualityInspection:save")
     public Result save(@RequestBody QualityInspection qualityInspection) {
         return qualityInspectionService.save(qualityInspection);
     }
@@ -38,6 +41,7 @@ public class QualityInspectionController {
      * @return
      */
     @PostMapping("/change")
+    @RequiresPermissions("qualityInspection:change")
     public Result change(@RequestBody QualityInspection qualityInspection) {
         return qualityInspectionService.change(qualityInspection);
     }
@@ -53,6 +57,7 @@ public class QualityInspectionController {
      * @return
      */
     @GetMapping("/findList")
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "code", required = false) String code,
                            @RequestParam(value = "preciseCode", required = false) String preciseCode,
                            @RequestParam(value = "productName", required = false) String productName,
@@ -70,6 +75,7 @@ public class QualityInspectionController {
      * @return
      */
     @GetMapping("/getInspectionDetail")
+    @RequiresAuthentication
     public Result getInspectionDetail(@RequestParam(value = "id") Integer id) {
         return qualityInspectionService.getInspectionDetail(id);
     }
@@ -81,6 +87,7 @@ public class QualityInspectionController {
      * @return
      */
     @GetMapping("/getInspectionChangeLog")
+    @RequiresAuthentication
     public Result getInspectionChangeLog(@RequestParam(value = "id") Integer id) {
         return qualityInspectionService.getInspectionChangeLog(id);
     }

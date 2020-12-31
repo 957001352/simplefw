@@ -30,6 +30,7 @@
         <trim prefix="SET" suffixOverrides=",">
             <if test="auditResult != null">audit_result = #{auditResult},</if>
             <if test="auditStatus != null  and auditStatus != ''">audit_status = #{auditStatus},</if>
+            <if test="createTime !=null  and createTime != ''">create_time = #{createTime},</if>
             <if test="endTime != null  and endTime != ''">end_time = #{endTime}</if>
         </trim>
         where id = #{id}

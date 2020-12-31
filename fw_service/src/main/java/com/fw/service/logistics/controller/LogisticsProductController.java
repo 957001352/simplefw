@@ -2,6 +2,7 @@ package com.fw.service.logistics.controller;
 
 import com.fw.domain.Result;
 import com.fw.service.logistics.service.LogisticsProductService;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +35,7 @@ public class LogisticsProductController {
      * @return
      */
     @GetMapping("/findList")
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "code", required = false) String code,
                            @RequestParam(value = "name", required = false) String name,
                            @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
@@ -76,6 +78,7 @@ public class LogisticsProductController {
      * @return
      */
     @GetMapping(value = "/exceedWarn")
+    @RequiresAuthentication
     public Result exceedWarn(@RequestParam(value = "name", required = false) String name,
                              @RequestParam(value = "code", required = false) String code,
                              @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
@@ -92,6 +95,7 @@ public class LogisticsProductController {
      * @return
      */
     @GetMapping(value = "/storeWarn")
+    @RequiresAuthentication
     public Result storeWarn(@RequestParam(value = "name", required = false) String name,
                             @RequestParam(value = "code", required = false) String code,
                             @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
@@ -107,11 +111,32 @@ public class LogisticsProductController {
      * @return
      */
     @GetMapping(value = "/getProductDetail")
+    @RequiresAuthentication
     public Result getProductDetail(@RequestParam(value = "id") Integer id) {
         return logisticsProductService.getProductDetail(id);
     }
-
-
+    /**
+     * 扫码获取上架物料详情
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping(value = "/getUpProductDetail")
+    @RequiresAuthentication
+    public Result getUpProductDetail(@RequestParam(value = "id") Integer id) {
+        return logisticsProductService.getUpProductDetail(id);
+    }
+    /**
+     * 扫码获取下架物料详情
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping(value = "/getDownProductDetail")
+    @RequiresAuthentication
+    public Result getDownProductDetail(@RequestParam(value = "id") Integer id,@RequestParam(value = "storageLocationId") Integer storageLocationId) {
+        return logisticsProductService.getDownProductDetail(id,storageLocationId);
+    }
     /**
      * 物料明细列表查询
      *
@@ -122,6 +147,7 @@ public class LogisticsProductController {
      * @return
      */
     @GetMapping("/findDetailList")
+    @RequiresAuthentication
     public Result findDetailList(@RequestParam(value = "code", required = false) String code,
                                  @RequestParam(value = "name", required = false) String name,
                                  @RequestParam(value = "storageCode", required = false) String storageCode,
@@ -136,6 +162,7 @@ public class LogisticsProductController {
      * @return
      */
     @GetMapping(value = "/getAllCode")
+    @RequiresAuthentication
     public Result getAllCode() {
         return logisticsProductService.getAllCode();
     }
@@ -147,6 +174,7 @@ public class LogisticsProductController {
      * @return
      */
     @GetMapping(value = "/getNameByCode")
+    @RequiresAuthentication
     public Result getNameByCode(@RequestParam(value = "code") String code) {
         return logisticsProductService.getNameByCode(code);
     }
@@ -156,6 +184,7 @@ public class LogisticsProductController {
      * @return
      */
     @GetMapping(value = "/findListByCode")
+    @RequiresAuthentication
     public Result findListByCode(@RequestParam(value = "codes") String codes) {
         return logisticsProductService.findListByCode(codes);
     }

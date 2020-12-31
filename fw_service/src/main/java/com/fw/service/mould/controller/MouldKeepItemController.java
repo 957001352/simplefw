@@ -4,6 +4,8 @@ import com.fw.domain.Result;
 import com.fw.entity.mould.MouldKeepItem;
 import com.fw.service.mould.service.MouldKeepItemService;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +28,7 @@ public class MouldKeepItemController {
      * @return
      */
     @PostMapping("/save")
+    @RequiresPermissions("mouldKeepItem:save")
     public Result save(@RequestBody MouldKeepItem mouldKeepItem) {
         return mouldKeepItemService.save(mouldKeepItem);
     }
@@ -38,6 +41,7 @@ public class MouldKeepItemController {
      * @return
      */
     @GetMapping("/getMouldKeepItem")
+    @RequiresAuthentication
     public Result getMouldKeepItem(@RequestParam(value = "id") Integer id) {
         return mouldKeepItemService.getMouldKeepItem(id);
     }
@@ -49,6 +53,7 @@ public class MouldKeepItemController {
      * @return result
      */
     @GetMapping(value = "/delete")
+    @RequiresPermissions("mouldKeepItem:delete")
     public Result delete(@RequestParam(value = "ids") String ids) {
         return mouldKeepItemService.delete(ids);
     }
@@ -62,6 +67,7 @@ public class MouldKeepItemController {
      * @return
      */
     @GetMapping("/findList")
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "name", required = false) String name,
                            @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
                            @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize) {

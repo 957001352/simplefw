@@ -2,6 +2,8 @@ package com.fw.service.produce.service.impl;
 
 import com.fw.domain.Result;
 import com.fw.entity.collect.Device;
+import com.fw.entity.craft.CardLog;
+import com.fw.entity.craft.CardParams;
 import com.fw.entity.craft.CraftCard;
 import com.fw.entity.craft.CraftModel;
 import com.fw.entity.logistics.LogisticsPicking;
@@ -14,6 +16,8 @@ import com.fw.entity.quality.QualityFirstendCheck;
 import com.fw.enums.ResultEnum;
 import com.fw.service.RedisService;
 import com.fw.service.collect.dao.DeviceDao;
+import com.fw.service.craft.dao.CardLogDao;
+import com.fw.service.craft.dao.CardParamsDao;
 import com.fw.service.craft.dao.CraftCardDao;
 import com.fw.service.craft.dao.CraftModelDao;
 import com.fw.service.enums.CodeEnum;
@@ -52,7 +56,7 @@ public class ProduceMoldingMonitorServiceImpl implements ProduceMoldingMonitorSe
     private E2CServicesUtil e2CServicesUtil;
 
     @Autowired
-    private CraftCardDao craftCardDao;
+    private CardParamsDao cardParamsDao;
 
     @Autowired
     private LogisticsPickingDao logisticsPickingDao;
@@ -74,6 +78,8 @@ public class ProduceMoldingMonitorServiceImpl implements ProduceMoldingMonitorSe
 
     @Autowired
     private MouldUseRecordDao mouldUseRecordDao;
+    @Autowired
+    private CardLogDao cardLogDao;
 
     @Override
     @Transactional
@@ -196,26 +202,36 @@ public class ProduceMoldingMonitorServiceImpl implements ProduceMoldingMonitorSe
             flag = produceMoldingMonitorDao.update(monitor);
         }
 
-        //完成生产的时候修改 注塑排产计划 的状态和时间
-        InjectionMolding injectionMolding = injectionMoldingDao.selectById(produceMoldingMonitor.getPlanMoldingId());
-        if (injectionMolding != null) {
-            injectionMolding.setStatus(4);
-            injectionMolding.setActualEnd(DateUtils.getTodayTime());
-            injectionMoldingDao.updateStatus(injectionMolding);
-            //完成后给插入一条下模任务
-            MouldUseRecord mouldUseRecord = new MouldUseRecord();
-            mouldUseRecord.setMouldId(injectionMolding.getMouldId());
-            mouldUseRecord.setCreateTime(DateUtils.getTodayTime());
-            mouldUseRecord.setOpreate(1);
-            mouldUseRecord.setStatus(0);
-            mouldUseRecord.setTaskStatus(0);
-            mouldUseRecord.setProductCode(injectionMolding.getProductCode());
-            mouldUseRecord.setMouldDevicesId(injectionMolding.getMouldId());
-            mouldUseRecord.setProductDevicesId(injectionMolding.getProductDevicesId());
-            mouldUseRecord.setInjectionMoldingId(injectionMolding.getId());
-            mouldUseRecordDao.insert(mouldUseRecord);
+        if(flag > 0){
+            //完成生产的时候修改 注塑排产计划 的状态和时间
+            InjectionMolding injectionMolding = injectionMoldingDao.selectById(produceMoldingMonitor.getPlanMoldingId());
+            if (injectionMolding != null) {
+                injectionMolding.setStatus(4);
+                injectionMolding.setActualEnd(DateUtils.getTodayTime());
+                injectionMoldingDao.updateStatus(injectionMolding);
+                //完成后给插入一条下模任务
+                MouldUseRecord mouldUseRecord = new MouldUseRecord();
+                mouldUseRecord.setMouldId(injectionMolding.getMouldId());
+                mouldUseRecord.setCreateTime(DateUtils.getTodayTime());
+                mouldUseRecord.setOpreate(1);
+                mouldUseRecord.setStatus(0);
+                mouldUseRecord.setTaskStatus(0);
+                mouldUseRecord.setProductCode(injectionMolding.getProductCode());
+                mouldUseRecord.setMouldDevicesId(injectionMolding.getMouldId());
+                mouldUseRecord.setProductDevicesId(injectionMolding.getProductDevicesId());
+                mouldUseRecord.setInjectionMoldingId(injectionMolding.getId());
+                mouldUseRecordDao.insert(mouldUseRecord);
+            }
+            //完成生产后判断该设备、零件使用的工艺卡是否是临时变更的工艺卡,如果是就变回永久变更的工艺卡
+            CardParams cardParams = cardParamsDao.findByDeviceProduct(produceMoldingMonitor.getProductDevicesId(), produceMoldingMonitor.getProductCode());
+            if(cardParams.getUpdateType() == 0){ //判断是否是临时变更
+                CardLog cardLog = cardLogDao.findIngByParamsId(cardParams.getId(),0);//查询该工艺卡最新的一次记录
+                //将工艺卡参数值变回之前永久变更的数据,将变更类型变回永久变更
+                cardParams.setCraftData(cardLog.getCraftPreData());
+                cardParams.setUpdateType(1);
+                cardParamsDao.update(cardParams);
+            }
         }
-
         //完成后给首末件管理新增数据
         if (flag > 0) {
             QualityFirstendCheck check = new QualityFirstendCheck();
@@ -227,6 +243,7 @@ public class ProduceMoldingMonitorServiceImpl implements ProduceMoldingMonitorSe
             check.setCheckType(2);
             flag = qualityFirstendCheckDao.save(check);
         }
+
         return flag > 0 ? ResultUtils.success() : ResultUtils.failure();
     }
 
@@ -268,13 +285,13 @@ public class ProduceMoldingMonitorServiceImpl implements ProduceMoldingMonitorSe
             Integer userId = logisticsPicking.getCreateUser();
             produceMoldingMonitor.setPickUser(e2CServicesUtil.findUserNameById(String.valueOf(userId)));
         }
-        //根据生产指令获取投料人
-        ProduceFeeding produceFeeding = produceFeedingDao.getProduceFeeding(productOrder);
-        if (produceFeeding != null) {
-            produceMoldingMonitor.setFeedTime(produceFeeding.getCreateTime());
-            Integer userId = produceFeeding.getCreateUser();
-            produceMoldingMonitor.setFeedUser(e2CServicesUtil.findUserNameById(String.valueOf(userId)));
-        }
+//        //根据生产指令获取投料人
+//        ProduceFeeding produceFeeding = produceFeedingDao.getProduceFeeding(productOrder);
+//        if (produceFeeding != null) {
+//            produceMoldingMonitor.setFeedTime(produceFeeding.getCreateTime());
+//            Integer userId = produceFeeding.getCreateUser();
+//            produceMoldingMonitor.setFeedUser(e2CServicesUtil.findUserNameById(String.valueOf(userId)));
+//        }
     }
 
 

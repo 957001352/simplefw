@@ -1,6 +1,7 @@
 package com.fw.service.logistics.service;
 
 import com.fw.domain.Result;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * 库存管理 服务类
@@ -63,7 +64,22 @@ public interface LogisticsProductService {
      * @return
      */
     Result getProductDetail(Integer id);
+    /**
+     * 扫码获取上架物料详情
+     *
+     * @param id
+     * @return
+     */
+    Result  getUpProductDetail(Integer id);
 
+
+    /**
+     * 扫码获取下架物料详情
+     *
+     * @param id
+     * @return
+     */
+    Result getDownProductDetail(Integer id,Integer storageLocationId);
     /**
      * 物料明细列表
      *

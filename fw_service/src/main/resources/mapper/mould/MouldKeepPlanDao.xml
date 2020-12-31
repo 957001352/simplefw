@@ -117,12 +117,12 @@
     </select>
 
     <select id="findAll" parameterType="com.fw.entity.mould.MouldKeepPlan" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List"/> from fw_mould_keep_plan
+        select t1.*,t2.keep_type from fw_mould_keep_plan t1 LEFT JOIN fw_mould_keep_team t2 on t1.keep_team_id = t2.id
     </select>
 
     <select id="findAllfail" parameterType="com.fw.entity.mould.MouldKeepPlan" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List"/> from fw_mould_keep_plan
-        where date_format(last_time,'%Y-%m-%d') &lt;= now()  and  keep_fre = 1
+        select t1.*, t2.keep_type from fw_mould_keep_plan t1 LEFT JOIN fw_mould_keep_team t2 on t1.keep_team_id = t2.id
+        where date_format(last_time,'%Y-%m-%d') &lt;= now()  and  t1.keep_fre = 1
     </select>
 
     <select id="verifyName" parameterType="java.lang.String" resultType="boolean">

@@ -118,6 +118,8 @@ public class DevicesKeepPlanServiceImpl implements DevicesKeepPlanService {
                 for (String mouldId : split) {
                     String mouldKeepOrder = mouldKeepTaskDao.findCode(CodeEnum.MOULD_01.getCode());
                     MouldKeepTask keepTask = new MouldKeepTask("0", item.getId(), mouldKeepOrder, item.getLastTime(), mouldId);
+                    //保养类型
+                    keepTask.setKeepType(item.getKeepType());
                     mouldKeepTaskDao.insert(keepTask);
                 }
                 String nextLastTime = GenerateDateUtil.generateLastTime(item.getLastTime(), null, null, item.getKeepCycle());
@@ -311,6 +313,8 @@ public class DevicesKeepPlanServiceImpl implements DevicesKeepPlanService {
                         for (String mouldId : split) {
                             String keepOrder = mouldKeepTaskDao.findCode(CodeEnum.MOULD_01.getCode());
                             MouldKeepTask keepTask = new MouldKeepTask("0", item.getId(), keepOrder, lastTime, mouldId);
+                            //保养类型
+                            keepTask.setKeepType(item.getKeepType());
                             mouldKeepTaskDao.insert(keepTask);
                         }
                         //用本次计划时间,周期,频率再次计算下次保养计划的时间

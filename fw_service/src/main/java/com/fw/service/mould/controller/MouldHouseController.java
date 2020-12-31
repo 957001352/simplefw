@@ -27,7 +27,7 @@ public class MouldHouseController {
      * @return
      */
     @PostMapping(value = "/save")
-    //@RequiresPermissions("mouldHouse:save")
+    @RequiresPermissions("mouldHouse:save")
     public Result save(@RequestBody MouldHouse mouldHouse) {
         return mouldHouseService.save(mouldHouse);
     }
@@ -40,7 +40,7 @@ public class MouldHouseController {
      * @return result
      */
     @GetMapping(value = "/delete")
-    //@RequiresPermissions("mouldHouse:delete")
+    @RequiresPermissions("mouldHouse:delete")
     public Result delete(@RequestParam(value = "ids") String ids) {
         return mouldHouseService.delete(ids);
     }

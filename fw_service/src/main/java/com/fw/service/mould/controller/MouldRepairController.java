@@ -5,6 +5,8 @@ import com.fw.entity.device.DevicesRepair;
 import com.fw.entity.mould.MouldRepair;
 import com.fw.service.device.service.DevicesRepairService;
 import com.fw.service.mould.service.MouldRepairService;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,16 +24,19 @@ public class MouldRepairController {
     private MouldRepairService mouldRepairService;
 
     @PostMapping(value = "/save")
+    @RequiresPermissions("mouldRepair:save")
     public Result save(@RequestBody MouldRepair mouldRepair) {
         return mouldRepairService.save(mouldRepair);
     }
 
     @GetMapping(value = "/delete")
+    @RequiresPermissions("mouldRepair:delete")
     public Result delete(@RequestParam("ids") String ids) {
         return mouldRepairService.delete(ids);
     }
 
     @GetMapping(value = "/findList")
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "id", required = false) Integer id,
                            @RequestParam(value = "code", required = false) String code,
                            @RequestParam(value = "mouldId", required = false) String mouldId,
@@ -50,6 +55,7 @@ public class MouldRepairController {
      * @return
      */
     @PostMapping(value = "/makeProject")
+    @RequiresPermissions("mouldRepair:makeProject")
     public Result makeProject(@RequestBody MouldRepair mouldRepair) {
         return mouldRepairService.makeProject(mouldRepair);
     }
@@ -59,11 +65,13 @@ public class MouldRepairController {
      * @param mouldRepair
      * @return
      */
+    @RequiresPermissions("mouldRepair:repairTaskExecute")
     @PostMapping(value = "/repairTaskExecute")
     public Result repairTaskExecute(@RequestBody MouldRepair mouldRepair) {
         return mouldRepairService.repairTaskExecute(mouldRepair);
     }
 
+    @RequiresPermissions("mouldRepair:getTask")
     @PostMapping(value = "/getTask")
     public Result getTask(@RequestBody MouldRepair mouldRepair){
         return mouldRepairService.getTask(mouldRepair);

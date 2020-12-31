@@ -321,7 +321,7 @@ public class MouldKeepTaskServiceImpl implements MouldKeepTaskService {
         }
         MouldKeepTask keepTask = mouldKeepTaskDao.getKeepTask(id);
         if (keepTask != null) {
-            keepTask.setStatus("1");
+            keepTask.setStatus("0");
             flag = mouldKeepTaskDao.update(keepTask);
         }
         return flag > 0 ? ResultUtils.success() : ResultUtils.failure();

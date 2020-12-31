@@ -281,6 +281,7 @@ public class DevicesKeepTaskServiceImpl implements DevicesKeepTaskService {
     }
 
     @Override
+    @Transactional
     public Result explainTask(DevicesKeepTask devicesKeepTask) {
         Integer flag = 0;
         if (CheckUtils.isNull(devicesKeepTask.getId())) {
@@ -358,7 +359,7 @@ public class DevicesKeepTaskServiceImpl implements DevicesKeepTaskService {
         }
         DevicesKeepTask keepTask = devicesKeepTaskDao.getKeepTask(id);
         if (keepTask != null) {
-            keepTask.setStatus("1");
+            keepTask.setStatus("0");
             flag = devicesKeepTaskDao.update(keepTask);
         }
         return flag > 0 ? ResultUtils.success() : ResultUtils.failure();

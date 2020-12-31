@@ -3,6 +3,8 @@ package com.fw.service.logistics.controller;
 import com.fw.domain.Result;
 import com.fw.entity.logistics.LogisticsTakeOrder;
 import com.fw.service.logistics.service.LogisticsTakeOrderService;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +30,7 @@ public class LogisticsTakeOrderController {
      * @return
      */
     @PostMapping(value = "/update")
+    @RequiresPermissions(value = "logisticsTakeOrder:update")
     public Result update(@RequestBody LogisticsTakeOrder logisticsTakeOrder){
         return logisticsTakeOrderService.update(logisticsTakeOrder);
     }
@@ -42,6 +45,7 @@ public class LogisticsTakeOrderController {
      * @return
      */
     @GetMapping(value = "findList")
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "taskNo",required = false) String taskNo,
                            @RequestParam(value = "status",required = false) Integer status,
                            @RequestParam(value = "kind",required = false) Integer kind,

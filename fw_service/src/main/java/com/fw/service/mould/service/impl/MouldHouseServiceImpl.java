@@ -159,7 +159,7 @@ public class MouldHouseServiceImpl implements MouldHouseService {
             //用户设置
             lists.forEach(item -> {
                 userList.forEach(vo -> {
-                    if (!CheckUtils.isNull(item.getCreateUser()) && item.getCreateUser().equals(vo.getId())) {
+                    if (!CheckUtils.isNull(item.getExecuteUser()) && item.getExecuteUser().equals(vo.getId())) {
                         item.setCreateUserName(vo.getName());
                     }
                 });

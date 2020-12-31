@@ -101,7 +101,8 @@ public class JbpmExecutionServiceImpl implements JbpmExecutionService {
             */
             if(idea.equals("审核通过")){
                 if(deployprop!=null) {
-                    //设置待审核状态
+                    //设置待审核状态 deployprop不为空，说明有下级审核流程，将流程状态一直设置为待审核
+                    jbpmExecution.setAuditResult(0);
                     jbpmExecution.setAuditStatus("待" + e2CServicesUtil.findUserNameById(deployprop.getAuditUsers()) + "审核");
                     jbpmTask = new JbpmTask();
                     jbpmTask.setDataId(jbpmExecution.getDataId());

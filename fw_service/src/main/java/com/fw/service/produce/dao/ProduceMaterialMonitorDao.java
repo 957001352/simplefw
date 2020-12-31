@@ -5,6 +5,7 @@ import com.fw.entity.produce.ProduceMaterialMonitor;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -27,5 +28,9 @@ public interface ProduceMaterialMonitorDao {
                                           @Param(value = "startTime") String startTime,
                                           @Param(value = "stopTime") String stopTime,
                                           @Param(value = "timeType") Integer timeType);
+
+    List<LinkedHashMap<String,Object>> findPlantUseMaterialList(@Param(value = "productCode") String productCode,
+                                                @Param(value = "startTime") String startTime,
+                                                @Param(value = "stopTime") String stopTime);
 
 }

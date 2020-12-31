@@ -6,6 +6,7 @@ import com.fw.entity.plan.InjectionStopList;
 import com.fw.entity.plan.PlanSwap;
 import com.fw.service.plan.service.InjectionMoldingService;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +28,7 @@ public class InjectionMoldingController {
      * @return
      */
     @PostMapping(value = "/insert")
-    //@RequiresPermissions("injectionMolding:insert")
+    @RequiresPermissions("injectionMolding:insert")
     public Result insert(@RequestBody InjectionMolding injectionMolding) {
         return injectionMoldingService.insert(injectionMolding);
     }
@@ -35,7 +36,7 @@ public class InjectionMoldingController {
      * 编辑  传入计划生产参数和设备id
      */
     @PostMapping(value = "/update")
-    //@RequiresPermissions("injectionMolding:update")
+    @RequiresPermissions("injectionMolding:update")
     public Result update(@RequestBody InjectionMolding injectionMolding) {
         return injectionMoldingService.update(injectionMolding);
     }
@@ -45,7 +46,7 @@ public class InjectionMoldingController {
      * @return
      */
     @PostMapping(value = "/stop")
-    //@RequiresPermissions("injectionMolding:stop")
+    @RequiresPermissions("injectionMolding:stop")
     public Result stop(@RequestBody InjectionStopList injectionStopList) {
         return injectionMoldingService.stop(injectionStopList);
     }
@@ -62,7 +63,7 @@ public class InjectionMoldingController {
      * @return
      */
     @GetMapping("/findList")
-    //@RequiresAuthentication
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "productDevicesId", required = false) Integer productDevicesId,
                            @RequestParam(value = "productDeviceCode", required = false) String productDeviceCode,
                            @RequestParam(value = "productCode", required = false) String productCode,
@@ -87,7 +88,7 @@ public class InjectionMoldingController {
      * }
      */
     @PostMapping("/findPlanList")
-//    @RequiresAuthentication
+    @RequiresAuthentication
     public Result findPlanList(@RequestBody InjectionMolding injectionMolding) {
         return injectionMoldingService.findPlanList(injectionMolding);
     }
@@ -97,7 +98,7 @@ public class InjectionMoldingController {
      * @param planSwap
      */
     @PostMapping(value = "/moveUpDownCancel")
-    //@RequiresPermissions("injectionMolding:moveUpDownCancel")
+    @RequiresPermissions("injectionMolding:moveUpDownCancel")
     public Result moveUpDownCancel(@RequestBody PlanSwap planSwap) {
         return injectionMoldingService.moveUpDownCancel(planSwap);
     }

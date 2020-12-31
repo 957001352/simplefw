@@ -3,6 +3,8 @@ package com.fw.service.device.controller;
 import com.fw.domain.Result;
 import com.fw.entity.device.DevicesSpareIn;
 import com.fw.service.device.service.DevicesSpareInService;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +29,7 @@ public class DevicesSpareInController {
      * @return
      */
     @PostMapping(value = "/save")
+    @RequiresPermissions("devicesSpareIn:save")
     public Result save(@RequestBody DevicesSpareIn devicesSpareIn) throws Exception {
         return spareInService.insert(devicesSpareIn);
     }
@@ -38,6 +41,7 @@ public class DevicesSpareInController {
      * @return
      */
     @GetMapping("/getDevicesSpareIn")
+    @RequiresAuthentication
     public Result getDevicesSpareOut(@RequestParam(value = "id") Integer id) {
         return spareInService.selectByIn(id);
     }
@@ -49,6 +53,7 @@ public class DevicesSpareInController {
      * @return
      */
     @GetMapping("/findList")
+    @RequiresAuthentication
     public Result FindList(
             @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
             @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize) {

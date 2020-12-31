@@ -8,6 +8,8 @@ import com.fw.service.quality.dao.QualityInspectResultDao;
 import com.fw.service.quality.service.QualityMaterialCheckService;
 import com.fw.utils.CheckUtils;
 import com.fw.utils.ResultUtils;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +34,7 @@ public class QualityMaterialCheckController {
     private QualityMaterialCheckService qualityMaterialCheckService;
 
     @GetMapping("/findList")
+    @RequiresAuthentication
     Result findList(@RequestParam(value = "checkNo",required = false) String checkNo,
                     @RequestParam(value = "startTime",required = false) String startTime,
                     @RequestParam(value = "stopTime",required = false) String stopTime,
@@ -44,16 +47,19 @@ public class QualityMaterialCheckController {
     }
 
     @GetMapping("/getCheckoutMaterialInfoById")
+    @RequiresAuthentication
     Result getCheckoutMaterialInfoById(@RequestParam(value = "id",required = true) Integer id){
         return qualityMaterialCheckService.getCheckoutMaterialInfoById(id);
     }
 
     @PostMapping("/submit")
+    @RequiresPermissions(value = "qualityMaterialCheck:submit")
     Result submit(@RequestBody List<QualityInspectResult> qualityInspectResultList){
         return qualityMaterialCheckService.submit(qualityInspectResultList);
     }
 
     @GetMapping("/findResultByDataIdAndClassify")
+    @RequiresAuthentication
     Result findResultByDataIdAndClassify(@RequestParam(value = "id",required = true) Integer id){
         return qualityMaterialCheckService.findResultByDataIdAndClassify(id);
     }

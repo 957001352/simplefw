@@ -30,4 +30,10 @@ public interface ProduceReworkRecordDao {
      */
     Integer batchUpdate(@Param("list") List<ProduceReworkRecord> list);
 
+    /**
+     * 修改报工单的状态
+     */
+    Integer updateBankStatus(@Param("ids") String ids,
+                        @Param("bankStatus") Integer bankStatus);
+
 }

@@ -33,4 +33,14 @@ public class ProduceMaterialMonitorController {
                            ){
         return  produceMaterialMonitorService.findList(productCode,productName,startTime,stopTime,timeType,pageNum,pageSize);
     }
+
+    @GetMapping("/findPlantUseMaterialList")
+    public Result findPlantUseMaterialList(
+                             @RequestParam(value = "productCode",required = false) String productCode,
+                             @RequestParam(value = "startTime",required = false) String startTime,
+                             @RequestParam(value = "stopTime",required = false) String stopTime,
+                             @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
+                             @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize){
+        return  produceMaterialMonitorService.findPlantUseMaterialList(productCode,startTime,stopTime,pageNum,pageSize);
+    }
 }

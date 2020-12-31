@@ -6,6 +6,7 @@
         <result column="id" property="id" jdbcType="INTEGER"/>
         <result column="code" property="code" jdbcType="VARCHAR"/>
         <result column="mould_id" property="mouldId" jdbcType="VARCHAR"/>
+        <result column="mould_code" property="mouldCode" jdbcType="VARCHAR"/>
         <result column="question" property="question" jdbcType="VARCHAR"/>
         <result column="question_desc" property="questionDesc" jdbcType="VARCHAR"/>
         <result column="priority" property="priority" jdbcType="VARCHAR"/>
@@ -104,7 +105,7 @@
 
     <select id="findList"  resultMap="BaseResultMap" >
         select
-        mould.id,mould.code,md.code as mould_id,md.name as mould_name,mould.question,mould.question_desc,mould.priority
+        mould.id,mould.code,md.id as mould_id,md.code as mould_code,md.name as mould_name,mould.question,mould.question_desc,mould.priority
         ,mould.before_file,mould.create_user,mould.create_time,mould.repair_team_ids,mould.add_plan,mould.plan_hour
         ,replace(mould.plan_file,#{rootPath},'\\attach\\') as plan_file
         ,mould.is_review,mould.project_create_user,mould.project_create_time,mould.after_file,mould.source,mould.status,mould.result,mould.repair_user
@@ -150,5 +151,10 @@
     <select id="findCode" resultType="java.lang.String">
         select ifnull(concat(left(max(code),4),lpad(right(max(code),6)+1,6,0)),#{code})code from fw_mould_repair
     </select>
+
+    <!--修改模具的型腔数-->
+    <update id="updateMouldCavity">
+        update fw_mould_devices set cavity = #{cavity} where id = #{mouldId}
+    </update>
 </mapper>
 

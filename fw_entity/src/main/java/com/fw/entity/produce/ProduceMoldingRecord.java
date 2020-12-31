@@ -96,7 +96,10 @@ public class ProduceMoldingRecord implements Serializable {
      */
     private String productCode;
 
-
+    /**
+     * 0:未入库  1:已入库
+     */
+    private Integer bankStatus;
 
 
 }

@@ -6,6 +6,8 @@ import com.fw.enums.ResultEnum;
 import com.fw.service.quality.service.QualityFirstendCheckService;
 import com.fw.utils.CheckUtils;
 import com.fw.utils.ResultUtils;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +41,10 @@ public class QualityFirstendCheckController {
      * @return
      */
     @GetMapping(value = "/findList")
-    Result findList(@RequestParam(value = "productCode", required = false) String productCode,
+    @RequiresAuthentication
+    Result findList(
+                    @RequestParam(value = "id", required = false) Integer id,
+                    @RequestParam(value = "productCode", required = false) String productCode,
                     @RequestParam(value = "productDevicesCode", required = false) String productDevicesCode,
                     @RequestParam(value = "checkType", required = false) Integer checkType,
                     @RequestParam(value = "startTime", required = false) String startTime,
@@ -47,7 +52,7 @@ public class QualityFirstendCheckController {
                     @RequestParam(value = "status",required = false)Integer status,
                     @RequestParam(value = "pageNum", required = true, defaultValue = "1") Integer pageNum,
                     @RequestParam(value = "pageSize", required = true,defaultValue = "10") Integer pageSize) {
-        return qualityFirstendCheckService.findList(productCode,productDevicesCode,checkType,startTime,stopTime,status,pageNum,pageSize);
+        return qualityFirstendCheckService.findList(id,productCode,productDevicesCode,checkType,startTime,stopTime,status,pageNum,pageSize);
 
     }
 
@@ -56,6 +61,7 @@ public class QualityFirstendCheckController {
      * @param id
      * @return
      */
+    @RequiresAuthentication
     @GetMapping(value = "/findAppearanceOrSizeInspectInfo")
     Result findAppearanceOrSizeInspectInfo(@RequestParam(value = "id",required = true) Integer id){
         if(CheckUtils.isNull(id)){
@@ -70,6 +76,7 @@ public class QualityFirstendCheckController {
      * @return
      */
     @PostMapping(value = "/submit")
+    @RequiresPermissions("qualityFirstendCheck:submit")
     Result submit(@RequestBody List<QualityInspectResult> qualityInspectResultList){
         return qualityFirstendCheckService.submit(qualityInspectResultList);
     }
@@ -80,6 +87,7 @@ public class QualityFirstendCheckController {
      * @return
      */
     @PostMapping(value = "/update")
+    @RequiresPermissions("qualityFirstendCheck:update")
     Result update(@RequestBody QualityInspectResult qualityInspectResult){
         return qualityFirstendCheckService.update(qualityInspectResult);
     }
@@ -91,6 +99,7 @@ public class QualityFirstendCheckController {
      * @return
      */
     @PostMapping(value = "/coerceClose")
+    @RequiresPermissions("qualityFirstendCheck:coerceClose")
     Result coerceClose(@RequestBody QualityFirstendCheck qualityFirstendCheck){
         return qualityFirstendCheckService.coerceClose(qualityFirstendCheck);
 
@@ -102,6 +111,7 @@ public class QualityFirstendCheckController {
      * @return
      */
     @PostMapping(value = "/postponeExe")
+    @RequiresPermissions("qualityFirstendCheck:postponeExe")
     Result postponeExe(@RequestBody QualityFirstendCheck qualityFirstendCheck){
         return qualityFirstendCheckService.postponeExe(qualityFirstendCheck);
 

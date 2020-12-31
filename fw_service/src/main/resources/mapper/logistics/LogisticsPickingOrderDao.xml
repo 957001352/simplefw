@@ -26,6 +26,15 @@
             <if test="storageCount != null">#{storageCount}</if>
         </trim>
     </insert>
+    <update id="updateStorageCountList">
+        <foreach collection="logisticsPickingOrders" separator=";" item="logisticsPickingOrder">
+            update fw_logistics_picking_order
+            <trim prefix="SET" suffixOverrides=",">
+                <if test="logisticsPickingOrder.storageCount != null">storage_count= #{logisticsPickingOrder.storageCount},</if>
+            </trim>
+            where id = #{logisticsPickingOrder.id}
+        </foreach>
+    </update>
 
     <select id="findList" resultType="com.fw.entity.logistics.LogisticsPickingOrder">
         select  l.*
@@ -37,6 +46,10 @@
         <if test="productOrder != null and productOrder != ''">
             and l.product_order = #{productOrder}
         </if>
+    </select>
+
+    <select id="findByOutHouseId" parameterType="java.util.HashSet" resultType="com.fw.entity.logistics.LogisticsPickingOrder">
+        select * from fw_logistics_picking_order where out_house_id = #{outHouseId}
     </select>
 
 

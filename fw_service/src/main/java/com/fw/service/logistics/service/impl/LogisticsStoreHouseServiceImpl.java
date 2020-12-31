@@ -13,6 +13,8 @@ import com.fw.service.logistics.service.LogisticsStoreHouseService;
 import com.fw.service.logistics.util.StorageProductUtil;
 import com.fw.service.produce.dao.ProduceMaterialMonitorDao;
 import com.fw.service.produce.dao.ProduceMoldingMonitorDao;
+import com.fw.service.produce.dao.ProduceMoldingRecordDao;
+import com.fw.service.produce.dao.ProduceReworkRecordDao;
 import com.fw.service.util.E2CServicesUtil;
 import com.fw.service.util.HeaderUtil;
 import com.fw.util.AuthUserUtil;
@@ -52,6 +54,10 @@ public class LogisticsStoreHouseServiceImpl implements LogisticsStoreHouseServic
     private ProduceMaterialMonitorDao produceMaterialMonitorDao;
     @Autowired
     private ProduceMoldingMonitorDao produceMoldingMonitorDao;
+    @Autowired
+    private ProduceMoldingRecordDao produceMoldingRecordDao;
+    @Autowired
+    private ProduceReworkRecordDao produceReworkRecordDao;
 
     @Override
     public Result findList(String orderNo, String houseNo, String houseType, Integer status, String startTime, String endTime, String partsType, Integer pageNum, Integer pageSize) {
@@ -89,7 +95,7 @@ public class LogisticsStoreHouseServiceImpl implements LogisticsStoreHouseServic
         if (CheckUtils.isNull(storeHouseId)) {
             return ResultUtils.error("参数错误");
         }
-        Integer integer = logisticsStoreHouseDetailDao.storeHouseIn(storeHouseId, 3);
+        Integer integer = logisticsStoreHouseDetailDao.storeHouseIn(storeHouseId, 0);
         if (integer > 0) {
             integer = inStorage(storeHouseId);
         }
@@ -188,11 +194,26 @@ public class LogisticsStoreHouseServiceImpl implements LogisticsStoreHouseServic
         List<LogisticsStoreHouseDetail> logisticsStoreHouseDetails = logisticsStoreHouse.getLogisticsStoreHouseDetailList();
         if (insert > 0 && logisticsStoreHouseDetails != null && logisticsStoreHouseDetails.size() > 0) {
             for (LogisticsStoreHouseDetail logisticsStoreHouseDetail : logisticsStoreHouseDetails) {
+                //如果泛沃批次号为空,就设置为生产指令
+                if(logisticsStoreHouseDetail.getFwBatch() == null){
+                    logisticsStoreHouseDetail.setFwBatch(logisticsStoreHouseDetail.getProductCode());
+                }
                 logisticsStoreHouseDetail.setStoreHouseId(logisticsStoreHouse.getId());
             }
             insert = logisticsStoreHouseDetailDao.insert(logisticsStoreHouseDetails);
         }
-        return insert >= 0 ? ResultUtils.success() : ResultUtils.failure();
+        if(insert >= 0){
+            //修改报工单状态为已入库状态
+            if(logisticsStoreHouse.getMoldingRecordIds() != null && !"".equals(logisticsStoreHouse.getMoldingRecordIds())){
+                if(logisticsStoreHouse.getPartsType() == 0){//成品入库
+                    produceReworkRecordDao.updateBankStatus(logisticsStoreHouse.getMoldingRecordIds(),1);
+                }else if(logisticsStoreHouse.getPartsType() == 1){//半成品入库
+                    produceMoldingRecordDao.updateBankStatus(logisticsStoreHouse.getMoldingRecordIds(),1);
+                }
+            }
+            return ResultUtils.success();
+        }
+        return ResultUtils.failure();
     }
 
     @Override
@@ -204,7 +225,18 @@ public class LogisticsStoreHouseServiceImpl implements LogisticsStoreHouseServic
         if (delete > 0) {
             delete = logisticsStoreHouseDetailDao.delete(logisticsStoreHouse.getId());
         }
-        return delete >= 0 ? ResultUtils.success() : ResultUtils.failure();
+        if(delete >= 0){
+            //修改报工单状态为未入库状态
+            if(logisticsStoreHouse.getMoldingRecordIds() != null && !"".equals(logisticsStoreHouse.getMoldingRecordIds())){
+                if(logisticsStoreHouse.getPartsType() == 0){//成品入库
+                    produceReworkRecordDao.updateBankStatus(logisticsStoreHouse.getMoldingRecordIds(),0);
+                }else if(logisticsStoreHouse.getPartsType() == 1){//半成品入库
+                    produceMoldingRecordDao.updateBankStatus(logisticsStoreHouse.getMoldingRecordIds(),0);
+                }
+            }
+            return ResultUtils.success();
+        }
+        return ResultUtils.failure();
     }
 
     @Override

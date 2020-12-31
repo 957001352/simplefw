@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * @program: dhlk_fw_plat
- * @description: 维修设备控制成
+ * @description: 维修设备控制层
  * @author: wqiang
  * @create: 2020-10-21 09:17
  **/

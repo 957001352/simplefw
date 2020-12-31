@@ -127,16 +127,18 @@ public class StorageProductUtil {
             List<LogisticsStorageDetail> logisticsStorageDetails = new ArrayList<>();
             //循环判断库存物料是否满足出库要求
             for (LogisticsOutHouseDetail houseDetail : detailList) {
-                LogisticsStorageDetail entrty= logisticsStorageDetailDao.selectById(houseDetail.getStorageDetailId());
-                //比较库存是否满足出库要求，如果不满足返回-1
-                if(entrty.getStorageCount()>=houseDetail.getStorageCount()){
-                    logisticsStorageDetails.add(new LogisticsStorageDetail(houseDetail.getStorageDetailId(), entrty.getStorageCount(),entrty.getStorageCount()-houseDetail.getStorageCount()));
-                }else{
-                    return -1;
+                if(houseDetail.getStorageDetailId() != null && houseDetail.getStorageDetailId() != 0){
+                    LogisticsStorageDetail entrty= logisticsStorageDetailDao.selectById(houseDetail.getStorageDetailId());
+                    //比较库存是否满足出库要求，如果不满足返回-1
+                    if(entrty.getStorageCount()>=houseDetail.getStorageCount()){
+                        logisticsStorageDetails.add(new LogisticsStorageDetail(houseDetail.getStorageDetailId(), entrty.getStorageCount(),entrty.getStorageCount()-houseDetail.getStorageCount()));
+                    }else{
+                        return -1;
+                    }
                 }
             }
             //更新库存物料数量
-            if(logisticsStorageDetails!=null&&logisticsStorageDetails.size()>0){
+            if(logisticsStorageDetails.size() > 0){
                 flag=logisticsStorageDetailDao.updateCount(logisticsStorageDetails);
                 if(flag>0){
                     //保存操作日志

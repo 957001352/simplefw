@@ -4,6 +4,7 @@ import com.fw.domain.Result;
 import com.fw.entity.quality.QualityInspectResult;
 import com.fw.service.quality.service.QualityInspectResultService;
 import org.apache.ibatis.annotations.Param;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +26,7 @@ public class QualityInspectResultController {
 
 
     @GetMapping(value = "/findHistoryResultByOfon")
+    @RequiresAuthentication
     Result findHistoryResultByOfon(@RequestParam(value = "productCode",required = true) String ofNo){
         return qualityInspectResultService.findHistoryResultByOfon(ofNo);
     }

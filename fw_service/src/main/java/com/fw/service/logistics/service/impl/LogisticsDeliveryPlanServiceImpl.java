@@ -54,7 +54,7 @@ public class LogisticsDeliveryPlanServiceImpl implements LogisticsDeliveryPlanSe
                 if(CheckUtils.isNull(outHouseId)){
                     //查询出库任务编号
                     logisticsOutHouse.setHouseNo(logisticsOutHouseDao.findCode(CodeEnum.LOGISTICS_04.getCode()));
-                    logisticsOutHouse.setHouseType("2");
+                    logisticsOutHouse.setHouseType("0");
                     logisticsOutHouse.setStoreDate(DateUtils.getCurrentTime("yyyy-MM-dd HH:mm:ss"));
                     logisticsOutHouseDao.planInsert(logisticsOutHouse);
                 }else{

@@ -211,21 +211,10 @@ public class MouldRepairServiceImpl implements MouldRepairService {
         if (mouldRepair.getIsReview() == 1) {
             jbpmUtil.startExecution(null, String.valueOf(mouldRepair.getId()), authUserUtil.userId(), "mouldRepair");
         }
-        /*if (flag > 0) {
-            //记录备品备件使用情况
-            List<MouldRepairSpare> mouldRepairSpareList = mouldRepair.getMouldRepairSpareList();
-            if (!CollectionUtils.isEmpty(mouldRepairSpareList)) {
-                for (MouldRepairSpare mouldRepairSpare : mouldRepairSpareList) {
-                    MouldRepairSpare mouldSpare = mouldRepairSpareDao.findMouldSpare(mouldRepairSpare.getMouldRepairId(), mouldRepairSpare.getMouldSpareId());
-                    if (mouldSpare != null) {
-                        mouldRepairSpareDao.updateMouldSpare(mouldRepairSpare);
-                    } else {
-                        mouldRepairSpareDao.insert(mouldRepairSpare);
-                    }
-                }
-                return ResultUtils.success();
-            }
-        }*/
+        //维修完成后，修改模具履历的模腔数
+        if(flag > 0 ){
+            mouldRepairDao.updateMouldCavity(mouldRepair.getMouldId(),mouldRepair.getCavityNumber());
+        }
         return flag > 0 ? ResultUtils.success() : ResultUtils.error("执行维修任务失败，请重新执行！");
     }
 

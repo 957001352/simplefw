@@ -6,7 +6,7 @@
         <foreach collection="logisticsStorageDetails" item="item" index="index" open="" close="" separator=";">
             insert into fw_logistics_storage_detail
             <trim prefix="(" suffix=")" suffixOverrides=",">
-                <if test="item.storageId != null  and item.storageId != ''">storage_id,</if>
+                <if test="item.storageId != null">storage_id,</if>
                 <if test="item.productId != null and item.productId !=''">product_id,</if>
                 <if test="item.storageCount != null">storage_count,</if>
                 <if test="item.productDate != null  and item.productDate != ''">product_date,</if>
@@ -17,7 +17,7 @@
                 <if test="item.orderDetailId != null  and item.orderDetailId != ''">order_detail_id</if>
             </trim>
             <trim prefix="values (" suffix=")" suffixOverrides=",">
-                <if test="item.storageId != null  and item.storageId != ''">#{item.storageId},</if>
+                <if test="item.storageId != null">#{item.storageId},</if>
                 <if test="item.productId != null and item.productId !=''">#{item.productId},</if>
                 <if test="item.storageCount != null">#{item.storageCount},</if>
                 <if test="item.productDate != null  and item.productDate != ''">#{item.productDate},</if>
@@ -31,7 +31,7 @@
     </insert>
     <update id="updateUpLocation">
         <foreach collection="list" item="item" index="index" open="" close="" separator=";">
-           update fw_logistics_storage_detail set storage_id = #{item.storageLocationId} where id = #{item.storageDetailId}
+           update fw_logistics_storage_detail set storage_id = #{item.storageLocationId},storage_count = #{item.storageCount} where id = #{item.storageDetailId}
         </foreach>
     </update>
     <update id="updateDownLocation">
@@ -56,24 +56,29 @@
           left join fw_logistics_product p on d.product_id=p.id
          where d.id = #{id}
     </select>
-
+    <sql id="findProductDetailSql">
+     SELECT t1.id,
+            t1.storage_id,
+            t1.product_id,
+            t1.storage_count,
+            t1.product_date,
+            t1.fw_batch,
+            t1.provider_name,
+            t1.provider_batch,
+            t1.storage_date,
+            t2.code as productCode,
+            t2.name as productName,
+            t2.unit
+        FROM fw_logistics_storage_detail t1
+        LEFT JOIN fw_logistics_product t2 ON t1.product_id = t2.id
+    </sql>
     <select id="getProductDetail" parameterType="integer" resultType="com.fw.entity.logistics.LogisticsStorageDetail">
-       SELECT
-        t1.id,
-        t1.storage_id,
-        t1.product_id,
-        t1.storage_count,
-        t1.product_date,
-        t1.fw_batch,
-        t1.provider_name,
-        t1.provider_batch,
-        t1.storage_date,
-        t2.code as productCode,
-        t2.name as productName,
-        t2.unit
-    FROM
-	 fw_logistics_storage_detail t1
-	 LEFT JOIN fw_logistics_product t2 ON t1.product_id = t2.id
-	 where  t1.id = #{id}
+     <include refid="findProductDetailSql"/>where  t1.id = #{id}
+    </select>
+    <select id="getUpProductDetail" parameterType="integer" resultType="com.fw.entity.logistics.LogisticsStorageDetail">
+        <include refid="findProductDetailSql"/>where  t1.id = #{id} and t1.storage_id=0
+    </select>
+    <select id="getDownProductDetail"  resultType="com.fw.entity.logistics.LogisticsStorageDetail">
+        <include refid="findProductDetailSql"/>where  t1.id = #{id} and t1.storage_id>0 and  t1.storage_id=#{storageLocationId}
     </select>
 </mapper>

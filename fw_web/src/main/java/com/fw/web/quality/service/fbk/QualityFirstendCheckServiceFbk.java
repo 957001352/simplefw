@@ -23,7 +23,7 @@ import java.util.List;
 @Service
 public class QualityFirstendCheckServiceFbk implements QualityFirstendCheckService {
     @Override
-    public Result findList(String productCode,String productDevicesCode, Integer checkType, String startTime, String stopTime,Integer status, Integer pageNum, Integer pageSize) {
+    public Result findList(Integer id,String productCode,String productDevicesCode, Integer checkType, String startTime, String stopTime,Integer status, Integer pageNum, Integer pageSize) {
         return ResultUtils.error(ResultEnum.NETWORK_ERR);
     }
 

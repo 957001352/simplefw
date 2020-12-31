@@ -21,6 +21,7 @@ import java.util.List;
 public interface QualityFirstendCheckDao  {
 
     List<QualityFirstendCheck> findList(
+                                        @Param(value = "id") Integer id,
                                         @Param(value = "productCode") String productCode,
                                         @Param(value = "checkType") Integer checkType,
                                         @Param(value = "startTime") String startTime,
@@ -44,6 +45,9 @@ public interface QualityFirstendCheckDao  {
      * @return
      */
     String findCode(String code);
+
+
+    QualityFirstendCheck findCheckByProductOrder(@Param(value = "productCode") String productCode);
 
 
 

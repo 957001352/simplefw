@@ -24,4 +24,12 @@ public interface ProduceMaterialMonitorService {
                            @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
                            @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize
     );
+
+    @GetMapping("/findPlantUseMaterialList")
+    public Result findPlantUseMaterialList(
+            @RequestParam(value = "productCode",required = false) String productCode,
+            @RequestParam(value = "startTime",required = false) String startTime,
+            @RequestParam(value = "stopTime",required = false) String stopTime,
+            @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
+            @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize);
 }

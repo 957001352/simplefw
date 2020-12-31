@@ -5,6 +5,7 @@ import com.fw.entity.produce.ProduceReworkMonitor;
 import com.fw.entity.produce.ProduceReworkRecord;
 import com.fw.service.produce.service.ProduceReworkMonitorService;
 import com.fw.service.produce.service.ProduceReworkRecordService;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +32,7 @@ public class ProduceReworkRecordController {
     }
 
     @GetMapping(value = "/findList")
+    @RequiresAuthentication
     Result findList(@RequestParam(value = "planReworkId", required = false) Integer planReworkId,
                     @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
                     @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize) {
@@ -44,6 +46,7 @@ public class ProduceReworkRecordController {
      * @return
      */
     @PostMapping(value = "/startProduce")
+    @RequiresAuthentication
     public Result startProduce(@RequestBody ProduceReworkMonitor produceReworkMonitor) {
         return produceReworkMonitorService.startProduce(produceReworkMonitor);
     }
@@ -55,6 +58,7 @@ public class ProduceReworkRecordController {
      * @return
      */
     @PostMapping(value = "/endProduce")
+    @RequiresAuthentication
     public Result endProduce(@RequestBody ProduceReworkMonitor produceReworkMonitor) {
         return produceReworkMonitorService.endProduce(produceReworkMonitor);
     }
@@ -66,6 +70,7 @@ public class ProduceReworkRecordController {
      * @return
      */
     @PostMapping(value = "/customsInspection")
+    @RequiresAuthentication
     public Result customsInspection(@RequestBody ProduceReworkMonitor produceReworkMonitor) {
         return produceReworkMonitorService.customsInspection(produceReworkMonitor);
     }

@@ -4,6 +4,7 @@ import com.fw.domain.Result;
 import com.fw.entity.mould.MouldKeepTeam;
 import com.fw.service.mould.service.MouldKeepTeamService;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +27,7 @@ public class MouldKeepTeamController {
      * @return
      */
     @PostMapping("/save")
+    @RequiresPermissions("mouldKeepTeam:save")
     public Result save(@RequestBody MouldKeepTeam mouldKeepTeam) {
         return mouldKeepTeamService.save(mouldKeepTeam);
     }
@@ -38,6 +40,7 @@ public class MouldKeepTeamController {
      * @return result
      */
     @GetMapping(value = "/delete")
+    @RequiresPermissions("mouldKeepTeam:delete")
     public Result delete(@RequestParam(value = "ids") String ids) {
         return mouldKeepTeamService.delete(ids);
     }
@@ -49,6 +52,7 @@ public class MouldKeepTeamController {
      * @return result
      */
     @GetMapping(value = "/getAllKeepItem")
+    @RequiresAuthentication
     public Result getAllKeepItem() {
         return mouldKeepTeamService.getAllKeepItem();
     }
@@ -63,6 +67,7 @@ public class MouldKeepTeamController {
      * @return
      */
     @GetMapping("/findList")
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "name", required = false) String name,
                            @RequestParam(value = "mouldCode", required = false) String mouldCode,
                            @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
@@ -76,6 +81,7 @@ public class MouldKeepTeamController {
      * @return result
      */
     @GetMapping(value = "/getMouldCode")
+    @RequiresAuthentication
     public Result getMouldCode() {
         return mouldKeepTeamService.getMouldCode();
     }
@@ -88,6 +94,7 @@ public class MouldKeepTeamController {
      * @return
      */
     @GetMapping("/getMouldKeepTeam")
+    @RequiresAuthentication
     public Result getMouldKeepTeam(@RequestParam(value = "id") Integer id) {
         return mouldKeepTeamService.getMouldKeepTeam(id);
     }
@@ -98,6 +105,7 @@ public class MouldKeepTeamController {
      * @return result
      */
     @GetMapping(value = "/getKeepItemByCycle")
+    @RequiresAuthentication
     public Result getKeepItemByCycle(@RequestParam(value = "cycle") Integer cycle) {
         return mouldKeepTeamService.getKeepItemByCycle(cycle);
     }

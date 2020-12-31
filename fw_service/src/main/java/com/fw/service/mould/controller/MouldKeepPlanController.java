@@ -5,6 +5,8 @@ import com.fw.entity.device.DevicesKeepPlan;
 import com.fw.entity.mould.MouldKeepPlan;
 import com.fw.service.device.service.DevicesKeepPlanService;
 import com.fw.service.mould.service.MouldKeepPlanService;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +29,7 @@ public class MouldKeepPlanController {
      * @return
      */
     @PostMapping("/save")
+    @RequiresPermissions("mouldKeepPlan:save")
     public Result save(@RequestBody MouldKeepPlan mouldKeepPlan) {
         return mouldKeepPlanService.save(mouldKeepPlan);
     }
@@ -38,6 +41,7 @@ public class MouldKeepPlanController {
      * @return
      */
     @GetMapping("/getMouldKeepPlan")
+    @RequiresAuthentication
     public Result getDevicesKeepPlan(@RequestParam(value = "id") Integer id) {
         return mouldKeepPlanService.getMouldKeepPlan(id);
     }
@@ -49,6 +53,7 @@ public class MouldKeepPlanController {
      * @return result
      */
     @GetMapping(value = "/delete")
+    @RequiresPermissions("mouldKeepPlan:delete")
     public Result delete(@RequestParam(value = "ids") String ids) {
         return mouldKeepPlanService.delete(ids);
     }
@@ -60,6 +65,7 @@ public class MouldKeepPlanController {
      * @return
      */
     @GetMapping(value = "/getAllKeepTeam")
+    @RequiresAuthentication
     public Result getAllKeepTeam() {
         return mouldKeepPlanService.getAllKeepTeam();
     }
@@ -75,6 +81,7 @@ public class MouldKeepPlanController {
      * @return
      */
     @GetMapping("/findList")
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "name", required = false) String name,
                            @RequestParam(value = "keepTeamName", required = false) String keepTeamName,
                            @RequestParam(value = "mouldCode", required = false) String mouldCode,

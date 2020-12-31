@@ -94,6 +94,22 @@ public interface LogisticsProductService {
     Result getProductDetail(@RequestParam(value = "id") Integer id);
 
     /**
+     * 扫码获取上架物料详情
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping(value = "/getUpProductDetail")
+    Result getUpProductDetail(@RequestParam(value = "id") Integer id);
+    /**
+     * 扫码获取下架物料详情
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping(value = "/getDownProductDetail")
+    Result getDownProductDetail(@RequestParam(value = "id") Integer id,@RequestParam(value = "storageLocationId") Integer storageLocationId);
+    /**
      * 物料明细列表查询
      *
      * @param code

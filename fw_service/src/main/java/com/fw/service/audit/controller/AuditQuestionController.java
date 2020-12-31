@@ -3,6 +3,8 @@ package com.fw.service.audit.controller;
 import com.fw.domain.Result;
 import com.fw.entity.audit.AuditQuestion;
 import com.fw.service.audit.service.AuditQuestionService;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +26,7 @@ public class AuditQuestionController {
      * @return
      */
     @PostMapping(value = "/save")
-    //@RequiresPermissions("auditQuestion:save")
+    @RequiresPermissions("auditQuestion:save")
     public Result save(@RequestBody AuditQuestion auditQuestion) {
         return auditQuestionService.save(auditQuestion);
     }
@@ -34,7 +36,7 @@ public class AuditQuestionController {
      * @return
      */
     @GetMapping(value = "/delete")
-    //@RequiresPermissions("auditQuestion:delete")
+    @RequiresPermissions("auditQuestion:delete")
     public Result delete(@RequestParam(value = "ids", required = false) String ids) {
         return auditQuestionService.delete(ids);
     }
@@ -46,7 +48,7 @@ public class AuditQuestionController {
      * @return
      */
     @GetMapping("/findList")
-    //@RequiresAuthentication
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "dutyUser", required = false) String dutyUser,
                            @RequestParam(value = "status", required = false) Integer status,
                            @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,

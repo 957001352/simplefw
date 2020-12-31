@@ -1,7 +1,9 @@
 package com.fw.service.util;
 
 import com.fw.utils.CheckUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -21,7 +23,7 @@ public class GenerateDateUtil {
      * @param month
      * @return
      */
-    public static String generateLastTime(String startTime, Integer week, Integer month,Integer day) {
+    public static String generateLastTime(String startTime, Integer week, Integer month, Integer day) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Calendar cd = Calendar.getInstance();//获取一个Calendar对象
@@ -126,6 +128,29 @@ public class GenerateDateUtil {
             e.printStackTrace();
         }
         return day;
+    }
+
+    /**
+     * 时间的时间差 HH:mm:ss格式相减
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public static Long getMinutesSub(String startTime, String endTime) {
+        long m = 0L;
+        try {
+            String[] start = StringUtils.split(startTime, " ");
+            String[] end = StringUtils.split(endTime, " ");
+            DateFormat df = new SimpleDateFormat("HH:mm:ss");
+            Date d1 = df.parse(start[1]);
+            Date d2 = df.parse(end[1]);
+            //这样得到的差值是毫秒级别
+            long diff = d1.getTime() - d2.getTime();
+            m = diff / 1000 / 60;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return m;
     }
 
 

@@ -1,10 +1,7 @@
 package com.fw.service.produce.dao;
 
 
-import com.fw.entity.produce.ProduceDuty;
-import com.fw.entity.produce.ProduceFeedingDetail;
-import com.fw.entity.produce.ProduceMaterialMonitor;
-import com.fw.entity.produce.ProduceReworkMonitor;
+import com.fw.entity.produce.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -74,7 +71,7 @@ public interface BarcodeQueryDao {
      * @param productOrder
     * @return
     */
-    List<ProduceMaterialMonitor> findMoldingMonitorList(@Param(value = "planMoldingId") Integer planMoldingId,
+    List<ProduceMoldingMonitor> findMoldingMonitorList(@Param(value = "planMoldingId") Integer planMoldingId,
                                                         @Param(value = "productOrder") String productOrder,
                                                         @Param(value = "status") List<String> status);
 

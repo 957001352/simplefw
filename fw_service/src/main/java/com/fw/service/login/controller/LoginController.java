@@ -2,11 +2,16 @@ package com.fw.service.login.controller;
 
 import com.fw.domain.Result;
 import com.fw.entity.e2c.User;
+import com.fw.enums.ResultEnum;
 import com.fw.service.login.service.LoginService;
+import com.fw.utils.DogUtil;
+import com.fw.utils.ResultUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
 /**
  * 登录 登出 校验token
@@ -15,6 +20,8 @@ import javax.annotation.Resource;
 public class LoginController {
     @Resource
     private LoginService loginServiceImpl;
+    @Value("${dog.check}")
+    private boolean check;
 
     /**
      * token校验
@@ -29,7 +36,10 @@ public class LoginController {
      */
     @PostMapping("/login")
     public Result login(@RequestBody User user){
-        return loginServiceImpl.login(user.getLoginName(),user.getPassword());
+        if(check || DogUtil.checkLoginDog()){
+            return  loginServiceImpl.login(user.getLoginName(),user.getPassword());
+        }
+        return ResultUtils.error(ResultEnum.DOG_ERROR);
     }
 
     /**

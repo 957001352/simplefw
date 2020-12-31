@@ -61,4 +61,18 @@ public interface LogisticsStorageDetailDao {
      * @return
      */
     LogisticsStorageDetail getProductDetail(Integer id);
+    /**
+     * 获取上架物料库存信息
+     * @param id
+     * @return
+     */
+    LogisticsStorageDetail getUpProductDetail(Integer id);
+
+    /**
+     * 获取下架物料库存信息
+     * @param id
+     * @return
+     */
+    LogisticsStorageDetail getDownProductDetail(@Param("id") Integer id,@Param("storageLocationId") Integer storageLocationId);
+
 }

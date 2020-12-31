@@ -29,7 +29,7 @@ public class LogisticsCheckHouseController {
      * @return
      */
     @PostMapping(value = "/insert")
-    //@RequiresPermissions("logisticsCheckHouse:insert")
+    @RequiresPermissions("logisticsCheckHouse:insert")
     public Result insert(@RequestBody LogisticsCheckHouse logisticsCheckHouse) {
         return logisticsCheckHouseService.insert(logisticsCheckHouse);
     }
@@ -40,7 +40,7 @@ public class LogisticsCheckHouseController {
      * @return
      */
     @PostMapping(value = "/update")
-    //@RequiresPermissions("logisticsCheckHouse:update")
+    @RequiresPermissions("logisticsCheckHouse:update")
     public Result update(@RequestBody LogisticsCheckHouse logisticsCheckHouse) {
         return logisticsCheckHouseService.update(logisticsCheckHouse);
     }
@@ -50,7 +50,7 @@ public class LogisticsCheckHouseController {
      * @return result
      */
     @GetMapping(value = "/updateStatus")
-    //@RequiresPermissions("logisticsCheckHouse:updateStatus")
+    @RequiresPermissions("logisticsCheckHouse:updateStatus")
     public Result updateStatus(@RequestParam(value = "id") Integer id) {
         return logisticsCheckHouseService.updateStatus(id);
     }
@@ -62,11 +62,11 @@ public class LogisticsCheckHouseController {
      * @return
      */
     @GetMapping("/findList")
-    //@RequiresAuthentication
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "houseNo", required = false) String houseNo,
                            @RequestParam(value = "checkTime", required = false) String checkTime,
                            @RequestParam(value = "status", required = false) Integer status,
-                           @RequestParam(value = "status", required = false) Integer checkResult,
+                           @RequestParam(value = "checkResult", required = false) Integer checkResult,
                            @RequestParam(value = "checkUser", required = false) Integer checkUser,
                            @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
                            @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize) {
@@ -78,7 +78,7 @@ public class LogisticsCheckHouseController {
     * @return
     */
     @GetMapping("/findDetailList")
-    //@RequiresAuthentication
+    @RequiresAuthentication
     public Result findDetailList(@RequestParam(value = "checkHouseId", required = false) Integer checkHouseId) {
         return logisticsCheckHouseService.findDetailList(checkHouseId);
     }
@@ -88,12 +88,12 @@ public class LogisticsCheckHouseController {
      * @return
      */
     @GetMapping("/findStoragePorductList")
-    //@RequiresAuthentication
+    @RequiresAuthentication
     public Result findStoragePorductList(@RequestParam(value = "locationId", required = false) Integer locationId) {
         return logisticsCheckHouseService.findStoragePorductList(locationId);
     }
     @GetMapping("/findTreeList")
-    //@RequiresAuthentication
+    @RequiresAuthentication
     public Result findTreeList(@RequestParam(value = "name", required = false) String name) {
         return logisticsCheckHouseService.findTreeList(name);
     }

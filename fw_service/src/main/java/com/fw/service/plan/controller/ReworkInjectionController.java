@@ -7,6 +7,7 @@ import com.fw.entity.plan.ReworkStopList;
 import com.fw.service.plan.service.ReworkInjectionService;
 import com.fw.utils.ResultUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +29,7 @@ public class ReworkInjectionController {
      * @return
      */
     @PostMapping(value = "/insert")
-    //@RequiresPermissions("reworkInjection:insert")
+    @RequiresPermissions("reworkInjection:insert")
     public Result insert(@RequestBody ReworkInjection reworkInjection) {
         return reworkInjectionService.insert(reworkInjection);
     }
@@ -38,7 +39,7 @@ public class ReworkInjectionController {
      * @return
      */
     @PostMapping(value = "/update")
-    //@RequiresPermissions("reworkInjection:update")
+    @RequiresPermissions("reworkInjection:update")
     public Result update(@RequestBody ReworkInjection reworkInjection) {
         return reworkInjectionService.update(reworkInjection);
     }
@@ -46,7 +47,7 @@ public class ReworkInjectionController {
      * 上移
      */
     @PostMapping(value = "/moveUp")
-    //@RequiresPermissions("reworkInjection:moveUp")
+    @RequiresPermissions("reworkInjection:moveUp")
     public Result moveUp(@RequestBody ReworkInjection reworkInjection) {
         return reworkInjectionService.moveUp(reworkInjection);
     }
@@ -56,7 +57,7 @@ public class ReworkInjectionController {
      * @return
      */
     @PostMapping(value = "/moveDown")
-    //@RequiresPermissions("reworkInjection:moveDown")
+    @RequiresPermissions("reworkInjection:moveDown")
     public Result moveDown(@RequestBody ReworkInjection reworkInjection) {
         return reworkInjectionService.moveDown(reworkInjection);
     }
@@ -65,7 +66,7 @@ public class ReworkInjectionController {
      * @param reworkInjection
      */
     @PostMapping(value = "/cancel")
-    //@RequiresPermissions("reworkInjection:cancel")
+    @RequiresPermissions("reworkInjection:cancel")
     public Result cancel(@RequestBody ReworkInjection reworkInjection) {
         return reworkInjectionService.cancel(reworkInjection);
     }
@@ -75,7 +76,7 @@ public class ReworkInjectionController {
      * @return
      */
     @PostMapping(value = "/stop")
-    //@RequiresPermissions("reworkInjection:stop")
+    @RequiresPermissions("reworkInjection:stop")
     public Result stop(@RequestBody ReworkStopList reworkStopList) {
         return reworkInjectionService.stop(reworkStopList);
     }
@@ -91,7 +92,7 @@ public class ReworkInjectionController {
      * @return
      */
     @GetMapping("/findList")
-//    @RequiresAuthentication
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "productCode", required = false) String productCode,
                            @RequestParam(value = "partsCode", required = false) String partsCode,
                            @RequestParam(value = "startTime", required = false) String startTime,
@@ -106,7 +107,7 @@ public class ReworkInjectionController {
      * 生成生产指令 获取生产指令和开始时间和结束时间
      */
     @GetMapping("/createProductCode")
-//    @RequiresAuthentication
+    @RequiresAuthentication
     public Result createProductCode(@RequestParam(value = "productTime", required = false) Double productTime) {
         return ResultUtils.success(reworkInjectionService.createProductCode(productTime));
     }

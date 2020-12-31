@@ -4,10 +4,7 @@ import com.fw.domain.Result;
 import com.fw.entity.e2c.User;
 import com.fw.entity.logistics.*;
 import com.fw.entity.produce.ProduceMaterialMonitor;
-import com.fw.service.logistics.dao.LogisticsDeliveryPlanDao;
-import com.fw.service.logistics.dao.LogisticsOutHouseDao;
-import com.fw.service.logistics.dao.LogisticsOutHouseDetailDao;
-import com.fw.service.logistics.dao.LogisticsOutSubpackageDao;
+import com.fw.service.logistics.dao.*;
 import com.fw.service.logistics.service.LogisticsOutHouseService;
 import com.fw.service.logistics.util.StorageProductUtil;
 import com.fw.service.produce.dao.ProduceMaterialMonitorDao;
@@ -26,8 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -50,6 +47,8 @@ public class LogisticsOutHouseServiceImpl implements LogisticsOutHouseService {
     private StorageProductUtil storageProductUtil;
     @Autowired
     private ProduceMaterialMonitorDao produceMaterialMonitorDao;
+    @Autowired
+    private LogisticsPickingOrderDao logisticsPickingOrderDao;
 
 
     @Override
@@ -98,34 +97,76 @@ public class LogisticsOutHouseServiceImpl implements LogisticsOutHouseService {
     public Result saveOutSubPack(InfoBox<LogisticsOutHouseDetail> infoBox) {
         List<LogisticsOutHouseDetail> data = infoBox.getData();
         if(data != null && data.size() > 0){
-            //修改出库单状态
-            Integer updateOuHouse = updateOutHouseStatus(infoBox.getId());
-            if(updateOuHouse >= 0){
-                LogisticsOutHouse logisticsOutHouse = new LogisticsOutHouse();
-                logisticsOutHouse.setId(infoBox.getId());
-                logisticsOutHouse.setLogisticsOutHouseDetailList(data);
-                //修改库存数量
-                Integer count = storageProductUtil.updateCount(logisticsOutHouse);
-                if(count < 0){
-                    return ResultUtils.error("出库数量大于库存数量");
-                }
+
+
+            LogisticsOutHouse logisticsOutHouse = new LogisticsOutHouse();
+            logisticsOutHouse.setId(infoBox.getId());
+            logisticsOutHouse.setLogisticsOutHouseDetailList(data);
+            //修改库存数量
+            Integer count = storageProductUtil.updateCount(logisticsOutHouse);
+            if(count < 0){
+                return ResultUtils.error("出库数量大于库存数量");
             }
+
             List<LogisticsOutSubpackage> logisticsOutSubpackages = new ArrayList<>();
+            Map<Integer,Integer> storageMap = new HashMap<>();
+            Map<Integer,Integer> applyMap = new HashMap<>();
             for (LogisticsOutHouseDetail logisticsOutHouseDetail:data) {
-                //插入出库明细
-                logisticsOutHouseDetailDao.insertOne(logisticsOutHouseDetail);
-                List<LogisticsOutSubpackage> outSubpackages = logisticsOutHouseDetail.getLogisticsOutSubpackages();
-                if(outSubpackages != null && outSubpackages.size() > 0 ){
-                    for (LogisticsOutSubpackage logisticsOutSubpackage:outSubpackages) {
-                        logisticsOutSubpackage.setOutDetailId(logisticsOutHouseDetail.getId());
+                if(logisticsOutHouseDetail.getStorageDetailId() != null && logisticsOutHouseDetail.getStorageDetailId() != 0){
+                    //插入出库明细
+                    logisticsOutHouseDetailDao.insertOne(logisticsOutHouseDetail);
+                    List<LogisticsOutSubpackage> outSubpackages = logisticsOutHouseDetail.getLogisticsOutSubpackages();
+                    if(outSubpackages != null && outSubpackages.size() > 0 ){
+                        for (LogisticsOutSubpackage logisticsOutSubpackage:outSubpackages) {
+                            logisticsOutSubpackage.setOutDetailId(logisticsOutHouseDetail.getId());
+                        }
+                        logisticsOutSubpackages.addAll(outSubpackages);
                     }
-                    logisticsOutSubpackages.addAll(outSubpackages);
+                }
+                //计算发货的实出数量
+                if(storageMap.containsKey(logisticsOutHouseDetail.getPickingOrderId())){
+                    storageMap.put(logisticsOutHouseDetail.getPickingOrderId(),storageMap.get(logisticsOutHouseDetail.getPickingOrderId())+logisticsOutHouseDetail.getStorageCount());
+                }else{
+                    storageMap.put(logisticsOutHouseDetail.getPickingOrderId(),logisticsOutHouseDetail.getStorageCount());
+                }
+                //记录发货的应出数量
+                if(!applyMap.containsKey(logisticsOutHouseDetail.getPickingOrderId())){
+                    applyMap.put(logisticsOutHouseDetail.getPickingOrderId(),Integer.parseInt(logisticsOutHouseDetail.getApplyCount()));
                 }
             }
             if(logisticsOutSubpackages.size() > 0){
                 //插入拆包明细
                 logisticsOutSubpackageDao.insert(logisticsOutSubpackages);
             }
+            //修改发货单的实出数量
+            Set<Integer> set = storageMap.keySet();
+            List<LogisticsPickingOrder> logisticsPickingOrders = new ArrayList<>();
+            //查询和出库单相关的发货单
+            List<LogisticsPickingOrder> lo = logisticsPickingOrderDao.findByOutHouseId(infoBox.getId());
+            //将获取到的发货单转成MAP集合
+            Map<Integer, Integer> collect = lo.stream().collect(Collectors.toMap(LogisticsPickingOrder::getId, LogisticsPickingOrder::getStorageCount));
+            boolean flag = true;
+            for (Integer pickingOrderId:set) {
+                int sumCount = 0;
+                if(collect.containsKey(pickingOrderId)){
+                    sumCount = collect.get(pickingOrderId);
+                }
+                sumCount += storageMap.get(pickingOrderId);
+                LogisticsPickingOrder logisticsPickingOrder = new LogisticsPickingOrder();
+                logisticsPickingOrder.setId(pickingOrderId);
+                logisticsPickingOrder.setStorageCount(sumCount);
+                logisticsPickingOrders.add(logisticsPickingOrder);
+                //判断应出数量是否大于实出数量
+                if(applyMap.get(pickingOrderId) > sumCount){
+                    flag = false;
+                }
+            }
+            //修改发货单的实出数量
+            if(logisticsPickingOrders.size() > 0){
+                logisticsPickingOrderDao.updateStorageCountList(logisticsPickingOrders);
+            }
+            //修改出库单状态
+            updateOutHouseStatus(infoBox.getId(),flag);
             return ResultUtils.success();
         }
         return ResultUtils.failure();
@@ -175,7 +216,7 @@ public class LogisticsOutHouseServiceImpl implements LogisticsOutHouseService {
         }
         if(logisticsDeliveryPlans.size() > 0){
             if(count == 0){
-                updateOutHouseStatus(infoBox.getId());
+                updateOutHouseStatus(infoBox.getId(),true);
             }
             logisticsDeliveryPlanDao.updateList(logisticsDeliveryPlans);//修改发货计划的状态和发货数量
             return ResultUtils.success();
@@ -184,10 +225,12 @@ public class LogisticsOutHouseServiceImpl implements LogisticsOutHouseService {
     }
 
     //出库完成，修改出库单状态
-    public Integer updateOutHouseStatus(Integer outHouseId){
+    public Integer updateOutHouseStatus(Integer outHouseId,boolean flag){
         LogisticsOutHouse logisticsOutHouse = new LogisticsOutHouse();
         logisticsOutHouse.setId(outHouseId);
-        logisticsOutHouse.setStatus(1);
+        if(flag){
+            logisticsOutHouse.setStatus(1);
+        }
         logisticsOutHouse.setExecuteTime(DateUtils.getToday("yyyy-MM-dd HH:mm:ss"));
         logisticsOutHouse.setExecuteUser(headerUtil.loginUser().getId());
         logisticsOutHouse.setStoreDate(DateUtils.getToday("yyyy-MM-dd HH:mm:ss"));

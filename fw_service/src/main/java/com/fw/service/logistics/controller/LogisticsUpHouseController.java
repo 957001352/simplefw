@@ -5,6 +5,8 @@ import com.fw.entity.logistics.LogisticsDownHouse;
 import com.fw.entity.logistics.LogisticsUpHouse;
 import com.fw.service.logistics.service.LogisticsUpHouseService;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +31,7 @@ public class LogisticsUpHouseController {
      * @return
      */
     @PostMapping(value = "/upHouse")
+    @RequiresAuthentication
     public Result upHouse(@RequestBody LogisticsUpHouse logisticsUpHouse) {
         return logisticsUphouseService.upHouse(logisticsUpHouse);
     }
@@ -41,6 +44,7 @@ public class LogisticsUpHouseController {
      * @return
      */
     @PostMapping(value = "/downHouse")
+    @RequiresAuthentication
     public Result upHouse(@RequestBody LogisticsDownHouse logisticsDownHouse) {
         return logisticsUphouseService.downHouse(logisticsDownHouse);
     }
@@ -54,6 +58,7 @@ public class LogisticsUpHouseController {
      * @return
      */
     @GetMapping("/findUpList")
+    @RequiresAuthentication
     public Result findUpList(
             @RequestParam(value = "code", required = false) String code,
             @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
@@ -69,6 +74,7 @@ public class LogisticsUpHouseController {
      * @return
      */
     @GetMapping("/findDownList")
+    @RequiresAuthentication
     public Result findDownList(
                             @RequestParam(value = "code", required = false) String code,
                             @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
@@ -83,6 +89,7 @@ public class LogisticsUpHouseController {
      * @return
      */
     @GetMapping("/getUpHouse")
+    @RequiresAuthentication
     public Result getUpHouse(@RequestParam(value = "id") Integer id) {
         return logisticsUphouseService.getUpHouse(id);
     }
@@ -94,6 +101,7 @@ public class LogisticsUpHouseController {
      * @return
      */
     @GetMapping("/getDownHouse")
+    @RequiresAuthentication
     public Result getDownHouse(@RequestParam(value = "id") Integer id) {
         return logisticsUphouseService.getDownHouse(id);
     }
@@ -109,6 +117,7 @@ public class LogisticsUpHouseController {
      * @return
      */
     @GetMapping("/findAllList")
+    @RequiresAuthentication
     public Result findAllList(@RequestParam(value = "code", required = false) String code,
                               @RequestParam(value = "storageName", required = false) String storageName,
                               @RequestParam(value = "startCreateTime", required = false) String startCreateTime,

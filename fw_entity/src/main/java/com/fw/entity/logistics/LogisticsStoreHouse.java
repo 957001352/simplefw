@@ -94,8 +94,14 @@ public class LogisticsStoreHouse {
     private User user;
 
     /**
-     * 零件类型
+     * 零件类型 0 成品 1半成品 2 原材料
      */
     @ApiModelProperty(value = "零件类型")
     private Integer partsType;
+
+    /**
+     * 报工单id
+     */
+    @ApiModelProperty(value = "报工单id")
+    private String moldingRecordIds;
 }

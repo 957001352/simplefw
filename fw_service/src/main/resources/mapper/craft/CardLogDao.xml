@@ -14,7 +14,7 @@
         <result column="craft_after_data" property="craftAfterData" jdbcType="VARCHAR"/>
     </resultMap>
     <sql id="Base_Column_List">
-        id,create_user,create_time, update_type, reason,content,params_id
+        id,create_user,create_time, update_type, reason,content,params_id,craft_pre_data,craft_after_data
     </sql>
     <insert id="insert" parameterType="com.fw.entity.craft.CardLog" useGeneratedKeys="true" keyProperty="id">
         insert into fw_craft_card_log
@@ -80,6 +80,13 @@
         from fw_craft_card_log fccl
         right join fw_craft_card_params fccp on fccl.params_id = fccp.id
         where fccl.id = #{id}
+    </select>
+    <select id="findIngByParamsId" resultType="com.fw.entity.craft.CardLog">
+        select id,create_user,create_time, update_type, reason,content,params_id,craft_pre_data,craft_after_data
+        from fw_craft_card_log
+        where params_id = #{paramsId} and update_type = #{updateType}
+        order by create_time desc
+        limit 0,1
     </select>
 
 </mapper>

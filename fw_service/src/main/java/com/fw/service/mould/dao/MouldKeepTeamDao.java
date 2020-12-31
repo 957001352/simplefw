@@ -79,7 +79,7 @@ public interface MouldKeepTeamDao {
      * @param keepType
      * @return
      */
-    boolean verifyKeepType(Integer keepType);
+    boolean verifyKeepType(@Param("id") Integer id,@Param("keepType") Integer keepType);
 
     /**
      * 根据保养类型获取保养表单

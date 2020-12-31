@@ -7,6 +7,7 @@ import com.fw.entity.plan.InjectionStopList;
 import com.fw.service.plan.service.CustomerService;
 import com.fw.service.plan.service.InjectionMoldingService;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +29,7 @@ public class CustomerController {
      * @return
      */
     @PostMapping(value = "/save")
-    //@RequiresPermissions("customer:save")
+    @RequiresPermissions("customer:save")
     public Result save(@RequestBody Customer customer) {
         return customerService.save(customer);
     }
@@ -38,7 +39,7 @@ public class CustomerController {
      * @return
      */
     @GetMapping(value = "/delete")
-    //@RequiresPermissions("customer:delete")
+    @RequiresPermissions("customer:delete")
     public Result delete(@RequestParam(value = "ids", required = false) String ids) {
         return customerService.delete(ids);
     }
@@ -50,7 +51,7 @@ public class CustomerController {
      * @return
      */
     @GetMapping("/findList")
-    //@RequiresAuthentication
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "name", required = false) String name,
                            @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
                            @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize) {

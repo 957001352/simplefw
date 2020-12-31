@@ -65,7 +65,7 @@ public class LogisticsCheckHouseController {
     public Result findList(@RequestParam(value = "houseNo", required = false) String houseNo,
                            @RequestParam(value = "checkTime", required = false) String checkTime,
                            @RequestParam(value = "status", required = false) Integer status,
-                           @RequestParam(value = "status", required = false) Integer checkResult,
+                           @RequestParam(value = "checkResult", required = false) Integer checkResult,
                            @RequestParam(value = "checkUser", required = false) Integer checkUser,
                            @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
                            @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize) {

@@ -165,6 +165,10 @@
                 t1.mould_id,
                 ifnull(t3.keep_type,t1.keep_type) AS keepType,
                 t3.NAME AS keepTeamName,
+                CASE
+                WHEN  t1.keep_type=2  THEN (SELECT name from  fw_mould_keep_team where keep_type = 2)
+                WHEN  t1.keep_type=4  THEN (SELECT name from  fw_mould_keep_team where keep_type = 4)
+                END teamName,
                 t4.CODE  AS mouldCode,
                 t4.NAME  AS mouldName,
                 t1.injection_molding_id
@@ -252,8 +256,12 @@
                 t1.start_time,
                 t1.keep_time,
                 t1.mould_id,
-                t3.keep_type AS keepType,
+                ifnull(t3.keep_type,t1.keep_type) AS keepType,
                 t3.NAME AS keepTeamName,
+                CASE
+                WHEN  t1.keep_type=2  THEN (SELECT name from  fw_mould_keep_team where keep_type = 2)
+                WHEN  t1.keep_type=4  THEN (SELECT name from  fw_mould_keep_team where keep_type = 4)
+                END teamName,
                 t4.CODE  AS mouldCode,
                 t4.NAME  AS mouldName
                 FROM
@@ -308,7 +316,7 @@
             LEFT JOIN fw_basic_attachment t4 ON t3.instructor = t4.data_id
         WHERE
             FIND_IN_SET(t3.id,(SELECT team.keep_item_ids FROM fw_mould_keep_team team WHERE
-           id = ( SELECT t2.keep_team_id FROM fw_mould_keep_task t1 LEFT JOIN fw_mould_keep_plan t2 ON t1.keep_plan_id = t2.id WHERE t1.id = #{id} )))
+           id = (SELECT t1.keep_type FROM fw_mould_keep_task t1  WHERE t1.id = #{id} )))
           AND t3.deleted = 0
     </select>
 

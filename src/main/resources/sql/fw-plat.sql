@@ -976,15 +976,18 @@ create table fw_audit_item_detail
 
 
 
-INSERT INTO fw_jbpm_form values(1, 'devicesKeepRelay', '设备保养延期执行', 'devicesKeep/selectById');
-INSERT INTO fw_jbpm_form values(2, 'devicesKeepClose', '设备保养强制关闭', 'devicesKeep/selectById');
-INSERT INTO fw_jbpm_form values(3, 'devicesRepair', '设备维修', NULL);
-INSERT INTO fw_jbpm_form values(4, 'devicesScrap', '设备报废', 'devicesScrap/devicesScrapPass');
-INSERT INTO fw_jbpm_form values(5, 'mouldRepair', '模具维修', 'mouldRepair/auditPass');
-INSERT INTO fw_jbpm_form values(6, 'cardChange', '工艺卡变更', 'craftCard/cardChangePass');
-INSERT INTO fw_jbpm_form values(7, 'mouldTurn', '模具转段', 'mouldDevices/mouldTurnPass');
-INSERT INTO fw_jbpm_form values(8, 'pollingCoerceClose', '巡检强制关闭', 'qualityFirstendCheck/updateCoerceCloseStatus');
-INSERT INTO fw_jbpm_form values(9, 'pollingPostponeExe', '巡检延期执行', 'qualityFirstendCheck/updatepostponeExeStatus');
+INSERT INTO fw_jbpm_form values (1, 'devicesKeepRelay', '设备保养延期执行', 'devicesKeepTask/postPonedPass');
+INSERT INTO fw_jbpm_form values (2, 'devicesKeepClose', '设备保养强制关闭', 'devicesKeepTask/closedPass');
+INSERT INTO fw_jbpm_form values (3, 'devicesRepair', '设备维修', NULL);
+INSERT INTO fw_jbpm_form values (4, 'devicesScrap', '设备报废', 'devicesScrap/devicesScrapPass');
+INSERT INTO fw_jbpm_form values (5, 'mouldRepair', '模具维修', 'mouldRepair/auditPass');
+INSERT INTO fw_jbpm_form values (6, 'cardChange', '工艺卡变更', 'craftCard/cardChangePass');
+INSERT INTO fw_jbpm_form values (7, 'mouldTurn', '模具转段', 'mouldDevices/mouldTurnPass');
+INSERT INTO fw_jbpm_form values (8, 'pollingCoerceClose', '巡检强制关闭', 'qualityFirstendCheck/updateCoerceCloseStatus');
+INSERT INTO fw_jbpm_form values (9, 'pollingPostponeExe', '巡检延期执行', 'qualityFirstendCheck/updatepostponeExeStatus');
+INSERT INTO fw_jbpm_form values (10, 'inspectionChange', '检验规范', 'qualityInspection/inspectionChangePass');
+INSERT INTO fw_jbpm_form values (11, 'mouldKeepRelay', '模具保养延期执行', 'mouldKeepTask/postPonedPass');
+INSERT INTO fw_jbpm_form values (12, 'mouldKeepClose', '模具保养强制关闭', 'mouldKeepTask/closedPass');
 
 
 
@@ -1129,7 +1132,7 @@ drop table if exists fw_logistics_storage_detail;
 create table fw_logistics_storage_detail
 (
    id                       integer                        NOT NULL AUTO_INCREMENT,
-   storage_id              	integer                        DEFAULT NULL COMMENT '库位对象',
+   storage_id              	integer                        DEFAULT 0 COMMENT '库位对象',
    product_id              	integer                        DEFAULT NULL COMMENT '物料',
    storage_count            integer                        DEFAULT NULL COMMENT '数量',
    product_date		        timestamp                      NULL COMMENT '生产日期',
@@ -1367,6 +1370,7 @@ create table fw_logistics_store_house
    store_date             			timestamp                      NULL COMMENT '入库日期',
    note             		        varchar(200)                   DEFAULT NULL COMMENT '备注',
    parts_type                       integer                        DEFAULT 2 COMMENT '0 成品 1半成品 2 原材料',
+   molding_record_ids               long varchar                   DEFAULT NULL COMMENT '报工单id',
    primary key  (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='入库';
 
@@ -1382,7 +1386,7 @@ create table fw_logistics_store_house_detail
    storage_count                    integer                        DEFAULT NULL COMMENT '实收数量',
    material_count             		char(10)                       DEFAULT NULL COMMENT '物料数量',
    fw_batch                         varchar(50)                    DEFAULT NULL COMMENT '泛沃批次号',
-   provider_batch             		varchar(20)                    DEFAULT NULL COMMENT '供应商批次号',
+   provider_batch             		varchar(100)                    DEFAULT NULL COMMENT '供应商批次号',
    storage_location_id             	integer                        DEFAULT NULL COMMENT '库位',
    note                             varchar(200)                   DEFAULT NULL COMMENT '备注',
    product_code                     varchar(100)                    DEFAULT NULL COMMENT '生产指令',
@@ -1399,7 +1403,7 @@ create table fw_logistics_out_house
 (
    id                               integer                        NOT NULL AUTO_INCREMENT,
    house_no                         varchar(50)                    DEFAULT NULL COMMENT '出库单号',
-   house_type              	        varchar(20)                    DEFAULT NULL COMMENT '出库类型',
+   house_type              	        varchar(20)                    DEFAULT NULL COMMENT '出库类型  0-销售出库 1-生产出库 2-委外加工出库 3-其他入库',
    order_no                         varchar(20)                    DEFAULT NULL COMMENT '销售单号',
    create_time                      timestamp                      DEFAULT now() COMMENT '制单时间',
    execute_time             		timestamp                      NULL COMMENT '执行时间',
@@ -1599,7 +1603,7 @@ create table fw_quality_firstend_check
 (
    id                       integer                        	NOT NULL AUTO_INCREMENT,
    check_no                 varchar(50)                   	DEFAULT NULL COMMENT '检验订单号',
-   product_devices_id		integer					        DEFAULT NULL COMMENT '设备编号',
+   product_devices_id		integer					        DEFAULT 0 COMMENT '设备编号',
    product_code             varchar(50)                     DEFAULT NULL COMMENT '生产指令',
    mould_no                 varchar(50)                     DEFAULT NULL COMMENT '模具编码',
    product_id               integer                  	    DEFAULT NULL COMMENT '物料对象',
@@ -1692,7 +1696,7 @@ create table fw_quality_inspect_result
    part_name		         varchar(20)					DEFAULT NULL COMMENT '名称',
    frequence		         varchar(20)					DEFAULT NULL COMMENT '频率',
    material_no		         varchar(20)					DEFAULT NULL COMMENT '材料批号',
-   of_no		             varchar(20)					DEFAULT NULL COMMENT '生产指令号',
+   of_no		             varchar(100)					DEFAULT NULL COMMENT '生产指令号',
    end_time		             timestamp					    NULL COMMENT '测量结束时间',
    note		                 varchar(200)					DEFAULT NULL COMMENT '备注',
    create_time				 timestamp						DEFAULT NOW() COMMENT '创建时间',
@@ -1967,6 +1971,7 @@ create table fw_produce_molding_record
    create_time              timestamp                      DEFAULT NOW() COMMENT '创建时间',
    qualified          		integer                    	   DEFAULT NULL COMMENT '本箱合格数量',
    unqualified          	integer                    	   DEFAULT NULL COMMENT '本箱不合格数量',
+   bank_status          	integer                    	   DEFAULT 0 COMMENT '0:未入库 1:已入库',
    primary key  (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='生产报工记录';
 
@@ -2003,6 +2008,7 @@ create table fw_produce_rework_record
    create_time          timestamp                      DEFAULT NOW() COMMENT '添加时间',
    qualified            integer                        DEFAULT NULL COMMENT '数量',
    status               integer                        DEFAULT 0 COMMENT '状态',
+   bank_status          integer                    	   DEFAULT 0 COMMENT '0:未入库 1:已入库',
    primary key  (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='二次加工报工记录';
 
@@ -2240,7 +2246,7 @@ create table fw_logistics_picking_order
    product_name         varchar(100)                   DEFAULT NULL COMMENT '物料名称',
    fw_batch             varchar(50)                    DEFAULT NULL COMMENT '泛沃批次号',
    apply_count          integer                        DEFAULT NULL COMMENT '申请数量',
-   storage_count        integer                        DEFAULT NULL COMMENT '实发数量',
+   storage_count        integer                        DEFAULT 0 COMMENT '实发数量',
    create_time          timestamp                      DEFAULT NOW() COMMENT '添加时间',
    out_house_id         integer                        DEFAULT NULL COMMENT '出库对象',
    product_order        varchar(100)                   DEFAULT NULL COMMENT '生产指令',

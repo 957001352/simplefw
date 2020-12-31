@@ -216,4 +216,13 @@ public class ProduceMoldingMonitor implements Serializable {
     private String qualified;
     @ApiModelProperty(value = "不合格数量",hidden = true)
     private String unqualified;
+
+    @ApiModelProperty(value = "计划添加人",hidden = true)
+    private Integer createUser;
+
+    @ApiModelProperty(value = "添加人姓名",hidden = true)
+    private String createUserName;
+
+    @ApiModelProperty(value = "计划添加时间",hidden = true)
+    private String createTime;
 }

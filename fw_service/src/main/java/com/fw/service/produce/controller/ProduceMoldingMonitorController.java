@@ -4,6 +4,7 @@ import com.fw.domain.Result;
 import com.fw.entity.produce.ProduceMoldingMonitor;
 import com.fw.entity.produce.ProduceReworkMonitor;
 import com.fw.service.produce.service.ProduceMoldingMonitorService;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +30,7 @@ public class ProduceMoldingMonitorController {
      * @return
      */
     @PostMapping(value = "/debug")
+    @RequiresAuthentication
     public Result debug(@RequestBody ProduceMoldingMonitor produceMoldingMonitor) {
         return produceMoldingMonitorService.debug(produceMoldingMonitor);
     }
@@ -40,6 +42,7 @@ public class ProduceMoldingMonitorController {
      * @return
      */
     @PostMapping(value = "/startProduct")
+    @RequiresAuthentication
     public Result startProduct(@RequestBody ProduceMoldingMonitor produceMoldingMonitor) {
         return produceMoldingMonitorService.startProduct(produceMoldingMonitor);
     }
@@ -52,6 +55,7 @@ public class ProduceMoldingMonitorController {
      * @return
      */
     @PostMapping(value = "/accomplishProduct")
+    @RequiresAuthentication
     public Result accomplishProduct(@RequestBody ProduceMoldingMonitor produceMoldingMonitor) {
         return produceMoldingMonitorService.accomplishProduct(produceMoldingMonitor);
     }
@@ -63,6 +67,7 @@ public class ProduceMoldingMonitorController {
      * @return
      */
     @PostMapping(value = "/startDebug")
+    @RequiresAuthentication
     public Result startDebug(@RequestBody ProduceMoldingMonitor produceMoldingMonitor) {
         return produceMoldingMonitorService.startDebug(produceMoldingMonitor);
     }

@@ -116,7 +116,28 @@ public class LogisticsProductController {
     public Result getProductDetail(@RequestParam(value = "id") Integer id) {
         return logisticsProductService.getProductDetail(id);
     }
-
+    /**
+     * 扫码获取上架物料详情
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping(value = "/getUpProductDetail")
+    @ApiOperation("PAD扫码获取上架物料详情")
+    public Result getUpProductDetail(@RequestParam(value = "id") Integer id) {
+        return logisticsProductService.getUpProductDetail(id);
+    }
+    /**
+     * 扫码获取下架物料详情
+     *
+     * @param id
+     * @return
+     */
+    @ApiOperation("PAD扫码获取下架物料详情")
+    @GetMapping(value = "/getDownProductDetail")
+    public Result getDownProductDetail(@RequestParam(value = "id") Integer id,@RequestParam(value = "storageLocationId") Integer storageLocationId) {
+        return logisticsProductService.getDownProductDetail(id,storageLocationId);
+    }
     /**
      * 物料明细列表查询
      *

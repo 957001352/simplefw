@@ -6,6 +6,8 @@ import com.fw.entity.mould.MouldSpareOut;
 import com.fw.entity.mould.MouldStorageInfo;
 import com.fw.service.mould.service.MouldStorageService;
 
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,16 +27,19 @@ public class MouldStorageController {
 
 
     @PostMapping(value = "/insertSpareInfo")
+    @RequiresPermissions("mouldStorage:insertSpareInfo")
     Result insertSpareInfo(@RequestBody MouldStorageInfo mouldStorageInfo){
         return mouldStorageService.insertSpareInfo(mouldStorageInfo);
     }
 
     @GetMapping(value = "/deleteSpareInfo")
+    @RequiresPermissions("mouldStorage:deleteSpareInfo")
     Result deleteSpareInfo(@RequestParam(value = "ids") String ids){
         return mouldStorageService.deleteSpareInfo(ids);
     }
 
     @GetMapping(value = "/findListSpareInfo")
+    @RequiresAuthentication
     Result findListSpareInfo(@RequestParam(value = "code",required = false) String code,
                              @RequestParam(value = "name",required = false) String name,
                              @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
@@ -47,6 +52,7 @@ public class MouldStorageController {
      * @param mouldSpareIn
      * @return
      */
+    @RequiresPermissions("mouldStorage:mouldIn")
     @PostMapping(value = "/mouldIn")
     Result mouldIn(@RequestBody MouldSpareIn mouldSpareIn) {
         return mouldStorageService.mouldIn(mouldSpareIn);
@@ -58,6 +64,7 @@ public class MouldStorageController {
      * @return
      */
     @PostMapping(value = "/mouldOut")
+    @RequiresPermissions("mouldStorage:mouldOut")
     Result mouldOut(@RequestBody MouldSpareOut mouldSpareOut) {
         return mouldStorageService.mouldOut(mouldSpareOut);
     }
@@ -71,6 +78,7 @@ public class MouldStorageController {
      * @return
      */
     @GetMapping(value = "/getInOutInfo")
+    @RequiresAuthentication
     Result getInOutInfo(@RequestParam(value = "outInNo" ,required = false) String outInNo,
                         @RequestParam(value = "operate",required = false) Integer operate,
                         @RequestParam(value = "startDate",required = false) String startDate,
@@ -88,17 +96,20 @@ public class MouldStorageController {
      * @return
      */
     @GetMapping(value = "findMouldSpareStoreList")
+    @RequiresAuthentication
     public Result findMouldSpareStoreList(@RequestParam(value = "name") String name){
         return mouldStorageService.findMouldSpareStoreList(name);
     }
 
     @GetMapping(value = "findMouldSpareStoreAndUse")
+    @RequiresAuthentication
     public Result findMouldSpareStoreAndUse(@RequestParam(value = "code",required = false) String code){
         return mouldStorageService.findMouldSpareStoreAndUse(code);
     }
 
 
     @GetMapping(value = "findOutInDetail")
+    @RequiresAuthentication
     public Result findOutInDetail(@RequestParam(value = "id") Integer id,@RequestParam(value = "operate") Integer operate){
         return mouldStorageService.findOutInDetail(id,operate);
     }

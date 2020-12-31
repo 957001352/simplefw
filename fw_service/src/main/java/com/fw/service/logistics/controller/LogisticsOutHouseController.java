@@ -7,6 +7,7 @@ import com.fw.entity.logistics.LogisticsOutHouseDetail;
 import com.fw.entity.logistics.LogisticsOutSubpackage;
 import com.fw.service.logistics.service.LogisticsOutHouseService;
 import org.apache.ibatis.annotations.Param;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -30,6 +31,7 @@ public class LogisticsOutHouseController {
      * @param houseNo houseType status startTime endTime
      */
     @GetMapping("/findList")
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "houseNo", required = false) String houseNo,
                            @RequestParam(value = "houseType", required = false) String houseType,
                            @RequestParam(value = "status", required = false) String status,
@@ -46,6 +48,7 @@ public class LogisticsOutHouseController {
      * @param type 出库类型 0-内部出库 1-外部出库
      */
     @GetMapping("/findByQrCode")
+    @RequiresAuthentication
     public Result findByQrCode(@RequestParam(value = "qrCode", required = false) String qrCode,
                                @RequestParam(value = "outHouseId", required = false) Integer outHouseId,
                                @RequestParam(value = "type", required = false) Integer type) {
@@ -57,6 +60,7 @@ public class LogisticsOutHouseController {
      * @param
      */
     @PostMapping("/saveOutSubPack")
+    @RequiresAuthentication
     public Result saveOutSubPack(@RequestBody InfoBox<LogisticsOutHouseDetail> infoBox) {
         return logisticsOutHouseServiceImpl.saveOutSubPack(infoBox);
     }
@@ -66,6 +70,7 @@ public class LogisticsOutHouseController {
      * @param
      */
     @GetMapping("/findOutSubpackage")
+    @RequiresAuthentication
     public Result findOutSubpackage(@RequestParam("outHouseId") String outHouseId) {
         return logisticsOutHouseServiceImpl.findOutSubpackage(outHouseId);
     }
@@ -74,6 +79,7 @@ public class LogisticsOutHouseController {
      * @param
      */
     @PostMapping("/saveOutHouseDetail")
+    @RequiresAuthentication
     public Result saveOutHouseDetail(@RequestBody InfoBox<LogisticsDeliveryPlan> infoBox) {
         return logisticsOutHouseServiceImpl.saveOutHouseDetail(infoBox);
     }
@@ -83,6 +89,7 @@ public class LogisticsOutHouseController {
      * @param
      */
     @GetMapping("/findDetailByProductOrder")
+    @RequiresAuthentication
     public Result findDetailByProductOrder(@RequestParam("productOrder") String productOrder) {
         return logisticsOutHouseServiceImpl.findDetailByProductOrder(productOrder);
     }

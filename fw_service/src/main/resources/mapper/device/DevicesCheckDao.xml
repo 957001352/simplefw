@@ -86,10 +86,16 @@
            <if test="shift != null">
                 <choose>
                     <when test="shift == 1">
-                        and (date_format(create_time,'%H')&gt;=20 or date_format(create_time,'%H') &lt;8)
+                        and date_format(create_time, '%Y-%m-%d %H')&gt;=concat(curdate(),' 20')
+                        and date_format(create_time, '%Y-%m-%d %H')&lt;=concat(curdate(),' 23')
+                    </when>
+                    <when test="shift == 2">
+                        and date_format(create_time, '%Y-%m-%d %H')&gt;= date_sub(concat(curdate(),' 00:00'), INTERVAL 4 HOUR)
+                        and date_format(create_time, '%Y-%m-%d %H')&lt;concat(curdate(),' 08')
                     </when>
                     <otherwise>
-                        and (date_format(create_time,'%H')&gt;=8 and date_format(create_time,'%H') &lt;20)
+                        and date_format(create_time, '%Y-%m-%d %H')&gt;=concat(curdate(),' 08')
+                        and date_format(create_time, '%Y-%m-%d %H')&lt;concat(curdate(),' 20')
                     </otherwise>
                 </choose>
            </if>
@@ -102,10 +108,16 @@
         <if test="shift != null">
             <choose>
                 <when test="shift == 1">
-                    and (date_format(create_time,'%H')&gt;=20 or date_format(create_time,'%H') &lt;8)
+                    and date_format(create_time, '%Y-%m-%d %H')&gt;=concat(curdate(),' 20')
+                    and date_format(create_time, '%Y-%m-%d %H')&lt;=concat(curdate(),' 23')
+                </when>
+                <when test="shift == 2">
+                    and date_format(create_time, '%Y-%m-%d %H')&gt;= date_sub(curdate(),' 00:00'), INTERVAL 4 HOUR)
+                    and date_format(create_time, '%Y-%m-%d %H')&lt;concat(curdate(),' 08')
                 </when>
                 <otherwise>
-                    and (date_format(create_time,'%H')&gt;=8 and date_format(create_time,'%H') &lt;20)
+                    and date_format(create_time, '%Y-%m-%d %H')&gt;=concat(curdate(),' 08')
+                    and date_format(create_time, '%Y-%m-%d %H')&lt;concat(curdate(),' 20')
                 </otherwise>
             </choose>
         </if>

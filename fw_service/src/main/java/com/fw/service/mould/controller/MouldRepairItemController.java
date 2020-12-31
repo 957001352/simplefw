@@ -3,6 +3,8 @@ package com.fw.service.mould.controller;
 import com.fw.domain.Result;
 import com.fw.entity.mould.MouldRepairItem;
 import com.fw.service.mould.service.MouldRepairItemService;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +28,7 @@ public class MouldRepairItemController {
      * @return
      */
     @PostMapping(value = "/save")
+    @RequiresPermissions(value = "mouldRepairItem:save")
     public Result save(@RequestBody MouldRepairItem mouldRepairItem) {
         return mouldRepairItemService.save(mouldRepairItem);
     }
@@ -39,6 +42,7 @@ public class MouldRepairItemController {
      * @return
      */
     @GetMapping("/findList")
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "name", required = false) String name,
                            @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
                            @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize) {
@@ -49,6 +53,7 @@ public class MouldRepairItemController {
      * 删除
      */
     @GetMapping("/delete")
+    @RequiresPermissions(value = "mouldRepairItem:delete")
     public Result delete(@RequestParam(value = "ids") String ids) {
         return mouldRepairItemService.delete(ids);
     }

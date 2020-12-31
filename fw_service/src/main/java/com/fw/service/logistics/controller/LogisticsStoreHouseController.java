@@ -5,6 +5,8 @@ import com.fw.entity.logistics.LogisticsStoreHouse;
 import com.fw.entity.logistics.LogisticsStoreHouseDetail;
 import com.fw.service.logistics.service.LogisticsProductService;
 import com.fw.service.logistics.service.LogisticsStoreHouseService;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +31,7 @@ public class LogisticsStoreHouseController {
      * @param houseNo houseType status startTime endTime
      */
     @GetMapping("/findList")
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "orderNo", required = false) String orderNo,
                            @RequestParam(value = "houseNo", required = false) String houseNo,
                            @RequestParam(value = "houseType", required = false) String houseType,
@@ -44,6 +47,7 @@ public class LogisticsStoreHouseController {
      * 根据单号查询入库明细
      */
     @GetMapping(value = "/findByOrderNo")
+    @RequiresAuthentication
     public Result findByOrderNo(@RequestParam(value = "storeHouseId") String storeHouseId) {
         return logisticsStoreHouseServiceImpl.findByOrderNo(storeHouseId);
     }
@@ -52,6 +56,7 @@ public class LogisticsStoreHouseController {
      * @param storeHouseId
      */
     @GetMapping(value = "/storeHouseIn")
+    @RequiresAuthentication
     public Result storeHouseIn(@RequestParam(value = "storeHouseId") Integer storeHouseId) {
         return logisticsStoreHouseServiceImpl.storeHouseIn(storeHouseId);
     }
@@ -60,6 +65,7 @@ public class LogisticsStoreHouseController {
      * @param logisticsStoreHouseDetails
      */
     @PostMapping(value = "/batchBound")
+    @RequiresAuthentication
     public Result batchBound(@RequestBody List<LogisticsStoreHouseDetail> logisticsStoreHouseDetails) {
         return logisticsStoreHouseServiceImpl.batchBound(logisticsStoreHouseDetails);
     }
@@ -69,6 +75,7 @@ public class LogisticsStoreHouseController {
      * @param logisticsStoreHouse
      */
     @PostMapping(value = "/save")
+    @RequiresPermissions("logisticsStoreHouse:save")
     public Result save(@RequestBody LogisticsStoreHouse logisticsStoreHouse) {
         return logisticsStoreHouseServiceImpl.save(logisticsStoreHouse);
     }
@@ -78,6 +85,7 @@ public class LogisticsStoreHouseController {
      * @param logisticsStoreHouse
      */
     @PostMapping(value = "/delete")
+    @RequiresPermissions("logisticsStoreHouse:delete")
     public Result delete(@RequestBody LogisticsStoreHouse logisticsStoreHouse) {
         return logisticsStoreHouseServiceImpl.delete(logisticsStoreHouse);
     }
@@ -87,6 +95,7 @@ public class LogisticsStoreHouseController {
      * 根据入库单查询入库明细
      */
     @GetMapping(value = "/findByStoreHouseId")
+    @RequiresAuthentication
     public Result findByStoreHouseId(@RequestParam("storeHouseId") Integer storeHouseId) {
         return logisticsStoreHouseServiceImpl.findByStoreHouseId(storeHouseId);
     }

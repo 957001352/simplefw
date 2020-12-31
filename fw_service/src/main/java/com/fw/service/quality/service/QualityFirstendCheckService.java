@@ -28,7 +28,7 @@ public interface QualityFirstendCheckService {
      * @param pageSize
      * @return
      */
-    Result findList(String productCode,String productDevicesCode,Integer checkType,String startTime,String stopTime,Integer status, Integer pageNum,Integer pageSize);
+    Result findList(Integer id,String productCode,String productDevicesCode,Integer checkType,String startTime,String stopTime,Integer status, Integer pageNum,Integer pageSize);
 
     /**
      * 外观检验

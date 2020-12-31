@@ -35,7 +35,7 @@ public class DevicesScrapController {
      * @param devicesCode devicesClassify status startTime endTime
      */
     @GetMapping("/findList")
-//    @RequiresAuthentication
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "devicesCode", required = false) String devicesCode,
                            @RequestParam(value = "devicesClassify", required = false) String devicesClassify,
                            @RequestParam(value = "devicesScrapId", required = false) Integer devicesScrapId,

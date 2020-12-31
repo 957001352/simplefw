@@ -65,4 +65,9 @@ public interface InjectionMoldingService {
      * 上移 下移 取消
      */
     Result moveUpDownCancel(PlanSwap planSwap);
+
+    /**
+     * 生产指令完成后对后面的生产指令重新进行排序
+     */
+    Result reloadSort(InjectionMolding injectionMolding);
 }

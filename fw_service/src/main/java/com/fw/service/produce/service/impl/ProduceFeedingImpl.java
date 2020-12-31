@@ -64,19 +64,19 @@ public class ProduceFeedingImpl implements ProduceFeedingService {
             if (!CollectionUtils.isEmpty(produceFeedingDetails)) {
                 produceFeedingDetails.forEach(item -> {
                     List<LogisticsOutHouseDetail> houseDetail = logisticsOutHouseDetailDao.findByDetailId(item.getStorageDetailId());
-                    if(!CollectionUtils.isEmpty(houseDetail)){
+                    if (!CollectionUtils.isEmpty(houseDetail)) {
                         Integer count = item.getStorageCount();
-                        for(LogisticsOutHouseDetail detail : houseDetail){
-                              count =  detail.getStorageCount() - count;
-                            if(count>=0){
-                                logisticsOutHouseDetailDao.updateFeedCount(detail.getId(),item.getStorageCount());
+                        for (LogisticsOutHouseDetail detail : houseDetail) {
+                            count = detail.getStorageCount() - count;
+                            if (count >= 0) {
+                                logisticsOutHouseDetailDao.updateFeedCount(detail.getId(), item.getStorageCount());
                                 break;
-                            }else{
-                                logisticsOutHouseDetailDao.updateFeedCount(detail.getId(),item.getStorageCount());
-                                count=Math.abs(count);
+                            } else {
+                                logisticsOutHouseDetailDao.updateFeedCount(detail.getId(), item.getStorageCount());
+                                count = Math.abs(count);
                                 continue;
                             }
-                       }
+                        }
                     }
                     //设置
                     item.setFeedingId(produceFeeding.getId());

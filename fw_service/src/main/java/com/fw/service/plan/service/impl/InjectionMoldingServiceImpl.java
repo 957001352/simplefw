@@ -332,6 +332,27 @@ public class InjectionMoldingServiceImpl implements InjectionMoldingService {
         return ResultUtils.success();
     }
 
+    public Result reloadSort(InjectionMolding injectionMolding) {
+        //获取设备所有未完成和暂停的生产指令
+        List<InjectionMolding> unFinishByDeviceId = injectionMoldingDao.findUnFinishByDeviceId(injectionMolding.getProductDevicesId());
+        //将生产完成的生产指令的实际完成时间作为第一个生产指令的开始时间,然后进行排序
+        String startTime = injectionMolding.getActualEnd();
+        for (InjectionMolding injection:unFinishByDeviceId) {
+            injection.setStartTime(startTime);
+            //计算每一个生产指令的生产结束时间-->开始时间+生产时间+暂停时间
+            int pt = injection.getProductTime().intValue();
+            if(injection.getStopTime() != null){
+                pt += injection.getStopTime();
+            }
+            startTime = DateUtils.getAddTime(injection.getStartTime(), pt);
+        }
+        Integer integer = 0;
+        if(unFinishByDeviceId.size() > 0){
+            integer = injectionMoldingDao.updateList(unFinishByDeviceId);
+        }
+        return integer >= 0?ResultUtils.success():ResultUtils.failure();
+    }
+
     private void predictTime(InjectionMolding nowInjectionMold, InjectionMolding lastInjectionMold,
                              PlanList planList, String endTime, String predictTime, String keepTaskTime,String cavity){
         CraftModel craftMode = nowInjectionMold.getCraftMode(); //工艺模型

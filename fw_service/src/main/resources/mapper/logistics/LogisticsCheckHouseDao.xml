@@ -116,7 +116,6 @@
           left join fw_logistics_storage_location l on d.storage_id=l.id
           left join fw_logistics_storage_house c on l.storage_house_id=c.id
          where d.storage_id=#{locationId}
-           and d.storage_count>0
         group by d.product_id,p.code,p.name,l.name
     </select>
 

@@ -5,6 +5,8 @@ import com.fw.entity.audit.AuditItem;
 import com.fw.entity.audit.AuditTask;
 import com.fw.service.audit.service.AuditItemService;
 import com.fw.service.audit.service.AuditTaskService;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +25,7 @@ public class AuditTaskController {
 
 
     @GetMapping(value = "/findList")
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "taskNo",required = false) String taskNo,
                            @RequestParam(value = "exeUser",required = false) String exeUser,
                            @RequestParam(value = "status",required = false) Integer status,
@@ -34,6 +37,7 @@ public class AuditTaskController {
 
 
     @GetMapping(value = "/findTaskDetailsById")
+    @RequiresAuthentication
     public Result findTaskDetails(@RequestParam(value = "id",required = true) Integer id,@RequestParam(value = "status",required = true) Integer status) {
         return auditTaskService.findTaskDetails(id,status);
     }
@@ -44,6 +48,7 @@ public class AuditTaskController {
      * @return
      */
     @PostMapping(value = "/exeTask")
+    @RequiresPermissions(value = "auditTask:exeTask")
     public Result exeTask(@RequestBody AuditTask auditTask){
         return auditTaskService.exeTask(auditTask);
     }

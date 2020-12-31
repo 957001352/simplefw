@@ -31,6 +31,16 @@ public class LogisticsProductServiceFbk implements LogisticsProductService {
     }
 
     @Override
+    public Result getUpProductDetail(Integer id) {
+            return ResultUtils.error(ResultEnum.NETWORK_ERR);
+    }
+
+    @Override
+    public Result getDownProductDetail(Integer id, Integer storageLocationId) {
+        return ResultUtils.error(ResultEnum.NETWORK_ERR);
+    }
+
+    @Override
     public Result storeWarn(String name, String code, Integer pageNum, Integer pageSize) {
         return ResultUtils.error(ResultEnum.NETWORK_ERR);
     }

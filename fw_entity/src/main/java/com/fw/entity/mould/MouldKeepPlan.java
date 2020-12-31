@@ -131,5 +131,11 @@ public class MouldKeepPlan implements Serializable {
     @ApiModelProperty(value = "模具初始累计开合模次数", hidden = true)
     private Integer totalCount;
 
+    /**
+     * 保养类型
+     */
+    @ApiModelProperty(value = "保养类型",hidden = true)
+    private Integer keepType;
+
 
 }

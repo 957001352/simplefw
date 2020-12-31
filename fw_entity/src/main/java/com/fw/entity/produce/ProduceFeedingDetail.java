@@ -58,5 +58,20 @@ public class ProduceFeedingDetail {
     @ApiModelProperty(value = "单位", hidden = true)
     private String unit;
 
+    /**
+     * 创建时间
+     */
+    @ApiModelProperty(value = "创建时间", hidden = true)
+    private String createTime;
+    /**
+     * 制单人
+     */
+    @ApiModelProperty(value = "制单人", hidden = true)
+    private Integer createUser;
 
+    /**
+     * 制单人名字
+     */
+    @ApiModelProperty(value = "制单人名字", hidden = true)
+    private String createUserName;
 }

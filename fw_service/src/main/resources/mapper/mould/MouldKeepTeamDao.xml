@@ -137,10 +137,7 @@
     </select>
 
     <select id="verifyKeepType" parameterType="java.lang.Integer" resultType="boolean">
-        select count(*)
-        from fw_mould_keep_team
-        where deleted = 0
-          and keep_type in (#{keepType})
+        select count(*) from fw_mould_keep_team  where deleted = 0 and id not in (IFNULL(#{id},'')) and keep_type in (#{keepType})
     </select>
 
     <select id="getKeepTeamByType" parameterType="java.lang.Integer" resultType="com.fw.entity.mould.MouldKeepTeam">

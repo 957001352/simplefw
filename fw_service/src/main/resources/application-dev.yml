@@ -78,3 +78,5 @@ attachment:
 #日志路径
 log:
   path: C:\log\
+dog:
+  check: true

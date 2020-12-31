@@ -71,4 +71,5 @@ public interface QualityInspectionDao {
      * @return
      */
     Integer verifyCode(@Param("productId") Integer productId, @Param("classify") Integer classify);
+
 }

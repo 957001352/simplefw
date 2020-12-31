@@ -71,9 +71,13 @@ public class DevicesCheckServiceImpl implements DevicesCheckService {
         Integer flag = 0;
         //获取当前小时
         int hour=  Integer.parseInt(DateUtils.getCurrentTime("HH"));
-        Integer shirt=1;//班次，默认夜班
+        Integer shirt=-1;//班次，默认夜班
         if(hour>8&&hour<20){
             shirt=0;//白班
+        }else if(hour>=20&&hour<=23){
+            shirt=1;//夜班，前一天
+        }else if(hour>=0&&hour<8){
+            shirt=2;//夜班，当天
         }
         //查询当前用户登录设备下是否有点检任务，如果没有则新增点检任务
         if(devicesCheckDao.findIsExistCheckTask(executeUser,productDevicesId,shirt)==0) {
@@ -210,9 +214,13 @@ public class DevicesCheckServiceImpl implements DevicesCheckService {
     public Result findCheckTask(Integer executeUser, Integer productDevicesId) {
         //获取当前小时
         int hour=  Integer.parseInt(DateUtils.getCurrentTime("HH"));
-        Integer shirt=1;//班次，默认夜班
+        Integer shirt=-1;//班次，默认夜班
         if(hour>8&&hour<20){
             shirt=0;//白班
+        }else if(hour>=20&&hour<=23){
+            shirt=1;//夜班，前一天
+        }else if(hour>=0&&hour<8){
+            shirt=2;//夜班，当天
         }
         List<DevicesItemVo> productList = e2CServicesUtil.getProductDevices(headerUtil.cloudToken());
         //查询当前用户登录设备下是否有点检任务

@@ -5,6 +5,7 @@ import com.fw.entity.mould.*;
 import com.fw.service.mould.service.*;
 import com.fw.service.mould.service.impl.MouldTurnServiceImpl;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +34,7 @@ public class MouldDevicesController {
      * @param mouldDevices
      */
     @PostMapping(value = "/save")
+    @RequiresPermissions("mouldDevices:save")
     public Result save(@RequestBody MouldDevices mouldDevices) {
         return MouldDevicesServiceImpl.save(mouldDevices);
     }
@@ -42,6 +44,7 @@ public class MouldDevicesController {
      * @param ids
      */
     @GetMapping(value = "/delete")
+    @RequiresAuthentication
     public Result delete(@RequestParam String ids) {
         return MouldDevicesServiceImpl.delete(ids);
     }
@@ -50,6 +53,7 @@ public class MouldDevicesController {
      * 列表查询
      */
     @GetMapping(value = "/findList")
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "code", required = false) String code,
                            @RequestParam(value = "mouldName", required = false) String mouldName,
                            @RequestParam(value = "status", required = false) Integer status,
@@ -63,6 +67,7 @@ public class MouldDevicesController {
      * 模具报废申请
      */
     @PostMapping(value = "/saveScrap")
+    @RequiresAuthentication
     public Result saveScrap(@RequestBody MouldScrap mouldScrap) {
         return mouldScrapServiceImpl.save(mouldScrap);
     }
@@ -71,6 +76,7 @@ public class MouldDevicesController {
      * 模具停用申请
      */
     @PostMapping(value = "/saveStop")
+    @RequiresAuthentication
     public Result saveStop(@RequestBody MouldStop mouldStop) {
         return mouldStopServiceImpl.save(mouldStop);
     }
@@ -79,6 +85,7 @@ public class MouldDevicesController {
      * 模具转段申请
      */
     @PostMapping(value = "/saveTurn")
+    @RequiresPermissions("mouldDevices:saveTurn")
     public Result saveTurn(@RequestBody MouldTurn mouldTurn) {
         return mouldTurnServiceImpl.save(mouldTurn);
     }
@@ -88,6 +95,7 @@ public class MouldDevicesController {
      * 转段履历
      */
     @GetMapping(value = "/findTurn")
+    @RequiresAuthentication
     public Result findTurn(@RequestParam("mouldDeviceId") Integer mouldDeviceId) {
         return mouldTurnServiceImpl.findTurn(mouldDeviceId);
     }
@@ -97,6 +105,7 @@ public class MouldDevicesController {
      * 查询所有未绑定库位的模具
      */
     @GetMapping(value = "/findUnBoundMould")
+    @RequiresAuthentication
     public Result findUnBoundMould() {
         return MouldDevicesServiceImpl.findUnBoundMould();
     }
@@ -108,6 +117,7 @@ public class MouldDevicesController {
      * @return result
      */
     @PostMapping(value = "/saveUseRecord")
+    @RequiresAuthentication
     //@RequiresPermissions("mouldStorageHouse:saveUseRecord")
     public Result saveUseRecord(@RequestBody MouldUseRecord mouldUseRecord) {
         return MouldDevicesServiceImpl.saveUseRecord(mouldUseRecord);
@@ -119,7 +129,7 @@ public class MouldDevicesController {
      * @return result
      */
     @GetMapping(value = "/findListUseRecord")
-//    @RequiresAuthentication
+    @RequiresAuthentication
     public Result findListUseRecord(@RequestParam(value = "mouldCode",required = false) String mouldCode,
                                     @RequestParam(value = "status",required = false) Integer status,
                                     @RequestParam(value = "pageNum",defaultValue = "1") Integer pageNum,
@@ -133,7 +143,7 @@ public class MouldDevicesController {
      * @return result
      */
     @GetMapping(value = "/findOneById")
-//    @RequiresAuthentication
+    @RequiresAuthentication
     public Result findOneById(@RequestParam("id") Integer id){
         return mouldTurnServiceImpl.findOneById(id);
     }
@@ -143,7 +153,7 @@ public class MouldDevicesController {
      * @param id
      */
     @GetMapping(value = "/mouldTurnPass")
-//    @RequiresAuthentication
+    @RequiresAuthentication
     public Result mouldTurnPass(@RequestParam("id") Integer id){
         return mouldTurnServiceImpl.mouldTurnPass(id);
     }

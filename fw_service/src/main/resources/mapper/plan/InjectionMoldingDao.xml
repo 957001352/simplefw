@@ -11,7 +11,7 @@
             <if test="productDevicesId != null">product_devices_id,</if>
             <if test="mouldId != null">mould_id,</if>
             <if test="startTime != null and startTime != ''">start_time,</if>
-            <if test="priority != null">priority, </if>
+            <if test="priority != null">priority,</if>
             <if test="productCode != null and productCode != ''">product_code,</if>
             <if test="material != null and material != ''">material,</if>
             <if test="productTime != null">product_time,</if>
@@ -34,7 +34,7 @@
             <if test="productDevicesId != null">#{productDevicesId},</if>
             <if test="mouldId != null">#{mouldId},</if>
             <if test="startTime != null and startTime != ''">#{startTime},</if>
-            <if test="priority != null">#{priority}, </if>
+            <if test="priority != null">#{priority},</if>
             <if test="productCode != null and productCode != ''">#{productCode},</if>
             <if test="material != null and material != ''">#{material},</if>
             <if test="productTime != null">#{productTime},</if>
@@ -60,7 +60,7 @@
             <if test="productCount != null and productCount != ''">product_count= #{productCount},</if>
             <if test="mouldId != null">mould_id= #{mouldId},</if>
             <if test="startTime != null and startTime != ''">start_time= #{startTime},</if>
-            <if test="priority != null">priority= #{priority}, </if>
+            <if test="priority != null">priority= #{priority},</if>
             <if test="productCode != null and productCode != ''">product_code= #{productCode},</if>
             <if test="material != null and material != ''">material= #{material},</if>
             <if test="productTime != null">product_time = #{productTime},</if>
@@ -72,7 +72,9 @@
 
             <if test="actualStart != null and actualStart != ''">actual_start = #{actualStart},</if>
             <if test="actualEnd != null and actualEnd != ''">actual_end = #{actualEnd},</if>
-            <if test="productDeviceCode != null and productDeviceCode != ''">product_device_code = #{productDeviceCode},</if>
+            <if test="productDeviceCode != null and productDeviceCode != ''">product_device_code =
+                #{productDeviceCode},
+            </if>
             <if test="createUser != null">create_user = #{createUser},</if>
             <if test="createTime != null and createTime != ''">create_time = #{createTime},</if>
         </trim>
@@ -95,7 +97,7 @@
     <update id="updateStatus" parameterType="com.fw.entity.plan.InjectionMolding">
         update fw_plan_injection_molding
         <trim prefix="SET" suffixOverrides=",">
-           <if test="status != null">status= #{status},</if>
+            <if test="status != null">status= #{status},</if>
             <if test="actualStart != null  and actualStart != ''">actual_start= #{actualStart},</if>
             <if test="actualEnd != null  and actualEnd != '' ">actual_end= #{actualEnd}</if>
         </trim>
@@ -109,11 +111,11 @@
 
     <select id="findList" resultType="com.fw.entity.plan.InjectionMolding">
         select p.*,l.code parts_code,l.name parts_name,l.unit,c.name customer_name,
-              (select sum(stop_time) from fw_plan_injection_stop_list where injection_id=p.id) stop_time,
-              date_add(start_time,INTERVAL product_time MINUTE) end_time
-          from   fw_plan_injection_molding p
-          left join fw_logistics_product l on p.product_id=l.id
-          left join fw_plan_customer c on p.customer_id=c.id
+        (select sum(stop_time) from fw_plan_injection_stop_list where injection_id=p.id) stop_time,
+        date_add(start_time,INTERVAL product_time MINUTE) end_time
+        from fw_plan_injection_molding p
+        left join fw_logistics_product l on p.product_id=l.id
+        left join fw_plan_customer c on p.customer_id=c.id
         where 1=1
         <if test="productDevicesId != null  and productDevicesId != ''">
             and p.product_devices_id like concat('%/', #{productDevicesId}, '%') ESCAPE '/'
@@ -181,18 +183,16 @@
         <result column="deliver_time" property="deliverTime" jdbcType="TIMESTAMP"/>
         <result column="note" property="note" jdbcType="VARCHAR"/>
         <result column="status" property="status" jdbcType="INTEGER"/>
-
         <result column="update_user" property="updateUser" jdbcType="INTEGER"/>
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
-
         <result column="actual_start" property="actualStart" jdbcType="TIMESTAMP"/>
         <result column="actual_end" property="actualEnd" jdbcType="TIMESTAMP"/>
         <result column="product_device_code" property="productDeviceCode" jdbcType="VARCHAR"/>
         <result column="create_user" property="createUser" jdbcType="INTEGER"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
-
         <result column="cavity" property="cavity" jdbcType="VARCHAR"/>
-        <association property="craftMode" column="product_id" select="com.fw.service.craft.dao.CraftModelDao.findByProductId"/>
+        <association property="craftMode" column="product_id"
+                     select="com.fw.service.craft.dao.CraftModelDao.findByProductId"/>
     </resultMap>
     <select id="findByDeviceId" resultMap="BaseResultMap">
         select fpim.*,fmd.cavity
@@ -237,19 +237,14 @@
        order by fpim.start_time desc limit 0,1
     </select>
     <select id="findMouldDevices" resultType="com.fw.entity.plan.InjectionMolding">
-          SELECT
-              t2.id AS mouldId,
-              t2.NAME AS mouldName,
-              t2.CODE AS mouldCode ,
-              t4.create_time,
-              t4.create_user
-          FROM
-              fw_plan_injection_molding t1
-              LEFT JOIN fw_mould_devices t2 ON t1.mould_id = t2.id
-              LEFT JOIN (SELECT  max(id) id,mould_devices_id  from  fw_mould_use_record mould_devices_id   GROUP BY mould_devices_id ) t3  on t3.mould_devices_id = t2.id
-              LEFT JOIN fw_mould_use_record t4 on t4.id = t3.id and t4.opreate = 0 and t4.task_status = 1
-          WHERE
-              t1.product_code = #{productCode}
+        select  m.id AS mouldId,
+            m.NAME AS mouldName,
+            m.CODE AS mouldCode ,
+            r.create_time,
+            r.create_user
+        from fw_mould_use_record r
+        left join fw_mould_devices m on r.mould_devices_id=m.id
+        where r.product_code = #{productCode} and r.opreate = 0 and r.status=1
     </select>
     <select id="findStartOneDay" resultType="com.fw.entity.plan.InjectionMolding">
         SELECT fpim.*,CASE
@@ -262,6 +257,19 @@
                     END AS checked
         FROM fw_plan_injection_molding fpim
         WHERE TIMESTAMPDIFF(MINUTE,NOW(),fpim.start_time) &lt;= 24*60 and fpim.status in (0);
+    </select>
+
+    <!--查询生产中的计划-->
+    <select id="findStartedPlan" resultType="com.fw.entity.plan.InjectionMolding">
+        select *
+        from fw_plan_injection_molding
+        where status = 1
+    </select>
+    <select id="findUnFinishByDeviceId" resultType="com.fw.entity.plan.InjectionMolding">
+        select fpim.*,(select sum(stop_time)*60 from fw_plan_injection_stop_list where injection_id=fpim.id) stop_time
+        from fw_plan_injection_molding fpim
+        where fpim.product_devices_id = #{deviceId} and fpim.status in (0,2)
+        order by fpim.start_time asc
     </select>
 </mapper>
 

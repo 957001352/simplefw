@@ -10,13 +10,14 @@
         <result column="create_user" property="createUser" jdbcType="INTEGER"/>
         <result column="qualified" property="qualified" jdbcType="INTEGER"/>
         <result column="unqualified" property="unqualified" jdbcType="INTEGER"/>
+        <result column="bank_status" property="bankStatus" jdbcType="INTEGER"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id,
         create_time,
-        plan_molding_id, create_user, qualified, unqualified
+        plan_molding_id, create_user, qualified, unqualified,bank_status
     </sql>
 
     <insert id="insert" parameterType="com.fw.entity.produce.ProduceMoldingRecord" useGeneratedKeys="true" keyProperty="id">
@@ -26,14 +27,19 @@
             <if test="createUser != null">create_user,</if>
             <if test="qualified != null">qualified,</if>
             <if test="unqualified != null">unqualified,</if>
+            <if test="bankStatus != null">bank_status,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="planMoldingId != null">#{planMoldingId},</if>
             <if test="createUser != null">#{createUser},</if>
             <if test="qualified != null">#{qualified},</if>
             <if test="unqualified != null">#{unqualified},</if>
+            <if test="bankStatus != null">#{bankStatus},</if>
         </trim>
     </insert>
+    <update id="updateBankStatus">
+        update fw_produce_molding_record set bank_status = #{bankStatus} where id in (${ids})
+    </update>
 
     <select id="findList" resultType="com.fw.entity.produce.ProduceMoldingRecord">
         SELECT
@@ -43,6 +49,7 @@
             t1.create_user,
             t1.qualified,
             t1.unqualified,
+            t1.bank_status,
             t2.product_code as of_no,
             t2.product_devices_id,
             t3.name as mould_name,

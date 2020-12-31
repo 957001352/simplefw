@@ -138,4 +138,16 @@ public interface InjectionMoldingDao {
      * @return
      */
     List<InjectionMolding> findStartOneDay();
+
+
+    /**
+     * 查询生产中的计划
+     * @return
+     */
+    List<InjectionMolding> findStartedPlan();
+
+    /**
+     * 查询设备待生产的所有的生产指令
+     */
+    List<InjectionMolding> findUnFinishByDeviceId(@Param("deviceId")Integer deviceId);
 }

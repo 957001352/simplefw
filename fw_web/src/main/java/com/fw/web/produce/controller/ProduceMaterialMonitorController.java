@@ -24,7 +24,7 @@ public class ProduceMaterialMonitorController {
     @Autowired
     private ProduceMaterialMonitorService produceMaterialMonitorService;
 
-    @ApiOperation(value = "获取列表 timeType：0入库日期 1领料日期")
+    @ApiOperation(value = "外购原材料监控查询：获取列表 timeType：0入库日期 1领料日期")
     @GetMapping("/findList")
     public Result findList(@RequestParam(value = "productCode",required = false) String productCode,
                            @RequestParam(value = "productName",required = false) String productName,
@@ -35,5 +35,16 @@ public class ProduceMaterialMonitorController {
                            @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize
     ){
         return  produceMaterialMonitorService.findList(productCode,productName,startTime,stopTime,timeType,pageNum,pageSize);
+    }
+
+    @ApiOperation(value = "车间使用物料查询")
+    @GetMapping("/findPlantUseMaterialList")
+    public Result findPlantUseMaterialList(
+            @RequestParam(value = "productCode",required = false) String productCode,
+            @RequestParam(value = "startTime",required = false) String startTime,
+            @RequestParam(value = "stopTime",required = false) String stopTime,
+            @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
+            @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize){
+        return  produceMaterialMonitorService.findPlantUseMaterialList(productCode,startTime,stopTime,pageNum,pageSize);
     }
 }

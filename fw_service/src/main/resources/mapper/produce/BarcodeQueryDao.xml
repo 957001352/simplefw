@@ -7,7 +7,7 @@
                    d.cavity,c.name customer,i.deliver_time deliverTime,ifnull(i.actual_start,i.start_time) startTime,q.param_value tmCycleTime,
                    date_add(i.actual_start,INTERVAL i.product_time MINUTE) endTime,i.plan_count planCount,b.qualified,
                    b.unqualified,m.beat planBeat,k.code carkCode,d.life_time lifeTime,d.init_count useCount,m.photo,r.id monitorId,
-                   i.product_devices_id productDevicesId,i.create_user createUser,i.actual_start createTime,r.status,i.product_id productId,
+                   i.product_devices_id productDevicesId,i.create_user createUser,i.create_time createTime,r.status,i.product_id productId,
                    concat(round(b.qualified/i.plan_count*100),'%') proPercent,concat(round((b.qualified-b.unqualified)/b.qualified*100),'%') passPercent,
                    concat(round(d.init_count/d.life_time*100),'%') mouldPercent,concat(round(m.beat/q.param_value*100),'%') beatPercent
              from fw_plan_injection_molding i
@@ -79,16 +79,16 @@
     </select>
 
     <select id="findFeedingDetailList" resultType="com.fw.entity.produce.ProduceFeedingDetail">
-        SELECT t1.id,  t1.storage_count, t3.code,t3.name, t3.unit
+        SELECT t1.id,  t1.storage_count, t3.code,t3.name, t3.unit,t4.create_user,t4.create_time
           FROM fw_produce_feeding_detail t1
           LEFT JOIN fw_logistics_storage_detail t2 ON t2.id = t1.storage_detail_id
           LEFT JOIN fw_logistics_product t3 ON t3.id = t2.product_id
 		  LEFT JOIN fw_produce_feeding t4 ON t4.id=t1.feeding_id
          WHERE t4.product_order=#{productOrder}
-         ORDER BY t1.id
+         ORDER BY t4.create_user
     </select>
     <select id="findMoldingMonitorList" resultType="com.fw.entity.produce.ProduceMoldingMonitor">
-        select m.*,i.plan_count, b.qualified,b.unqualified
+        select m.*,i.plan_count, b.qualified,b.unqualified,i.create_user,DATE_FORMAT(i.create_time,'%Y-%m-%d %H:%i:%s') create_time
           from fw_produce_molding_monitor m
           left join fw_plan_injection_molding i on i.id=m.plan_molding_id
           left join (select plan_molding_id,sum(qualified) qualified,sum(unqualified)unqualified

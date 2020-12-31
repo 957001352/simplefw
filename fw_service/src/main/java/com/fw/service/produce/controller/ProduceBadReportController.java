@@ -3,6 +3,7 @@ package com.fw.service.produce.controller;
 import com.fw.domain.Result;
 import com.fw.entity.produce.ProduceBadReport;
 import com.fw.service.produce.service.ProduceBadReportService;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +26,7 @@ public class ProduceBadReportController {
      * @return
      */
     @PostMapping("/save")
+    @RequiresAuthentication
     public Result save(@RequestBody ProduceBadReport produceBadReport) {
         return produceBadReportService.save(produceBadReport);
     }
@@ -36,6 +38,7 @@ public class ProduceBadReportController {
      * @return result
      */
     @GetMapping(value = "/delete")
+    @RequiresAuthentication
     public Result delete(@RequestParam(value = "ids") String ids) {
         return produceBadReportService.delete(ids);
     }
@@ -49,6 +52,7 @@ public class ProduceBadReportController {
      * @return
      */
     @GetMapping(value = "/findList")
+    @RequiresAuthentication
     public Result findList(@RequestParam(value = "id", required = false) Integer moldingId,
                            @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
                            @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize) {

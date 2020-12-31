@@ -69,4 +69,6 @@ public interface MouldRepairDao {
                               @Param("nowTime")String nowTime);
 
     String findCode(@Param(value = "code") String code);
+
+    int updateMouldCavity(@Param("mouldId") String mouldId,@Param("cavity") Integer cavity);
 }

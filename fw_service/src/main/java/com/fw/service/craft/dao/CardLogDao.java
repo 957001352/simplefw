@@ -47,4 +47,10 @@ public interface CardLogDao {
      * @return
      */
     CardLog findById(Integer id);
+
+    /**
+     * 查询该工艺卡最新的一次记录
+     * @return
+     */
+    CardLog findIngByParamsId(@Param("paramsId") Integer paramsId,@Param("updateType") Integer updateType);
 }

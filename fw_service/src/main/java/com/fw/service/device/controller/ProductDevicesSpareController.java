@@ -3,6 +3,8 @@ package com.fw.service.device.controller;
 import com.fw.domain.Result;
 import com.fw.entity.device.ProductDevicesSpare;
 import com.fw.service.device.service.ProductDevicesSpareService;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +27,7 @@ public class ProductDevicesSpareController {
      * @return
      */
     @PostMapping(value = "/save")
+    @RequiresPermissions("productDevicesSpare:save")
     public Result save(@RequestBody ProductDevicesSpare productDevicesSpare) {
         return productDevicesSpareService.save(productDevicesSpare);
     }
@@ -36,6 +39,7 @@ public class ProductDevicesSpareController {
      * @return
      */
     @GetMapping("/getProductDevicesSpare")
+    @RequiresAuthentication
     public Result getProductDevicesSpare(@RequestParam(value = "id") Integer id) {
         return productDevicesSpareService.getProductDevicesSpare(id);
     }
@@ -47,6 +51,7 @@ public class ProductDevicesSpareController {
      * @return
      */
     @GetMapping(value = "/delete")
+    @RequiresPermissions("productDevicesSpare:delete")
     public Result delete(@RequestParam(value = "ids") String ids) {
         return productDevicesSpareService.delete(ids);
     }
@@ -59,6 +64,7 @@ public class ProductDevicesSpareController {
      * @return
      */
     @GetMapping("/findList")
+    @RequiresAuthentication
     public Result FindList(
             @RequestParam(value = "code", required = false) String code,
             @RequestParam(value = "name", required = false) String name,

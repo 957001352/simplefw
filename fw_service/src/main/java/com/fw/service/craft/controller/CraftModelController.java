@@ -4,6 +4,8 @@ import com.fw.domain.Result;
 import com.fw.entity.craft.CraftModel;
 import com.fw.entity.device.DevicesRepair;
 import com.fw.service.craft.service.CraftModelService;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,18 +23,21 @@ public class CraftModelController {
     private CraftModelService craftModelService;
 
     @PostMapping(value = "/save")
+    @RequiresPermissions(value = "craftModel:save")
     public Result save(@RequestBody CraftModel craftModel) {
         return craftModelService.save(craftModel);
     }
 
 
     @GetMapping(value = "/delete")
+    @RequiresPermissions(value = "craftModel:delete")
     public Result delete(@RequestParam("ids") String ids) {
         return craftModelService.delete(ids);
     }
 
 
     @GetMapping(value = "/findList")
+    @RequiresAuthentication
     public Result findList(
             @RequestParam(value = "productCode", required = false) String productCode,
             @RequestParam(value = "productName", required = false) String productName,
@@ -43,6 +48,7 @@ public class CraftModelController {
     }
 
     @GetMapping(value = "/findByProductCode")
+    @RequiresAuthentication
     public Result findByProductCode(@RequestParam(value = "productCode", required = false) String productCode) {
         return craftModelService.findByProductCode(productCode);
     }

@@ -5,6 +5,7 @@ import com.fw.entity.produce.ProduceDuty;
 import com.fw.service.produce.service.BarcodeQueryService;
 import com.fw.service.produce.service.ProduceDutyService;
 import org.apache.ibatis.annotations.Param;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 /**
@@ -24,6 +25,7 @@ public class BarcodeQueryController {
      * @return
      */
     @GetMapping(value = "/findProductProcessList")
+    @RequiresAuthentication
     public Result findProductProcessList(){
         return barcodeQueryService.findProductProcessList();
     }
@@ -35,6 +37,7 @@ public class BarcodeQueryController {
      * @return
      */
     @GetMapping(value = "/findMoldingInjectionList")
+    @RequiresAuthentication
     public Result findMoldingInjectionList(@RequestParam(value = "productOrder", required = false) String productOrder,
                                            @RequestParam(value = "partsCode", required = false) String partsCode,
                                            @RequestParam(value = "partsName", required = false) String partsName,
@@ -49,6 +52,7 @@ public class BarcodeQueryController {
      * @return
      */
     @GetMapping(value = "/findNowProductOrder")
+    @RequiresAuthentication
     public Result findNowProductOrder(@RequestParam(value = "productDevicesId") Integer productDevicesId){
         return barcodeQueryService.findNowProductOrder(productDevicesId);
     }
@@ -60,6 +64,7 @@ public class BarcodeQueryController {
      * @return
      */
     @GetMapping(value = "/findProductStatusList")
+    @RequiresAuthentication
     public Result  findProductStatusList(@RequestParam(value = "productDevicesCode") String productDevicesCode){
         return barcodeQueryService.findProductStatusList(productDevicesCode);
     }
@@ -70,6 +75,7 @@ public class BarcodeQueryController {
      * @return
      */
     @GetMapping(value = "/findBadProductList")
+    @RequiresAuthentication
     public Result findBadProductList(@RequestParam(value = "planMoldingId") Integer planMoldingId){
         return barcodeQueryService.findBadProductList(planMoldingId);
     }
@@ -80,6 +86,7 @@ public class BarcodeQueryController {
      * @return
      */
     @GetMapping(value = "/findFeedingDetailList")
+    @RequiresAuthentication
     public Result findFeedingDetailList(@RequestParam(value = "productOrder") String productOrder){
         return barcodeQueryService.findFeedingDetailList(productOrder);
     }
@@ -90,6 +97,7 @@ public class BarcodeQueryController {
      * @return
      */
     @GetMapping(value = "/findMoldingMonitorList")
+    @RequiresAuthentication
     public Result findMoldingMonitorList(@RequestParam(value = "planMoldingId", required = false) Integer planMoldingId,
                                          @RequestParam(value = "productOrder", required = false) String productOrder,
                                          @RequestParam(value = "status", required = false) String status) {
@@ -103,6 +111,7 @@ public class BarcodeQueryController {
      * @return
      */
     @GetMapping(value = "/findReworkInjectionList")
+    @RequiresAuthentication
     public Result findReworkInjectionList(@RequestParam(value = "productOrder", required = false) String productOrder,
                                           @RequestParam(value = "partsCode", required = false) String partsCode,
                                           @RequestParam(value = "partsName", required = false) String partsName,
@@ -115,6 +124,7 @@ public class BarcodeQueryController {
      *  根据设备code查询设备在线状态
      */
     @GetMapping(value = "/findDevicesStateByCode")
+    @RequiresAuthentication
     public Result findDevicesStateByCode(@RequestParam(value = "devicesCode") String devicesCode) {
         return barcodeQueryService.findDevicesStateByCode(devicesCode);
     }

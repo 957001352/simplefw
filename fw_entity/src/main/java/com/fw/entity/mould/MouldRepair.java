@@ -33,6 +33,9 @@ public class MouldRepair implements Serializable {
     @ApiModelProperty(value = "模具ID")
     private String mouldId;
 
+    @ApiModelProperty(value = "模具编码")
+    private String mouldCode;
+
     @ApiModelProperty(value = "模具名称")
     private String mouldName;
 

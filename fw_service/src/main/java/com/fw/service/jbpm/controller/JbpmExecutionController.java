@@ -32,7 +32,7 @@ public class JbpmExecutionController {
      * @return
      */
     @PostMapping(value = "/startExecution")
-    //@RequiresPermissions("jbpmExecution:startExecution")
+    @RequiresPermissions("jbpmExecution:startExecution")
     public Result startExecution(@RequestBody JbpmExecution jbpmExecution) {
         Integer flag=jbpmUtil.startExecution(jbpmExecution.getId(),jbpmExecution.getDataId(),jbpmExecution.getCreateUser(),jbpmExecution.getFormCode());
         return flag > 0 ? ResultUtils.success() : ResultUtils.failure();
@@ -44,7 +44,7 @@ public class JbpmExecutionController {
      * @return
      */
     @PostMapping(value = "/doTask")
-    //@RequiresPermissions("jbpmExecution:doTask")
+    @RequiresPermissions("jbpmExecution:doTask")
     public Result doTask(@RequestBody JbpmExecution jbpmExecution) {
         return jbpmExecutionService.doTask(jbpmExecution);
     }

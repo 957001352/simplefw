@@ -2,10 +2,7 @@ package com.fw.service.logistics.service.impl;
 
 import com.fw.domain.Result;
 import com.fw.entity.e2c.User;
-import com.fw.entity.logistics.LogisticsDownHouse;
-import com.fw.entity.logistics.LogisticsDownHouseDetail;
-import com.fw.entity.logistics.LogisticsUpHouse;
-import com.fw.entity.logistics.LogisticsUpHouseDetail;
+import com.fw.entity.logistics.*;
 import com.fw.enums.ResultEnum;
 import com.fw.service.logistics.dao.*;
 import com.fw.service.logistics.service.LogisticsUpHouseService;
@@ -21,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -91,13 +89,42 @@ public class LogisticsUpHouseServiceImpl implements LogisticsUpHouseService {
         flag = logisticsUpHouseDao.insert(logisticsUpHouse);
         if (flag > 0) {
             List<LogisticsUpHouseDetail> logisticsUpHouseDetails = logisticsUpHouse.getLogisticsUpHouseDetails();
+            List<LogisticsStorageDetail> insertStorageDetails = new ArrayList<>();
+            List<LogisticsUpHouseDetail> updateStorageDetails = new ArrayList<>();
             if (!CollectionUtils.isEmpty(logisticsUpHouseDetails)) {
                 logisticsUpHouseDetails.forEach(item -> {
                     item.setUpHouseId(logisticsUpHouse.getId());
                     item.setStorageLocationId(logisticsUpHouse.getStorageLocationId());
+                    //查询库中待上架物料数量
+                    LogisticsStorageDetail entity= logisticsStorageDetailDao.selectById(item.getStorageDetailId());
+                    //如果待上架物料数小于库中物料数，说明上架拆包了，则新插入一条库存明细
+                    if(item.getStorageCount()<entity.getStorageCount()){
+                        //更新存储中待上架物料数量，并保持库位为暂存区
+                        int storageCount=entity.getStorageCount();
+                        entity.setStorageCount(item.getStorageCount());
+                        entity.setStorageId(item.getStorageLocationId());
+                        item.setStorageCount(storageCount-item.getStorageCount());
+                        item.setStorageLocationId(0);
+                        insertStorageDetails.add(entity);
+                    }else{
+                        updateStorageDetails.add(item);
+                    }
                 });
-                flag = logisticsUpHouseDetailDao.batchInsert(logisticsUpHouseDetails);
+                //插入拆包上架物料
+                if (!CollectionUtils.isEmpty(insertStorageDetails)) {
+                    logisticsStorageDetailDao.inStorage(insertStorageDetails);
+                    insertStorageDetails.forEach(item -> {
+                        LogisticsUpHouseDetail detail=new LogisticsUpHouseDetail();
+                        detail.setStorageCount(item.getStorageCount());
+                        detail.setStorageLocationId(item.getStorageId());
+                        detail.setStorageDetailId(item.getId());
+                        detail.setBatch(item.getProviderBatch());
+                        detail.setUpHouseId(logisticsUpHouse.getId());
+                        updateStorageDetails.add(detail);
+                    });
+                }
                 logisticsStorageDetailDao.updateUpLocation(logisticsUpHouseDetails);
+                flag = logisticsUpHouseDetailDao.batchInsert(updateStorageDetails);
             }
         }
         return flag > 0 ? ResultUtils.success() : ResultUtils.failure();

@@ -93,4 +93,11 @@ public class LogisticsOutHouseDetail {
     @ApiModelProperty(value = "物料代码",hidden = true)
     private String productCode;
 
+    /**
+     *发货id
+     *
+     */
+    @ApiModelProperty(value = "发货id",hidden = true)
+    private Integer pickingOrderId;
+
 }

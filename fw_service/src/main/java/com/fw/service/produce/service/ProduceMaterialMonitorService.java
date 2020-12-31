@@ -10,4 +10,6 @@ public interface ProduceMaterialMonitorService {
                     String startTime,
                     String stopTime,
                     Integer timeType,Integer pageNum, Integer pageSize);
+
+    Result findPlantUseMaterialList(String productCode,String startTime, String stopTime, Integer pageNum, Integer pageSize);
 }
